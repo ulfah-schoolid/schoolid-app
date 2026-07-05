@@ -669,6 +669,28 @@
     transition: border-color 0.2s;
   }
   .form-textarea:focus { border-color: var(--green); }
+
+  /* ===== MODUL & ASESMEN (Guru/Kepala Sekolah) ===== */
+  .status-badge { display:inline-block; font-size:10.5px; font-weight:800; padding:4px 9px; border-radius:10px; }
+  .status-draft { background:#F5F5F5; color:var(--gray-500); }
+  .status-dikirim { background:#FFF3E0; color:#F57F17; }
+  .status-disetujui { background:#E8F5E9; color:var(--green-dark); }
+  .ma-card { background:white; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .ma-card-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .ma-fab { position:absolute; right:16px; bottom:20px; width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg,var(--green),var(--green-light)); color:white; border:none; font-size:26px; box-shadow:0 6px 16px rgba(0,0,0,0.25); cursor:pointer; z-index:5; }
+  .dpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .dpl-item { display:flex; align-items:flex-start; gap:8px; background:var(--gray-50,#FAFAFA); border:1.5px solid var(--gray-200); border-radius:10px; padding:8px 10px; font-size:12px; font-weight:600; color:var(--gray-700); }
+  .dpl-item input { margin-top:2px; width:16px; height:16px; accent-color:var(--green); flex-shrink:0; }
+  .jenis-tab-row { display:flex; gap:6px; overflow-x:auto; padding:2px 0 4px; }
+  .jenis-tab { flex-shrink:0; padding:7px 13px; border-radius:20px; border:1.5px solid var(--gray-200); background:white; font-size:11.5px; font-weight:700; color:var(--gray-600); cursor:pointer; }
+  .jenis-tab.active { background:var(--green); border-color:var(--green); color:white; }
+  .asesmen-table { width:100%; border-collapse:collapse; background:white; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+  .asesmen-table th { background:#1B5E20; color:white; font-size:10.5px; font-weight:700; padding:8px 6px; text-align:left; }
+  .asesmen-table td { padding:6px; border-bottom:1px solid var(--gray-100); vertical-align:top; }
+  .asesmen-table input, .asesmen-table textarea { width:100%; border:1px solid var(--gray-200); border-radius:6px; padding:6px 7px; font-size:11.5px; font-family:var(--font); resize:vertical; }
+  .asesmen-row-del { background:#FFEBEE; color:#F44336; border:none; border-radius:6px; width:26px; height:26px; font-weight:800; cursor:pointer; }
+  .ttd-box { border:2px dashed var(--gray-300); border-radius:var(--radius); padding:16px; text-align:center; }
+  .ttd-signed { border:2px solid var(--green); background:#F1F8E9; border-radius:var(--radius); padding:14px; }
   .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
     padding: 6px 14px;
@@ -2157,6 +2179,14 @@
             <div class="quick-btn-icon" style="background:#42A5F5;color:white;">📋</div>
             <span>Laporan Harian</span>
           </button>
+          <button class="quick-btn" onclick="goToFromDashboard('guru-modul-list','dashboard-guru');renderGuruModulList()">
+            <div class="quick-btn-icon" style="background:#5E35B1;color:white;">📘</div>
+            <span>Modul Pembelajaran</span>
+          </button>
+          <button class="quick-btn" onclick="goToFromDashboard('guru-asesmen-list','dashboard-guru');renderGuruAsesmenList()">
+            <div class="quick-btn-icon" style="background:#00897B;color:white;">🗒️</div>
+            <span>Lembar Asesmen</span>
+          </button>
         </div>
       </div>
       <div class="section" style="padding-top:0;">
@@ -2256,8 +2286,159 @@
       <button class="nav-item active" onclick="switchTab('daftar-murid-guru', this, 'guru');renderDaftarMuridGuru()"><span class="nav-icon">👦</span><span class="nav-label">Murid</span></button>
       <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
       <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
-    </nav>
+  <!-- ===== DAFTAR MODUL PEMBELAJARAN (GURU) ===== -->
+  <div id="guru-modul-list" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="switchTab('dashboard-guru', document.querySelector('#bottomNav-guru .nav-item'), 'guru')">‹</button>
+      <h2>Modul Pembelajaran</h2>
+    </div>
+    <div class="scroll-content" style="padding:14px 16px;position:relative;min-height:100%;">
+      <div id="gm-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="gm-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--gray-400);">
+        <div style="font-size:44px;margin-bottom:10px;">📘</div>
+        <div style="font-weight:700;">Belum ada modul pembelajaran</div>
+        <div style="font-size:12px;margin-top:4px;">Tekan tombol + untuk membuat modul baru</div>
+      </div>
+      <div style="height:70px;"></div>
+    </div>
+    <button class="ma-fab" onclick="bukaModulBaru()">+</button>
   </div>
+
+  <!-- ===== FORM MODUL PEMBELAJARAN (GURU) ===== -->
+  <div id="guru-modul-form" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="switchTab('guru-modul-list', document.querySelector('#bottomNav-guru .nav-item'), 'guru');renderGuruModulList()">‹</button>
+      <h2 id="gm-form-title">Modul Pembelajaran</h2>
+    </div>
+    <div class="scroll-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:14px;">
+      <div id="gm-status-wrap"></div>
+
+      <div class="section-title" style="padding:0;">Identitas Modul</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group"><label class="form-label">Guru</label><input type="text" class="form-input" id="md-guru" placeholder="Nama guru"></div>
+        <div class="form-group"><label class="form-label">Semester</label><input type="text" class="form-input" id="md-semester" placeholder="cth: 1 (Gasal)"></div>
+        <div class="form-group"><label class="form-label">Asal Sekolah</label><input type="text" class="form-input" id="md-asal_sekolah" placeholder="KB-TKIT Istiqomah Penumping"></div>
+        <div class="form-group"><label class="form-label">Minggu Ke-</label><input type="text" class="form-input" id="md-minggu_ke" placeholder="cth: 1"></div>
+        <div class="form-group"><label class="form-label">Fase</label><input type="text" class="form-input" id="md-fase" placeholder="cth: Fondasi"></div>
+        <div class="form-group"><label class="form-label">Bulan</label><input type="text" class="form-input" id="md-bulan" placeholder="cth: Juli 2026"></div>
+        <div class="form-group"><label class="form-label">Jenjang/Kelas</label><input type="text" class="form-input" id="md-jenjang_kelas" placeholder="cth: A (4-5 Tahun)"></div>
+        <div class="form-group"><label class="form-label">Alokasi Waktu</label><input type="text" class="form-input" id="md-alokasi_waktu" placeholder="cth: 5 x 3 JP"></div>
+        <div class="form-group"><label class="form-label">Model Pembelajaran</label><input type="text" class="form-input" id="md-model_pembelajaran" placeholder="cth: Inkuiri"></div>
+        <div class="form-group"><label class="form-label">Jumlah Anak</label><input type="text" class="form-input" id="md-jumlah_anak" placeholder="cth: 20"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Topik / Sub Topik</label><textarea class="form-textarea" id="md-topik_subtopik" placeholder="cth: Identitas / Diriku (Aku Istimewa: Ayo Kita Berkenalan)"></textarea></div>
+
+      <div class="section-title" style="padding:0;">Identifikasi</div>
+      <div class="form-group"><label class="form-label">Peserta Didik</label><textarea class="form-textarea" id="md-peserta_didik" placeholder="Karakteristik, pengetahuan awal, minat, dan kebutuhan peserta didik"></textarea></div>
+      <div class="form-group"><label class="form-label">Materi Pelajaran</label><textarea class="form-textarea" id="md-materi_pelajaran" placeholder="Uraian materi ajar yang relevan dengan topik"></textarea></div>
+      <div class="form-group">
+        <label class="form-label">Dimensi Profil Lulusan</label>
+        <div class="dpl-grid">
+          <label class="dpl-item"><input type="checkbox" id="md-dpl1"> Keimanan &amp; Ketakwaan thd Tuhan YME</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl2"> Kewargaan</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl3"> Penalaran Kritis</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl4"> Kreativitas</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl5"> Kolaborasi</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl6"> Kemandirian</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl7"> Kesehatan</label>
+          <label class="dpl-item"><input type="checkbox" id="md-dpl8"> Komunikasi</label>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">7 Kebiasaan Anak Indonesia Hebat</label><textarea class="form-textarea" id="md-kebiasaan_hebat" placeholder="Diisi jika relevan"></textarea></div>
+
+      <div class="section-title" style="padding:0;">Desain Pembelajaran</div>
+      <div class="form-group"><label class="form-label">Capaian Pembelajaran</label><textarea class="form-textarea" id="md-capaian_pembelajaran" placeholder="CP yang menjadi acuan topik ini"></textarea></div>
+      <div class="form-group"><label class="form-label">Tujuan Pembelajaran</label><textarea class="form-textarea" id="md-tujuan_pembelajaran" placeholder="Tujuan pembelajaran yang ingin dicapai"></textarea></div>
+      <div class="form-group"><label class="form-label">Topik Pembelajaran</label><input type="text" class="form-input" id="md-topik_pembelajaran" placeholder="Topik pembelajaran"></div>
+      <div class="form-group"><label class="form-label">Praktik Pedagogis</label><textarea class="form-textarea" id="md-praktik_pedagogis" placeholder="Pendekatan/model pembelajaran yang digunakan"></textarea></div>
+      <div class="form-group"><label class="form-label">Kemitraan Pembelajaran</label><textarea class="form-textarea" id="md-kemitraan_pembelajaran" placeholder="Pihak yang dilibatkan: sekolah, orang tua, masyarakat"></textarea></div>
+      <div class="form-group"><label class="form-label">Lingkungan Pembelajaran</label><textarea class="form-textarea" id="md-lingkungan_pembelajaran" placeholder="Ruang fisik, ruang virtual, budaya belajar"></textarea></div>
+      <div class="form-group"><label class="form-label">Pemanfaatan Digital</label><textarea class="form-textarea" id="md-pemanfaatan_digital" placeholder="Perencanaan, pelaksanaan, dan asesmen digital"></textarea></div>
+
+      <div class="section-title" style="padding:0;">Pengalaman Belajar</div>
+      <div class="form-group"><label class="form-label">Awal (Berkesadaran, Bermakna, Menggembirakan)</label><textarea class="form-textarea" id="md-kegiatan_awal" placeholder="Langkah pembuka: salam & doa, pemusatan konsentrasi, apersepsi, motivasi..." style="min-height:90px;"></textarea></div>
+
+      <label class="form-label">Inti — Uraian Kegiatan per Hari</label>
+      <div class="form-group"><label class="form-label" style="font-weight:700;">Hari 1</label><textarea class="form-textarea" id="md-hari1" placeholder="Nama kegiatan, dimensi profil lulusan, alat & bahan, cara/langkah kegiatan"></textarea></div>
+      <div class="form-group"><label class="form-label" style="font-weight:700;">Hari 2</label><textarea class="form-textarea" id="md-hari2" placeholder="Nama kegiatan, dimensi profil lulusan, alat & bahan, cara/langkah kegiatan"></textarea></div>
+      <div class="form-group"><label class="form-label" style="font-weight:700;">Hari 3</label><textarea class="form-textarea" id="md-hari3" placeholder="Nama kegiatan, dimensi profil lulusan, alat & bahan, cara/langkah kegiatan"></textarea></div>
+      <div class="form-group"><label class="form-label" style="font-weight:700;">Hari 4</label><textarea class="form-textarea" id="md-hari4" placeholder="Nama kegiatan, dimensi profil lulusan, alat & bahan, cara/langkah kegiatan"></textarea></div>
+      <div class="form-group"><label class="form-label" style="font-weight:700;">Hari 5</label><textarea class="form-textarea" id="md-hari5" placeholder="Nama kegiatan, dimensi profil lulusan, alat & bahan, cara/langkah kegiatan"></textarea></div>
+
+      <div class="form-group"><label class="form-label">Penutup (Berkesadaran, Menggembirakan)</label><textarea class="form-textarea" id="md-kegiatan_penutup" placeholder="Lingkaran refleksi, penyimpulan bersama, pratinjau berikutnya, doa penutup..." style="min-height:90px;"></textarea></div>
+
+      <div class="section-title" style="padding:0;">Asesmen Pembelajaran</div>
+      <div class="form-group"><label class="form-label">Asesmen pada Awal Pembelajaran</label><textarea class="form-textarea" id="md-asesmen_awal" placeholder="Cara mengetahui kesiapan dan pengetahuan awal anak"></textarea></div>
+      <div class="form-group"><label class="form-label">Asesmen pada Proses Pembelajaran</label><textarea class="form-textarea" id="md-asesmen_proses" placeholder="Cara mendokumentasikan proses belajar anak"></textarea></div>
+      <div class="form-group"><label class="form-label">Asesmen pada Akhir Pembelajaran</label><textarea class="form-textarea" id="md-asesmen_akhir" placeholder="Cara menilai hasil belajar anak di akhir topik"></textarea></div>
+
+      <div id="gm-ttd-wrap"></div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+        <button onclick="simpanModul('draft')" style="width:100%;padding:14px;background:white;border:2px solid var(--green);color:var(--green-dark);border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;">💾 Simpan sebagai Draft</button>
+        <button onclick="simpanModul('dikirim')" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;">📤 Kirim ke Kepala Sekolah</button>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== DAFTAR LEMBAR ASESMEN (GURU) ===== -->
+  <div id="guru-asesmen-list" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="switchTab('dashboard-guru', document.querySelector('#bottomNav-guru .nav-item'), 'guru')">‹</button>
+      <h2>Lembar Asesmen</h2>
+    </div>
+    <div class="scroll-content" style="padding:14px 16px;position:relative;min-height:100%;">
+      <div id="ga-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="ga-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--gray-400);">
+        <div style="font-size:44px;margin-bottom:10px;">🗒️</div>
+        <div style="font-weight:700;">Belum ada lembar asesmen</div>
+        <div style="font-size:12px;margin-top:4px;">Tekan tombol + untuk membuat lembar baru</div>
+      </div>
+      <div style="height:70px;"></div>
+    </div>
+    <button class="ma-fab" onclick="bukaAsesmenBaru()">+</button>
+  </div>
+
+  <!-- ===== FORM LEMBAR ASESMEN (GURU) ===== -->
+  <div id="guru-asesmen-form" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="switchTab('guru-asesmen-list', document.querySelector('#bottomNav-guru .nav-item'), 'guru');renderGuruAsesmenList()">‹</button>
+      <h2>Lembar Asesmen</h2>
+    </div>
+    <div class="scroll-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
+      <div id="ga-status-wrap"></div>
+      <div class="jenis-tab-row">
+        <button class="jenis-tab" id="jt-anekdot" onclick="pilihJenisAsesmen('anekdot')">Catatan Anekdot</button>
+        <button class="jenis-tab" id="jt-iktp" onclick="pilihJenisAsesmen('iktp')">Ceklis IKTP</button>
+        <button class="jenis-tab" id="jt-karya" onclick="pilihJenisAsesmen('karya')">Dokumentasi Karya</button>
+        <button class="jenis-tab" id="jt-foto" onclick="pilihJenisAsesmen('foto')">Foto Berseri</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group"><label class="form-label">Jenjang / Kelas</label><input type="text" class="form-input" id="as-jenjang_kelas" placeholder="cth: TK / A"></div>
+        <div class="form-group"><label class="form-label">Semester / Minggu</label><input type="text" class="form-input" id="as-semester_minggu" placeholder="cth: 1/1"></div>
+        <div class="form-group"><label class="form-label">Guru Kelas</label><input type="text" class="form-input" id="as-guru_kelas" placeholder="Nama guru"></div>
+        <div class="form-group"><label class="form-label">Tahun Ajaran</label><input type="text" class="form-input" id="as-tahun_ajaran" placeholder="cth: 2026/2027"></div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="asesmen-table" id="as-table"></table>
+      </div>
+      <button onclick="tambahBarisAsesmen()" style="width:100%;padding:10px;background:#F1F8E9;border:1.5px dashed var(--green);color:var(--green-dark);border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;">+ Tambah Baris</button>
+
+      <div id="ga-ttd-wrap"></div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+        <button onclick="simpanAsesmen('draft')" style="width:100%;padding:14px;background:white;border:2px solid var(--green);color:var(--green-dark);border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;">💾 Simpan sebagai Draft</button>
+        <button onclick="simpanAsesmen('dikirim')" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;">📤 Kirim ke Kepala Sekolah</button>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
 
   <!-- ===== PROFIL DETAIL MURID (GURU) ===== -->
   <div id="profil-detail-murid" class="screen">
@@ -4119,6 +4300,7 @@
         <div class="ks-sidebar-logo">🏫</div>
         <button class="ks-side-item active" onclick="switchSidebarKepala(this,'dashboard-kepala')">🏠</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'laporan-bulanan')">📊</button>
+        <button class="ks-side-item" onclick="switchSidebarKepala(this,'kepala-arsip')">📘</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'notifikasi')">🔔</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'pengaturan')">⚙️</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'profil-user')">👤</button>
@@ -4150,6 +4332,17 @@
                 <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Review & verifikasi calon peserta didik</div>
               </div>
               <div id="badge-pendaftaran" style="background:#F44336;color:white;font-size:11px;font-weight:800;padding:4px 8px;border-radius:10px;flex-shrink:0;">0</div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title">Arsip Modul &amp; Asesmen Guru</div>
+            <div onclick="goToFromDashboard('kepala-arsip','dashboard-kepala');renderArsipKepala()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#5E35B1,#7E57C2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📘</div>
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;">Modul Pembelajaran &amp; Lembar Asesmen</div>
+                <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Cek dan tanda tangani berkas dari guru</div>
+              </div>
+              <div id="badge-arsip" style="background:#F44336;color:white;font-size:11px;font-weight:800;padding:4px 8px;border-radius:10px;flex-shrink:0;">0</div>
             </div>
           </div>
           <div class="section">
@@ -4222,6 +4415,45 @@
     </div>
     <div class="scroll-content">
       <div id="detail-pendaftaran-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== ARSIP MODUL & ASESMEN (KEPALA SEKOLAH) ===== -->
+  <div id="kepala-arsip" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <h2>Arsip Modul &amp; Asesmen</h2>
+    </div>
+    <div class="scroll-content">
+      <div class="jenis-tab-row" style="padding:10px 16px 4px;">
+        <button class="jenis-tab active" id="ak-tab-modul" onclick="pilihTabArsip('modul')">📘 Modul Pembelajaran</button>
+        <button class="jenis-tab" id="ak-tab-asesmen" onclick="pilihTabArsip('asesmen')">🗒️ Lembar Asesmen</button>
+      </div>
+      <div style="padding:0 16px 10px;display:flex;gap:8px;">
+        <button onclick="filterArsip('semua',this)" class="filter-ak" style="padding:5px 14px;border-radius:20px;border:none;background:var(--green);color:white;font-size:12px;font-weight:700;cursor:pointer;">Semua</button>
+        <button onclick="filterArsip('dikirim',this)" class="filter-ak" style="padding:5px 14px;border-radius:20px;border:1.5px solid #FF9800;color:#FF9800;background:white;font-size:12px;font-weight:700;cursor:pointer;">Menunggu</button>
+        <button onclick="filterArsip('disetujui',this)" class="filter-ak" style="padding:5px 14px;border-radius:20px;border:1.5px solid #4CAF50;color:#4CAF50;background:white;font-size:12px;font-weight:700;cursor:pointer;">Disetujui</button>
+      </div>
+      <div id="ak-list" style="padding:0 16px;display:flex;flex-direction:column;gap:8px;"></div>
+      <div id="ak-empty" style="display:none;text-align:center;padding:60px 20px;color:var(--gray-400);">
+        <div style="font-size:44px;margin-bottom:10px;">📭</div>
+        <div style="font-weight:700;">Belum ada berkas</div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL ARSIP MODUL/ASESMEN (KEPALA SEKOLAH) ===== -->
+  <div id="kepala-arsip-detail" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <h2 id="akd-title">Detail Berkas</h2>
+    </div>
+    <div class="scroll-content">
+      <div id="akd-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
       <div style="height:16px;"></div>
     </div>
   </div>
@@ -5655,6 +5887,7 @@ function goTo(screenId) {
     if (screenId === 'dokumentasi') updateDokumentasiNav();
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
+    if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
   }
 }
 
@@ -6894,6 +7127,433 @@ function simpanPenilaian() {
 }
 
 // ===== KELOLA MURID (localStorage) =====
+// ===================================================================
+// ===== MODUL PEMBELAJARAN & LEMBAR ASESMEN (Guru <-> Kepala Sekolah) =====
+// ===================================================================
+const MODUL_KEY = 'schoolid_modul_ajar';
+const ASESMEN_KEY = 'schoolid_lembar_asesmen';
+
+const MD_TEXT_FIELDS = ['guru','semester','asal_sekolah','minggu_ke','fase','bulan','jenjang_kelas','alokasi_waktu','model_pembelajaran','jumlah_anak','topik_pembelajaran'];
+const MD_TEXTAREA_FIELDS = ['topik_subtopik','peserta_didik','materi_pelajaran','kebiasaan_hebat','capaian_pembelajaran','tujuan_pembelajaran','praktik_pedagogis','kemitraan_pembelajaran','lingkungan_pembelajaran','pemanfaatan_digital','kegiatan_awal','kegiatan_penutup','asesmen_awal','asesmen_proses','asesmen_akhir','hari1','hari2','hari3','hari4','hari5'];
+const MD_DPL_FIELDS = ['dpl1','dpl2','dpl3','dpl4','dpl5','dpl6','dpl7','dpl8'];
+
+let currentModulId = null;
+let currentAsesmenId = null;
+let currentAsesmenJenis = 'anekdot';
+let currentAsesmenRows = [];
+
+const JENIS_ASESMEN_CONFIG = {
+  anekdot: {
+    label: 'Catatan Anekdot',
+    cols: [ {k:'tanggal', l:'Tanggal', w:'90px'}, {k:'nama', l:'Nama Anak', w:'120px'}, {k:'kejadian', l:'Kejadian Teramati', w:'auto', area:true}, {k:'analisis', l:'Analisis Capaian', w:'auto', area:true} ]
+  },
+  iktp: {
+    label: 'Ceklis IKTP',
+    cols: [ {k:'iktp', l:'IKTP', w:'auto', area:true}, {k:'nama', l:'Nama Anak', w:'110px'}, {k:'sudah', l:'Sudah Muncul', w:'46px', check:true}, {k:'belum', l:'Belum Muncul', w:'46px', check:true}, {k:'keterangan', l:'Keterangan', w:'auto', area:true} ]
+  },
+  karya: {
+    label: 'Dokumentasi Hasil Karya',
+    cols: [ {k:'tanggal', l:'Tanggal', w:'90px'}, {k:'nama', l:'Nama Anak', w:'110px'}, {k:'foto_desc', l:'Ket. Foto Karya', w:'auto', area:true}, {k:'deskripsi', l:'Deskripsi & Analisis', w:'auto', area:true} ]
+  },
+  foto: {
+    label: 'Foto Berseri',
+    cols: [ {k:'tanggal', l:'Tanggal', w:'90px'}, {k:'nama_dok', l:'Nama Anak & Ket. Foto (min 3)', w:'auto', area:true}, {k:'deskripsi', l:'Deskripsi & Analisis CP', w:'auto', area:true} ]
+  }
+};
+
+function getModulList() { try { return JSON.parse(localStorage.getItem(MODUL_KEY) || '[]'); } catch(e) { return []; } }
+function saveModulList(list) { localStorage.setItem(MODUL_KEY, JSON.stringify(list)); }
+function getAsesmenList() { try { return JSON.parse(localStorage.getItem(ASESMEN_KEY) || '[]'); } catch(e) { return []; } }
+function saveAsesmenList(list) { localStorage.setItem(ASESMEN_KEY, JSON.stringify(list)); }
+
+function statusBadgeHtml(status) {
+  if (status === 'dikirim') return '<span class="status-badge status-dikirim">⏳ Menunggu Kepala Sekolah</span>';
+  if (status === 'disetujui') return '<span class="status-badge status-disetujui">✅ Disetujui</span>';
+  return '<span class="status-badge status-draft">📝 Draft</span>';
+}
+
+// ---------- GURU: MODUL PEMBELAJARAN ----------
+function renderGuruModulList() {
+  const list = getModulList().slice().sort((a,b) => (b.updatedAt||'').localeCompare(a.updatedAt||''));
+  const container = document.getElementById('gm-list');
+  const empty = document.getElementById('gm-empty');
+  if (!container) return;
+  if (list.length === 0) { container.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+  container.innerHTML = list.map(m => `
+    <div class="ma-card" onclick="bukaModulById('${m.id}')">
+      <div class="ma-card-icon" style="background:#EDE7F6;">📘</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13.5px;">${(m.topik_subtopik || 'Topik belum diisi').split('\\n')[0].slice(0,60)}</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Minggu ${m.minggu_ke || '-'} · ${m.bulan || '-'}</div>
+        <div style="margin-top:6px;">${statusBadgeHtml(m.status)}</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+  `).join('');
+}
+
+function bukaModulBaru() {
+  currentModulId = null;
+  document.getElementById('gm-form-title').textContent = 'Modul Pembelajaran Baru';
+  [...MD_TEXT_FIELDS, ...MD_TEXTAREA_FIELDS].forEach(f => { const el = document.getElementById('md-' + f); if (el) el.value = ''; });
+  MD_DPL_FIELDS.forEach(f => { const el = document.getElementById('md-' + f); if (el) el.checked = false; });
+  document.getElementById('md-asal_sekolah').value = 'KB-TKIT Istiqomah Penumping';
+  document.getElementById('md-fase').value = 'Fondasi';
+  document.getElementById('gm-status-wrap').innerHTML = '';
+  document.getElementById('gm-ttd-wrap').innerHTML = '';
+  goToFromDashboard('guru-modul-form', 'guru-modul-list');
+}
+
+function bukaModulById(id) {
+  const m = getModulList().find(x => x.id === id);
+  if (!m) return;
+  currentModulId = id;
+  document.getElementById('gm-form-title').textContent = 'Edit Modul Pembelajaran';
+  [...MD_TEXT_FIELDS, ...MD_TEXTAREA_FIELDS].forEach(f => { const el = document.getElementById('md-' + f); if (el) el.value = m[f] || ''; });
+  MD_DPL_FIELDS.forEach(f => { const el = document.getElementById('md-' + f); if (el) el.checked = !!m[f]; });
+  document.getElementById('gm-status-wrap').innerHTML = `<div style="text-align:center;">${statusBadgeHtml(m.status)}</div>`;
+  document.getElementById('gm-ttd-wrap').innerHTML = ttdBoxHtml(m);
+  goToFromDashboard('guru-modul-form', 'guru-modul-list');
+}
+
+function ttdBoxHtml(item) {
+  if (item.status === 'disetujui') {
+    return `<div class="ttd-signed">
+      <div style="font-size:12px;color:var(--gray-600);">Ditandatangani &amp; disetujui oleh</div>
+      <div style="font-weight:800;font-size:15px;color:var(--green-dark);margin-top:2px;">✍️ ${item.approvedBy || 'Kepala Sekolah'}</div>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">${item.approvedAt || ''}</div>
+    </div>`;
+  }
+  if (item.status === 'dikirim') {
+    return `<div class="ttd-box"><div style="font-size:12px;color:var(--gray-500);">Menunggu tanda tangan Kepala Sekolah</div></div>`;
+  }
+  return '';
+}
+
+function simpanModul(status) {
+  const list = getModulList();
+  let item = currentModulId ? list.find(x => x.id === currentModulId) : null;
+  const isNew = !item;
+  if (isNew) { item = { id: 'modul_' + Date.now(), createdAt: new Date().toLocaleString('id-ID') }; }
+
+  [...MD_TEXT_FIELDS, ...MD_TEXTAREA_FIELDS].forEach(f => { item[f] = document.getElementById('md-' + f)?.value || ''; });
+  MD_DPL_FIELDS.forEach(f => { item[f] = document.getElementById('md-' + f)?.checked || false; });
+  item.status = status;
+  item.updatedAt = new Date().toISOString();
+  if (status === 'dikirim') item.sentAt = new Date().toLocaleString('id-ID');
+
+  if (isNew) { list.push(item); currentModulId = item.id; } else {
+    const idx = list.findIndex(x => x.id === item.id); list[idx] = item;
+  }
+  saveModulList(list);
+  updateBadgeArsip();
+
+  if (status === 'dikirim') {
+    showToast('Modul dikirim ke Kepala Sekolah ✅');
+    switchTab('guru-modul-list', document.querySelector('#bottomNav-guru .nav-item'), 'guru');
+    renderGuruModulList();
+  } else {
+    showToast('Modul disimpan sebagai draft 💾');
+  }
+}
+
+// ---------- GURU: LEMBAR ASESMEN ----------
+function renderGuruAsesmenList() {
+  const list = getAsesmenList().slice().sort((a,b) => (b.updatedAt||'').localeCompare(a.updatedAt||''));
+  const container = document.getElementById('ga-list');
+  const empty = document.getElementById('ga-empty');
+  if (!container) return;
+  if (list.length === 0) { container.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+  container.innerHTML = list.map(a => `
+    <div class="ma-card" onclick="bukaAsesmenById('${a.id}')">
+      <div class="ma-card-icon" style="background:#E0F2F1;">🗒️</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13.5px;">${JENIS_ASESMEN_CONFIG[a.jenis]?.label || a.jenis}</div>
+        <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">${a.jenjang_kelas || '-'} · Minggu ${a.semester_minggu || '-'}</div>
+        <div style="margin-top:6px;">${statusBadgeHtml(a.status)}</div>
+      </div>
+      <span class="chevron">›</span>
+    </div>
+  `).join('');
+}
+
+function bukaAsesmenBaru() {
+  currentAsesmenId = null;
+  currentAsesmenRows = [];
+  ['jenjang_kelas','semester_minggu','guru_kelas','tahun_ajaran'].forEach(f => { const el = document.getElementById('as-' + f); if (el) el.value = ''; });
+  document.getElementById('as-tahun_ajaran').value = '2026/2027';
+  document.getElementById('ga-status-wrap').innerHTML = '';
+  document.getElementById('ga-ttd-wrap').innerHTML = '';
+  pilihJenisAsesmen('anekdot');
+  goToFromDashboard('guru-asesmen-form', 'guru-asesmen-list');
+}
+
+function bukaAsesmenById(id) {
+  const a = getAsesmenList().find(x => x.id === id);
+  if (!a) return;
+  currentAsesmenId = id;
+  currentAsesmenRows = JSON.parse(JSON.stringify(a.rows || []));
+  document.getElementById('as-jenjang_kelas').value = a.jenjang_kelas || '';
+  document.getElementById('as-semester_minggu').value = a.semester_minggu || '';
+  document.getElementById('as-guru_kelas').value = a.guru_kelas || '';
+  document.getElementById('as-tahun_ajaran').value = a.tahun_ajaran || '';
+  document.getElementById('ga-status-wrap').innerHTML = `<div style="text-align:center;">${statusBadgeHtml(a.status)}</div>`;
+  document.getElementById('ga-ttd-wrap').innerHTML = ttdBoxHtml(a);
+  pilihJenisAsesmen(a.jenis || 'anekdot', true);
+  goToFromDashboard('guru-asesmen-form', 'guru-asesmen-list');
+}
+
+function pilihJenisAsesmen(jenis, keepRows) {
+  simpanBarisDariForm(); // simpan input yang sedang diketik sebelum ganti jenis
+  currentAsesmenJenis = jenis;
+  if (!keepRows) currentAsesmenRows = currentAsesmenRows.length ? currentAsesmenRows : [];
+  if (!keepRows && (!currentAsesmenId)) currentAsesmenRows = [];
+  document.querySelectorAll('.jenis-tab').forEach(t => t.classList.remove('active'));
+  const tabEl = document.getElementById('jt-' + jenis);
+  if (tabEl) tabEl.classList.add('active');
+  if (currentAsesmenRows.length === 0) tambahBarisAsesmen(true);
+  else renderAsesmenTable();
+}
+
+function renderAsesmenTable() {
+  const cfg = JENIS_ASESMEN_CONFIG[currentAsesmenJenis];
+  const table = document.getElementById('as-table');
+  if (!table || !cfg) return;
+  let html = '<thead><tr>' + cfg.cols.map(c => `<th style="width:${c.w};">${c.l}</th>`).join('') + '<th style="width:30px;"></th></tr></thead><tbody>';
+  currentAsesmenRows.forEach((row, i) => {
+    html += '<tr>' + cfg.cols.map(c => {
+      const val = row[c.k] || '';
+      if (c.check) return `<td style="text-align:center;"><input type="checkbox" style="width:18px;height:18px;accent-color:var(--green);" data-row="${i}" data-k="${c.k}" ${val ? 'checked' : ''}></td>`;
+      if (c.area) return `<td><textarea rows="2" data-row="${i}" data-k="${c.k}">${val}</textarea></td>`;
+      return `<td><input type="text" data-row="${i}" data-k="${c.k}" value="${val.replace(/"/g,'&quot;')}"></td>`;
+    }).join('') + `<td><button class="asesmen-row-del" onclick="hapusBarisAsesmen(${i})">✕</button></td></tr>`;
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function simpanBarisDariForm() {
+  const table = document.getElementById('as-table');
+  if (!table) return;
+  table.querySelectorAll('[data-row]').forEach(el => {
+    const i = parseInt(el.dataset.row, 10);
+    const k = el.dataset.k;
+    if (!currentAsesmenRows[i]) return;
+    currentAsesmenRows[i][k] = el.type === 'checkbox' ? el.checked : el.value;
+  });
+}
+
+function tambahBarisAsesmen(silent) {
+  simpanBarisDariForm();
+  currentAsesmenRows.push({});
+  renderAsesmenTable();
+  if (!silent) showToast('Baris baru ditambahkan');
+}
+
+function hapusBarisAsesmen(idx) {
+  simpanBarisDariForm();
+  currentAsesmenRows.splice(idx, 1);
+  renderAsesmenTable();
+}
+
+function simpanAsesmen(status) {
+  simpanBarisDariForm();
+  const list = getAsesmenList();
+  let item = currentAsesmenId ? list.find(x => x.id === currentAsesmenId) : null;
+  const isNew = !item;
+  if (isNew) { item = { id: 'asesmen_' + Date.now(), createdAt: new Date().toLocaleString('id-ID') }; }
+
+  item.jenis = currentAsesmenJenis;
+  item.jenjang_kelas = document.getElementById('as-jenjang_kelas')?.value || '';
+  item.semester_minggu = document.getElementById('as-semester_minggu')?.value || '';
+  item.guru_kelas = document.getElementById('as-guru_kelas')?.value || '';
+  item.tahun_ajaran = document.getElementById('as-tahun_ajaran')?.value || '';
+  item.rows = currentAsesmenRows;
+  item.status = status;
+  item.updatedAt = new Date().toISOString();
+  if (status === 'dikirim') item.sentAt = new Date().toLocaleString('id-ID');
+
+  if (isNew) { list.push(item); currentAsesmenId = item.id; } else {
+    const idx = list.findIndex(x => x.id === item.id); list[idx] = item;
+  }
+  saveAsesmenList(list);
+  updateBadgeArsip();
+
+  if (status === 'dikirim') {
+    showToast('Lembar asesmen dikirim ke Kepala Sekolah ✅');
+    switchTab('guru-asesmen-list', document.querySelector('#bottomNav-guru .nav-item'), 'guru');
+    renderGuruAsesmenList();
+  } else {
+    showToast('Lembar asesmen disimpan sebagai draft 💾');
+  }
+}
+
+// ---------- KEPALA SEKOLAH: ARSIP ----------
+let arsipTabAktif = 'modul';
+let arsipFilterAktif = 'semua';
+
+function updateBadgeArsip() {
+  const pending = getModulList().filter(m => m.status === 'dikirim').length + getAsesmenList().filter(a => a.status === 'dikirim').length;
+  const badge = document.getElementById('badge-arsip');
+  if (badge) { badge.textContent = pending; badge.style.background = pending > 0 ? '#F44336' : '#4CAF50'; }
+}
+
+function pilihTabArsip(tab) {
+  arsipTabAktif = tab;
+  document.getElementById('ak-tab-modul')?.classList.toggle('active', tab === 'modul');
+  document.getElementById('ak-tab-asesmen')?.classList.toggle('active', tab === 'asesmen');
+  renderArsipKepala();
+}
+
+function filterArsip(filter, el) {
+  arsipFilterAktif = filter;
+  document.querySelectorAll('.filter-ak').forEach(b => {
+    b.style.background = 'white'; b.style.color = b.textContent.includes('Menunggu') ? '#FF9800' : (b.textContent.includes('Disetujui') ? '#4CAF50' : 'var(--gray-600)');
+  });
+  if (el) { el.style.background = 'var(--green)'; el.style.color = 'white'; }
+  renderArsipKepala();
+}
+
+function renderArsipKepala() {
+  updateBadgeArsip();
+  const container = document.getElementById('ak-list');
+  const empty = document.getElementById('ak-empty');
+  if (!container) return;
+  let list = arsipTabAktif === 'modul' ? getModulList() : getAsesmenList();
+  list = list.filter(x => x.status !== 'draft');
+  if (arsipFilterAktif !== 'semua') list = list.filter(x => x.status === arsipFilterAktif);
+  list = list.slice().sort((a,b) => (b.updatedAt||'').localeCompare(a.updatedAt||''));
+
+  if (list.length === 0) { container.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none';
+
+  container.innerHTML = list.map(item => {
+    if (arsipTabAktif === 'modul') {
+      return `<div class="ma-card" onclick="bukaDetailArsip('modul','${item.id}')">
+        <div class="ma-card-icon" style="background:#EDE7F6;">📘</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13.5px;">${(item.topik_subtopik||'Topik belum diisi').split('\\n')[0].slice(0,50)}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Guru: ${item.guru || '-'} · Minggu ${item.minggu_ke||'-'}</div>
+          <div style="margin-top:6px;">${statusBadgeHtml(item.status)}</div>
+        </div>
+        <span class="chevron">›</span>
+      </div>`;
+    } else {
+      return `<div class="ma-card" onclick="bukaDetailArsip('asesmen','${item.id}')">
+        <div class="ma-card-icon" style="background:#E0F2F1;">🗒️</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13.5px;">${JENIS_ASESMEN_CONFIG[item.jenis]?.label || item.jenis}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Guru: ${item.guru_kelas || '-'} · ${item.jenjang_kelas||'-'}</div>
+          <div style="margin-top:6px;">${statusBadgeHtml(item.status)}</div>
+        </div>
+        <span class="chevron">›</span>
+      </div>`;
+    }
+  }).join('');
+}
+
+function esc(s) { return (s || '-').toString().replace(/\\n/g, '<br>'); }
+
+function bukaDetailArsip(type, id) {
+  const item = (type === 'modul' ? getModulList() : getAsesmenList()).find(x => x.id === id);
+  if (!item) return;
+  document.getElementById('akd-title').textContent = type === 'modul' ? 'Detail Modul Pembelajaran' : 'Detail Lembar Asesmen';
+  let html = '';
+
+  if (type === 'modul') {
+    const dplLabel = {dpl1:'Keimanan & Ketakwaan',dpl2:'Kewargaan',dpl3:'Penalaran Kritis',dpl4:'Kreativitas',dpl5:'Kolaborasi',dpl6:'Kemandirian',dpl7:'Kesehatan',dpl8:'Komunikasi'};
+    const dplAktif = MD_DPL_FIELDS.filter(f => item[f]).map(f => dplLabel[f]).join(', ') || '-';
+    html = `
+      <div style="text-align:center;">${statusBadgeHtml(item.status)}</div>
+      <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;">
+        <div style="font-weight:800;font-size:15px;margin-bottom:8px;">${esc(item.topik_subtopik)}</div>
+        <div style="font-size:12px;color:var(--gray-600);line-height:1.8;">
+          <b>Guru:</b> ${esc(item.guru)} &nbsp;·&nbsp; <b>Semester:</b> ${esc(item.semester)}<br>
+          <b>Asal Sekolah:</b> ${esc(item.asal_sekolah)}<br>
+          <b>Minggu Ke-:</b> ${esc(item.minggu_ke)} &nbsp;·&nbsp; <b>Bulan:</b> ${esc(item.bulan)}<br>
+          <b>Jenjang/Kelas:</b> ${esc(item.jenjang_kelas)} &nbsp;·&nbsp; <b>Alokasi Waktu:</b> ${esc(item.alokasi_waktu)}<br>
+          <b>Model Pembelajaran:</b> ${esc(item.model_pembelajaran)} &nbsp;·&nbsp; <b>Jumlah Anak:</b> ${esc(item.jumlah_anak)}
+        </div>
+      </div>
+      ${detailSectionHtml('Peserta Didik', item.peserta_didik)}
+      ${detailSectionHtml('Materi Pelajaran', item.materi_pelajaran)}
+      ${detailSectionHtml('Dimensi Profil Lulusan', dplAktif)}
+      ${detailSectionHtml('7 Kebiasaan Anak Indonesia Hebat', item.kebiasaan_hebat)}
+      ${detailSectionHtml('Capaian Pembelajaran', item.capaian_pembelajaran)}
+      ${detailSectionHtml('Tujuan Pembelajaran', item.tujuan_pembelajaran)}
+      ${detailSectionHtml('Praktik Pedagogis', item.praktik_pedagogis)}
+      ${detailSectionHtml('Kemitraan Pembelajaran', item.kemitraan_pembelajaran)}
+      ${detailSectionHtml('Lingkungan Pembelajaran', item.lingkungan_pembelajaran)}
+      ${detailSectionHtml('Pemanfaatan Digital', item.pemanfaatan_digital)}
+      ${detailSectionHtml('Kegiatan Awal', item.kegiatan_awal)}
+      ${detailSectionHtml('Hari 1', item.hari1)}
+      ${detailSectionHtml('Hari 2', item.hari2)}
+      ${detailSectionHtml('Hari 3', item.hari3)}
+      ${detailSectionHtml('Hari 4', item.hari4)}
+      ${detailSectionHtml('Hari 5', item.hari5)}
+      ${detailSectionHtml('Kegiatan Penutup', item.kegiatan_penutup)}
+      ${detailSectionHtml('Asesmen Awal', item.asesmen_awal)}
+      ${detailSectionHtml('Asesmen Proses', item.asesmen_proses)}
+      ${detailSectionHtml('Asesmen Akhir', item.asesmen_akhir)}
+    `;
+  } else {
+    const cfg = JENIS_ASESMEN_CONFIG[item.jenis];
+    const rowsHtml = (item.rows || []).map(r => {
+      return '<tr>' + cfg.cols.map(c => {
+        const v = r[c.k];
+        if (c.check) return `<td style="text-align:center;">${v ? '✅' : ''}</td>`;
+        return `<td>${esc(v)}</td>`;
+      }).join('') + '</tr>';
+    }).join('');
+    html = `
+      <div style="text-align:center;">${statusBadgeHtml(item.status)}</div>
+      <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;">
+        <div style="font-weight:800;font-size:15px;margin-bottom:8px;">${cfg?.label || item.jenis}</div>
+        <div style="font-size:12px;color:var(--gray-600);line-height:1.8;">
+          <b>Guru Kelas:</b> ${esc(item.guru_kelas)}<br>
+          <b>Jenjang/Kelas:</b> ${esc(item.jenjang_kelas)} &nbsp;·&nbsp; <b>Semester/Minggu:</b> ${esc(item.semester_minggu)}<br>
+          <b>Tahun Ajaran:</b> ${esc(item.tahun_ajaran)}
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="asesmen-table"><thead><tr>${cfg.cols.map(c=>`<th>${c.l}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table>
+      </div>
+    `;
+  }
+
+  html += `<div id="akd-ttd">${ttdBoxHtml(item)}</div>`;
+  if (item.status === 'dikirim') {
+    html += `<button onclick="tandaTanganSetujui('${type}','${id}')" style="width:100%;padding:15px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:var(--radius);font-size:14.5px;font-weight:800;cursor:pointer;margin-top:4px;">✍️ Tanda Tangan &amp; Setujui</button>`;
+  }
+
+  document.getElementById('akd-content').innerHTML = html;
+  goTo('kepala-arsip-detail');
+}
+
+function detailSectionHtml(title, content) {
+  return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;">
+    <div style="font-weight:700;font-size:12.5px;color:var(--green-dark);margin-bottom:4px;">${title}</div>
+    <div style="font-size:12.5px;color:var(--gray-700);line-height:1.6;">${esc(content)}</div>
+  </div>`;
+}
+
+function tandaTanganSetujui(type, id) {
+  if (!confirm('Setujui dan tanda tangani berkas ini sebagai Kepala Sekolah?')) return;
+  const list = type === 'modul' ? getModulList() : getAsesmenList();
+  const idx = list.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  list[idx].status = 'disetujui';
+  list[idx].approvedBy = 'Kepala Sekolah';
+  list[idx].approvedAt = new Date().toLocaleString('id-ID');
+  if (type === 'modul') saveModulList(list); else saveAsesmenList(list);
+  showToast('Berkas disetujui & diarsipkan ✅');
+  updateBadgeArsip();
+  bukaDetailArsip(type, id);
+}
+
+
 const MURID_KEY = 'schoolid_murid';
 let selectedJK = '';
 let editMuridId = null;
@@ -7296,6 +7956,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'dokumentasi') updateDokumentasiNav();
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
+    if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
   }
 }
 
@@ -7353,6 +8014,7 @@ function switchSidebarKepala(btn, screenId) {
     const sc = document.getElementById(screenId)?.querySelector('.scroll-content');
     if (sc) sc.scrollTop = 0;
     if (screenId === 'profil-user') updateProfilUserView();
+    if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
   }
 }
 
