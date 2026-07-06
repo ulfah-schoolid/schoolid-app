@@ -2586,8 +2586,8 @@
     <div class="top-bar" style="gap:6px;">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2 id="guru-rapor-judul" style="font-size:12px;flex:1;">Isi Rapor</h2>
-      <button id="btn-edit-indikator" onclick="toggleEditIndikator()" style="border:none;background:#E3F2FD;color:#1565C0;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">✏️ Edit Kegiatan</button>
-      <button onclick="simpanRaporGuru()" style="border:none;background:var(--green);color:white;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">💾 Simpan</button>
+      <span id="gr-status-badge" style="font-size:10px;font-weight:800;padding:4px 8px;border-radius:10px;background:#F5F5F5;color:var(--gray-500);flex-shrink:0;">Draft</span>
+      <button id="btn-simpan-rapor-guru" onclick="simpanRaporGuru()" style="border:none;background:var(--green);color:white;border-radius:20px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;">💾 Simpan</button>
     </div>
     <div class="scroll-content">
       <!-- Info murid -->
@@ -3216,8 +3216,10 @@
       </div>
 
       <!-- Tombol navigasi bawah -->
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <button onclick="simpanRaporGuru()" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan</button>
+      <div id="gr-aksi-wrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+        <button onclick="simpanRaporGuru()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan Draft</button>
+        <button id="gr-btn-kirim" onclick="kirimRaporKeKepala()" style="width:100%;padding:13px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">📤 Kirim ke Kepala Sekolah</button>
+        <button id="gr-btn-bagikan" onclick="bagikanRaporKeOrtu()" style="width:100%;padding:13px;background:#FF9800;color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;display:none;">📨 Bagikan ke Wali Murid</button>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:16px;">
         <button onclick="navigasiMuridRapor(-1)" style="flex:1;padding:12px;border:1.5px solid var(--gray-200);border-radius:var(--radius);background:white;font-size:13px;font-weight:700;cursor:pointer;color:var(--gray-700);">‹ Murid Sebelumnya</button>
@@ -4338,6 +4340,17 @@
             </div>
           </div>
           <div class="section">
+            <div class="section-title">Template Rapor</div>
+            <div onclick="goToFromDashboard('kelola-template-rapor','dashboard-kepala');pilihTemplateKelompok('KB')" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#00897B,#26A69A);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧾</div>
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;">Kelola Template Rapor</div>
+                <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Atur kegiatan rapor per Kelompok &amp; Periode</div>
+              </div>
+              <span class="chevron">›</span>
+            </div>
+          </div>
+          <div class="section">
             <div class="section-title">Arsip Modul &amp; Asesmen Guru</div>
             <div onclick="goToFromDashboard('kepala-arsip','dashboard-kepala');renderArsipKepala()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
               <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#5E35B1,#7E57C2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📘</div>
@@ -4433,6 +4446,7 @@
       <div class="jenis-tab-row" style="padding:10px 16px 4px;">
         <button class="jenis-tab active" id="ak-tab-modul" onclick="pilihTabArsip('modul')">📘 Modul Pembelajaran</button>
         <button class="jenis-tab" id="ak-tab-asesmen" onclick="pilihTabArsip('asesmen')">🗒️ Lembar Asesmen</button>
+        <button class="jenis-tab" id="ak-tab-rapor" onclick="pilihTabArsip('rapor')">🧾 Rapor Murid</button>
       </div>
       <div style="padding:0 16px 10px;display:flex;gap:8px;">
         <button onclick="filterArsip('semua',this)" class="filter-ak" style="padding:5px 14px;border-radius:20px;border:none;background:var(--green);color:white;font-size:12px;font-weight:700;cursor:pointer;">Semua</button>
@@ -4457,6 +4471,43 @@
     </div>
     <div class="scroll-content">
       <div id="akd-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== KELOLA TEMPLATE RAPOR (KEPALA SEKOLAH) ===== -->
+  <div id="kelola-template-rapor" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <h2>Kelola Template Rapor</h2>
+    </div>
+    <div class="scroll-content">
+      <div style="padding:12px 16px 4px;">
+        <label class="form-label">Kelompok / Kelas</label>
+        <div class="jenis-tab-row">
+          <button class="jenis-tab active" id="tr-tab-KB" onclick="pilihTemplateKelompok('KB')">KB</button>
+          <button class="jenis-tab" id="tr-tab-A" onclick="pilihTemplateKelompok('A')">Kelompok A</button>
+          <button class="jenis-tab" id="tr-tab-B" onclick="pilihTemplateKelompok('B')">Kelompok B</button>
+        </div>
+      </div>
+      <div style="padding:6px 16px 10px;">
+        <label class="form-label">Periode Rapor</label>
+        <div class="jenis-tab-row">
+          <button class="jenis-tab active" id="tr-per-tengah1" onclick="pilihTemplatePeriode('tengah1')">Mid Semester 1</button>
+          <button class="jenis-tab" id="tr-per-semester1" onclick="pilihTemplatePeriode('semester1')">Semester 1</button>
+          <button class="jenis-tab" id="tr-per-tengah2" onclick="pilihTemplatePeriode('tengah2')">Mid Semester 2</button>
+          <button class="jenis-tab" id="tr-per-semester2" onclick="pilihTemplatePeriode('semester2')">Semester 2</button>
+        </div>
+      </div>
+      <div style="padding:0 16px 8px;">
+        <div id="tr-status-wrap" style="text-align:center;"></div>
+      </div>
+      <div id="tr-content" style="padding:0 16px;display:flex;flex-direction:column;gap:14px;"></div>
+      <div style="padding:14px 16px 4px;display:flex;flex-direction:column;gap:10px;">
+        <button onclick="simpanTemplateRapor('draft')" style="width:100%;padding:14px;background:white;border:2px solid var(--green);color:var(--green-dark);border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;">💾 Simpan sebagai Draft</button>
+        <button onclick="simpanTemplateRapor('dibagikan')" style="width:100%;padding:14px;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;">📤 Distribusikan ke Guru</button>
+      </div>
       <div style="height:16px;"></div>
     </div>
   </div>
@@ -5721,6 +5772,14 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="form-label">Kelompok / Kelas *</label>
+        <select id="fm-kelompok" class="form-input">
+          <option value="KB">KB (Kelompok Bermain)</option>
+          <option value="A">Kelompok A</option>
+          <option value="B">Kelompok B</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label class="form-label">Tanggal Lahir</label>
         <input type="date" id="fm-tgl" class="form-input">
       </div>
@@ -6314,13 +6373,20 @@ function simpanIndikator() {
 
 function loadIndikator() {
   try {
-    const data = JSON.parse(localStorage.getItem(INDIKATOR_KEY) || '{}');
+    const list = getMuridList();
+    const m = list[guruRaporMuridIdx];
+    const kelompok = (m && m.kelompok) || 'A';
+    const data = getIndikatorEfektif(kelompok, guruRaporPeriode);
     document.querySelectorAll('#guru-form-rapor .indikator-cell').forEach(cell => {
       const key = cell.dataset.key;
       const span = cell.querySelector('.indikator-text');
+      const input = cell.querySelector('.indikator-input');
       if (key && data[key] && span) {
         span.textContent = data[key];
+        if (input) input.value = data[key];
       }
+      if (input) input.style.display = 'none';
+      if (span) span.style.display = 'inline';
     });
   } catch(e) {}
 }
@@ -6384,6 +6450,7 @@ function bukaFormRaporGuru(idx) {
   setTimeout(() => {
     loadIndikator();
     initTombolTambahBaris();
+    renderStatusRaporGuru();
   }, 100);
   goToFromDashboard('guru-form-rapor', 'guru-rapor-siswa');
 }
@@ -6447,10 +6514,17 @@ function loadFormRaporGuru(idx) {
   if (sc) sc.scrollTop = 0;
 }
 
-function simpanRaporGuru() {
+function simpanRaporGuru(silent) {
   const list = getMuridList();
   const m = list[guruRaporMuridIdx];
   if (!m) return;
+
+  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const existing = all[guruRaporPeriode]?.[m.nama] || {};
+  if (existing.status === 'dikirim' || existing.status === 'disetujui') {
+    if (!silent) showToast('Rapor sudah dikirim, tidak bisa diubah lagi 🔒');
+    return;
+  }
 
   const radioData = {};
   document.querySelectorAll('#guru-form-rapor input[type=radio]:checked').forEach(r => {
@@ -6460,9 +6534,9 @@ function simpanRaporGuru() {
   const getVal = (id) => document.getElementById(id)?.value || '';
 
   try {
-    const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
     if (!all[guruRaporPeriode]) all[guruRaporPeriode] = {};
     all[guruRaporPeriode][m.nama] = {
+      ...existing,
       agama_narasi: getVal('gr-agama-narasi'),
       jatidiri_narasi: getVal('gr-jatidiri-narasi'),
       literasi_narasi: getVal('gr-literasi-narasi'),
@@ -6477,20 +6551,23 @@ function simpanRaporGuru() {
       hadir_alpa: getVal('gr-hadir-alpa'),
       hadir_total: getVal('gr-hadir-total'),
       radio: radioData,
+      kelompok: m.kelompok || 'A',
+      status: existing.status || 'draft',
       tgl_simpan: new Date().toLocaleDateString('id-ID')
     };
     localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
-    showToast(`Rapor ${m.nama} tersimpan! ✅`);
+    if (!silent) showToast(`Rapor ${m.nama} tersimpan! ✅`);
   } catch(e) {
     showToast('Gagal menyimpan ⚠️');
   }
 }
 
 function navigasiMuridRapor(arah) {
-  simpanRaporGuru();
+  simpanRaporGuru(true);
   const list = getMuridList();
   guruRaporMuridIdx = Math.max(0, Math.min(list.length-1, guruRaporMuridIdx + arah));
   loadFormRaporGuru(guruRaporMuridIdx);
+  setTimeout(() => { loadIndikator(); renderStatusRaporGuru(); }, 50);
   if (arah === 1 && guruRaporMuridIdx === list.length-1) {
     showToast('Ini murid terakhir! 🎉');
   }
@@ -7133,6 +7210,142 @@ function simpanPenilaian() {
 // ===================================================================
 // ===== MODUL PEMBELAJARAN & LEMBAR ASESMEN (Guru <-> Kepala Sekolah) =====
 // ===================================================================
+// ===================================================================
+// ===== TEMPLATE RAPOR (Kepala Sekolah) & STATUS WORKFLOW RAPOR =====
+// ===================================================================
+const TEMPLATE_RAPOR_KEY = 'schoolid_template_rapor';
+const DEFAULT_INDIKATOR = [{"key": "ind_1", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyanyi lagu-lagu bernuansa Islam"}, {"key": "ind_2", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan tempat ibadah umat Islam"}, {"key": "ind_3", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Bersyair bernafaskan Islam"}, {"key": "ind_4", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan ciptaan-ciptaan Allah"}, {"key": "ind_5", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan rukun Iman"}, {"key": "ind_6", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan alasan memeluk agama Islam"}, {"key": "ind_7", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan kewajiban orang Islam"}, {"key": "ind_8", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Terbiasa mengucapkan kalimat thoyyibah"}, {"key": "ind_9", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan alasan harus taat kepada Allah"}, {"key": "ind_10", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan bagian-bagian Al-Quran"}, {"key": "ind_11", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menceritakan kandungan Al-Quran secara global"}, {"key": "ind_12", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan cara beriman kepada Allah"}, {"key": "ind_13", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Berdoa sebelum dan sesudah berkegiatan"}, {"key": "ind_14", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Mengikuti acara keagamaan"}, {"key": "ind_15", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Melaksanakan gerakan beribadah secara urut"}, {"key": "ind_16", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Memahami perilaku mulia"}, {"key": "ind_17", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Membedakan perilaku baik dan buruk"}, {"key": "ind_18", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan hari-hari besar Islam"}, {"key": "ind_19", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Abu Bakar Ash Shidiq"}, {"key": "ind_20", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Umar bin Khotob"}, {"key": "ind_21", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Utsman bin Affan"}, {"key": "ind_22", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Ali bin Abi Tholib"}, {"key": "ind_23", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Thalhah bin Ubaidillah"}, {"key": "ind_24", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hudzaifah Ibnu Yaman"}, {"key": "ind_25", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Bilal bin Rabbah"}, {"key": "ind_26", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Mushab bin Umair"}, {"key": "ind_27", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Ibnu Masud"}, {"key": "ind_28", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan macam agama di Indonesia"}, {"key": "ind_29", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Menyebutkan tempat ibadah agama lain"}, {"key": "ind_30", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Mengenal hari-hari besar agama di Indonesia"}, {"key": "ind_31", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Memberi dan membalas salam"}, {"key": "ind_32", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab tidur"}, {"key": "ind_33", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab di rumah"}, {"key": "ind_34", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab di masjid"}, {"key": "ind_35", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab di sekolah"}, {"key": "ind_36", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab makan dan minum"}, {"key": "ind_37", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab berpakaian"}, {"key": "ind_38", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab menyembelih binatang"}, {"key": "ind_39", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab menjenguk orang sakit"}, {"key": "ind_40", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Adab ke kamar mandi"}, {"key": "ind_41", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Zakat fitrah"}, {"key": "ind_42", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Puasa Ramadhan"}, {"key": "ind_43", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Kalimat talbiyyah"}, {"key": "ind_44", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS An Naas"}, {"key": "ind_45", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Falaq"}, {"key": "ind_46", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Lahab"}, {"key": "ind_47", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS An Nashr"}, {"key": "ind_48", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Kaafirun"}, {"key": "ind_49", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Maun"}, {"key": "ind_50", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Quraisy"}, {"key": "ind_51", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Fiil"}, {"key": "ind_52", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Humazah"}, {"key": "ind_53", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS At Takatsur"}, {"key": "ind_54", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Qoriah"}, {"key": "ind_55", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Adiyat"}, {"key": "ind_56", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Zalzalah"}, {"key": "ind_57", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Qodr"}, {"key": "ind_58", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Alaq"}, {"key": "ind_59", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS At Tiin"}, {"key": "ind_60", "kategori": "MUATAN LOKAL DINIYYAH", "label": "QS Al Insyiroh"}, {"key": "ind_61", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Ayat Kursi"}, {"key": "ind_62", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa masuk dan keluar masjid"}, {"key": "ind_63", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa bercermin"}, {"key": "ind_64", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa memakai dan melepas pakaian"}, {"key": "ind_65", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa ketika turun hujan"}, {"key": "ind_66", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa setelah turun hujan"}, {"key": "ind_67", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa minta hujan"}, {"key": "ind_68", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa mendengar petir"}, {"key": "ind_69", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa setelah adzan"}, {"key": "ind_70", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa binatang tergelincir"}, {"key": "ind_71", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa menyembelih binatang"}, {"key": "ind_72", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa berbuka puasa"}, {"key": "ind_73", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa pagi dan sore"}, {"key": "ind_74", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa melihat permulaan buah"}, {"key": "ind_75", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Doa sesudah wudhu"}, {"key": "ind_76", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits sholat tiang agama"}, {"key": "ind_77", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits setiap kebaikan adalah shodaqoh"}, {"key": "ind_78", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits persaudaraan"}, {"key": "ind_79", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits surga di bawah telapak kaki ibu"}, {"key": "ind_80", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits belajar Al-Quran"}, {"key": "ind_81", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits Islam itu tinggi"}, {"key": "ind_82", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits kasih sayang"}, {"key": "ind_83", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits adab makan"}, {"key": "ind_84", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits tentang sholat"}, {"key": "ind_85", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits menunjukkan kebaikan"}, {"key": "ind_86", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits larangan mencela"}, {"key": "ind_87", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Hadits perkataan yang baik adalah shodaqoh"}, {"key": "ind_88", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Mahfudhot tentang kebersihan"}, {"key": "ind_89", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Mahfudhot tentang kesungguhan"}, {"key": "ind_90", "kategori": "MUATAN LOKAL DINIYYAH", "label": "Mahfudhot tentang waktu"}, {"key": "ind_91", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif parang rusak"}, {"key": "ind_92", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif arum dalu"}, {"key": "ind_93", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif mega mendung"}, {"key": "ind_94", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif kawung"}, {"key": "ind_95", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif kawung 2"}, {"key": "ind_96", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif parang rusak barong"}, {"key": "ind_97", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif sidomukti"}, {"key": "ind_98", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Motif truntum"}, {"key": "ind_99", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Menggambar motif batik sederhana"}, {"key": "ind_100", "kategori": "MUATAN LOKAL SENI BATIK", "label": "Mewarnai motif batik sederhana"}, {"key": "ind_101", "kategori": "MUATAN LOKAL BAHASA ARAB", "label": "Mengucap salam dan sapaan"}, {"key": "ind_102", "kategori": "MUATAN LOKAL BAHASA ARAB", "label": "Memperkenalkan identitas diri"}, {"key": "ind_103", "kategori": "MUATAN LOKAL BAHASA ARAB", "label": "Menyanyikan lagu berbahasa Arab"}, {"key": "ind_104", "kategori": "MUATAN LOKAL BAHASA ARAB", "label": "Mengenal kosakata bahasa Arab"}, {"key": "ind_105", "kategori": "EKSTRAKURIKULER", "label": "Mengucap salam dan sapaan"}, {"key": "ind_106", "kategori": "EKSTRAKURIKULER", "label": "Memperkenalkan identitas diri"}, {"key": "ind_107", "kategori": "EKSTRAKURIKULER", "label": "Menyanyikan lagu berbahasa Inggris"}, {"key": "ind_108", "kategori": "EKSTRAKURIKULER", "label": "Mengenal kosakata bahasa Inggris"}, {"key": "ind_109", "kategori": "EKSTRAKURIKULER", "label": "Menyukai kegiatan eksplorasi air"}, {"key": "ind_110", "kategori": "EKSTRAKURIKULER", "label": "Menggerakkan anggota tubuh di air"}, {"key": "ind_111", "kategori": "EKSTRAKURIKULER", "label": "Mengikuti arahan guru di kolam renang"}, {"key": "ind_112", "kategori": "EKSTRAKURIKULER", "label": "Koordinasi gerakan"}, {"key": "ind_113", "kategori": "EKSTRAKURIKULER", "label": "Kelenturan tubuh"}, {"key": "ind_114", "kategori": "EKSTRAKURIKULER", "label": "Keserasian gerakan"}, {"key": "ind_115", "kategori": "EKSTRAKURIKULER", "label": "Memegang rebana dengan benar"}, {"key": "ind_116", "kategori": "EKSTRAKURIKULER", "label": "Memainkan rebana sesuai irama lagu"}, {"key": "ind_117", "kategori": "EKSTRAKURIKULER", "label": "Menyanyikan lagu diiringi rebana"}, {"key": "ind_118", "kategori": "EKSTRAKURIKULER", "label": "Teknik menggambar"}, {"key": "ind_119", "kategori": "EKSTRAKURIKULER", "label": "Kreativitas"}, {"key": "ind_120", "kategori": "CATATAN KESEHATAN", "label": "Kebersihan badan"}, {"key": "ind_121", "kategori": "CATATAN KESEHATAN", "label": "Kerapian pakaian"}, {"key": "ind_122", "kategori": "CATATAN KESEHATAN", "label": "Kuku dan jari"}, {"key": "ind_123", "kategori": "CATATAN KESEHATAN", "label": "Tinggi badan"}, {"key": "ind_124", "kategori": "CATATAN KESEHATAN", "label": "Berat badan"}, {"key": "ind_125", "kategori": "CATATAN KESEHATAN", "label": "Status gizi"}];
+
+let templateKelompokAktif = 'KB';
+let templatePeriodeAktif = 'tengah1';
+
+function getTemplateRaporAll() { try { return JSON.parse(localStorage.getItem(TEMPLATE_RAPOR_KEY) || '{}'); } catch(e) { return {}; } }
+function saveTemplateRaporAll(all) { localStorage.setItem(TEMPLATE_RAPOR_KEY, JSON.stringify(all)); }
+function templateRaporKey(kelompok, periode) { return kelompok + '_' + periode; }
+
+function getIndikatorEfektif(kelompok, periode) {
+  const all = getTemplateRaporAll();
+  const tpl = all[templateRaporKey(kelompok, periode)];
+  const map = {};
+  DEFAULT_INDIKATOR.forEach(d => { map[d.key] = d.label; });
+  if (tpl && tpl.indikator) Object.assign(map, tpl.indikator);
+  return map;
+}
+
+function pilihTemplateKelompok(kelompok) {
+  templateKelompokAktif = kelompok;
+  ['KB','A','B'].forEach(k => { const el = document.getElementById('tr-tab-'+k); if (el) el.classList.toggle('active', k===kelompok); });
+  renderTemplateRaporContent();
+}
+
+function pilihTemplatePeriode(periode) {
+  templatePeriodeAktif = periode;
+  ['tengah1','semester1','tengah2','semester2'].forEach(p => { const el = document.getElementById('tr-per-'+p); if (el) el.classList.toggle('active', p===periode); });
+  renderTemplateRaporContent();
+}
+
+function renderTemplateRaporContent() {
+  const all = getTemplateRaporAll();
+  const tpl = all[templateRaporKey(templateKelompokAktif, templatePeriodeAktif)];
+  const statusWrap = document.getElementById('tr-status-wrap');
+  if (statusWrap) {
+    if (!tpl) statusWrap.innerHTML = '<span class="status-badge status-draft">📝 Belum dibuat</span>';
+    else if (tpl.status === 'dibagikan') statusWrap.innerHTML = '<span class="status-badge status-disetujui">📤 Sudah didistribusikan ke Guru</span>';
+    else statusWrap.innerHTML = '<span class="status-badge status-draft">📝 Draft (belum didistribusikan)</span>';
+  }
+
+  const container = document.getElementById('tr-content');
+  if (!container) return;
+  const grouped = {};
+  const order = [];
+  DEFAULT_INDIKATOR.forEach(d => {
+    if (!grouped[d.kategori]) { grouped[d.kategori] = []; order.push(d.kategori); }
+    const val = (tpl && tpl.indikator && tpl.indikator[d.key]) || d.label;
+    grouped[d.kategori].push({key: d.key, label: val});
+  });
+  let html = '';
+  order.forEach(kategori => {
+    html += '<div><div class="section-title" style="padding:0 0 6px;">' + kategori + '</div><div style="display:flex;flex-direction:column;gap:6px;">';
+    grouped[kategori].forEach(it => {
+      html += '<input type="text" class="form-input" data-tr-key="' + it.key + '" value="' + it.label.replace(/"/g,'&quot;') + '" style="font-size:12.5px;">';
+    });
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function simpanTemplateRapor(status) {
+  const all = getTemplateRaporAll();
+  const key = templateRaporKey(templateKelompokAktif, templatePeriodeAktif);
+  const indikator = {};
+  document.querySelectorAll('#tr-content [data-tr-key]').forEach(inp => { indikator[inp.dataset.trKey] = inp.value; });
+  all[key] = { indikator, status, updatedAt: new Date().toISOString(), updatedBy: 'Kepala Sekolah' };
+  saveTemplateRaporAll(all);
+  showToast(status === 'dibagikan' ? 'Template didistribusikan ke Guru ✅' : 'Template disimpan sebagai draft 💾');
+  renderTemplateRaporContent();
+}
+
+// ---------- GURU: status workflow rapor per murid ----------
+function kirimRaporKeKepala() {
+  simpanRaporGuru(true);
+  const list = getMuridList();
+  const m = list[guruRaporMuridIdx];
+  if (!m) return;
+  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  if (!all[guruRaporPeriode]) all[guruRaporPeriode] = {};
+  if (!all[guruRaporPeriode][m.nama]) all[guruRaporPeriode][m.nama] = {};
+  all[guruRaporPeriode][m.nama].status = 'dikirim';
+  all[guruRaporPeriode][m.nama].sentAt = new Date().toLocaleString('id-ID');
+  localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+  showToast('Rapor dikirim ke Kepala Sekolah untuk ditandatangani ✅');
+  updateBadgeArsip();
+  renderStatusRaporGuru();
+  renderDaftarMuridRapor();
+}
+
+function bagikanRaporKeOrtu() {
+  const list = getMuridList();
+  const m = list[guruRaporMuridIdx];
+  if (!m) return;
+  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const data = all[guruRaporPeriode]?.[m.nama];
+  if (!data || data.status !== 'disetujui') { showToast('Rapor belum disetujui Kepala Sekolah ⚠️'); return; }
+  data.dibagikan = true;
+  data.dibagikanAt = new Date().toLocaleString('id-ID');
+  try {
+    const rk = JSON.parse(localStorage.getItem(RAPOR_KEY) || '{}');
+    rk[guruRaporPeriode] = Object.assign({}, data, { tgl_simpan: new Date().toLocaleDateString('id-ID') });
+    localStorage.setItem(RAPOR_KEY, JSON.stringify(rk));
+  } catch(e) {}
+  localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+  showToast('Rapor berhasil dibagikan ke Wali Murid 📨');
+  renderStatusRaporGuru();
+}
+
+function renderStatusRaporGuru() {
+  const list = getMuridList();
+  const m = list[guruRaporMuridIdx];
+  if (!m) return;
+  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const data = all[guruRaporPeriode]?.[m.nama] || {};
+  const status = data.status || 'draft';
+  const badge = document.getElementById('gr-status-badge');
+  const btnKirim = document.getElementById('gr-btn-kirim');
+  const btnBagikan = document.getElementById('gr-btn-bagikan');
+  const btnSimpan = document.getElementById('btn-simpan-rapor-guru');
+  if (badge) {
+    if (status === 'dikirim') { badge.textContent = '⏳ Menunggu TTD'; badge.style.background = '#FFF3E0'; badge.style.color = '#F57F17'; }
+    else if (status === 'disetujui') { badge.textContent = data.dibagikan ? '📨 Dibagikan' : '✅ Disetujui'; badge.style.background = '#E8F5E9'; badge.style.color = 'var(--green-dark)'; }
+    else { badge.textContent = 'Draft'; badge.style.background = '#F5F5F5'; badge.style.color = 'var(--gray-500)'; }
+  }
+  const locked = status === 'dikirim' || status === 'disetujui';
+  document.querySelectorAll('#guru-form-rapor input, #guru-form-rapor textarea').forEach(el => { el.disabled = locked; });
+  if (btnSimpan) btnSimpan.style.display = locked ? 'none' : 'inline-block';
+  if (btnKirim) btnKirim.style.display = status === 'draft' ? 'block' : 'none';
+  if (btnBagikan) btnBagikan.style.display = (status === 'disetujui' && !data.dibagikan) ? 'block' : 'none';
+}
+
+
 const MODUL_KEY = 'schoolid_modul_ajar';
 const ASESMEN_KEY = 'schoolid_lembar_asesmen';
 
@@ -7397,8 +7610,23 @@ function simpanAsesmen(status) {
 let arsipTabAktif = 'modul';
 let arsipFilterAktif = 'semua';
 
+function getRaporFlatList() {
+  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const list = [];
+  Object.entries(all).forEach(([periode, muridMap]) => {
+    Object.entries(muridMap || {}).forEach(([nama, data]) => {
+      list.push({ id: periode + '|||' + nama, periode, nama, ...data, status: data.status || 'draft' });
+    });
+  });
+  return list;
+}
+
+const PERIODE_LABEL = { tengah1: 'Mid Semester 1', semester1: 'Semester 1', tengah2: 'Mid Semester 2', semester2: 'Semester 2' };
+
 function updateBadgeArsip() {
-  const pending = getModulList().filter(m => m.status === 'dikirim').length + getAsesmenList().filter(a => a.status === 'dikirim').length;
+  const pending = getModulList().filter(m => m.status === 'dikirim').length
+    + getAsesmenList().filter(a => a.status === 'dikirim').length
+    + getRaporFlatList().filter(r => r.status === 'dikirim').length;
   const badge = document.getElementById('badge-arsip');
   if (badge) { badge.textContent = pending; badge.style.background = pending > 0 ? '#F44336' : '#4CAF50'; }
 }
@@ -7407,6 +7635,7 @@ function pilihTabArsip(tab) {
   arsipTabAktif = tab;
   document.getElementById('ak-tab-modul')?.classList.toggle('active', tab === 'modul');
   document.getElementById('ak-tab-asesmen')?.classList.toggle('active', tab === 'asesmen');
+  document.getElementById('ak-tab-rapor')?.classList.toggle('active', tab === 'rapor');
   renderArsipKepala();
 }
 
@@ -7424,10 +7653,14 @@ function renderArsipKepala() {
   const container = document.getElementById('ak-list');
   const empty = document.getElementById('ak-empty');
   if (!container) return;
-  let list = arsipTabAktif === 'modul' ? getModulList() : getAsesmenList();
+  let list;
+  if (arsipTabAktif === 'modul') list = getModulList();
+  else if (arsipTabAktif === 'asesmen') list = getAsesmenList();
+  else list = getRaporFlatList();
+
   list = list.filter(x => x.status !== 'draft');
   if (arsipFilterAktif !== 'semua') list = list.filter(x => x.status === arsipFilterAktif);
-  list = list.slice().sort((a,b) => (b.updatedAt||'').localeCompare(a.updatedAt||''));
+  list = list.slice().sort((a,b) => (b.updatedAt||b.sentAt||'').localeCompare(a.updatedAt||a.sentAt||''));
 
   if (list.length === 0) { container.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
   if (empty) empty.style.display = 'none';
@@ -7443,12 +7676,22 @@ function renderArsipKepala() {
         </div>
         <span class="chevron">›</span>
       </div>`;
-    } else {
+    } else if (arsipTabAktif === 'asesmen') {
       return `<div class="ma-card" onclick="bukaDetailArsip('asesmen','${item.id}')">
         <div class="ma-card-icon" style="background:#E0F2F1;">🗒️</div>
         <div style="flex:1;min-width:0;">
           <div style="font-weight:700;font-size:13.5px;">${JENIS_ASESMEN_CONFIG[item.jenis]?.label || item.jenis}</div>
           <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">Guru: ${item.guru_kelas || '-'} · ${item.jenjang_kelas||'-'}</div>
+          <div style="margin-top:6px;">${statusBadgeHtml(item.status)}</div>
+        </div>
+        <span class="chevron">›</span>
+      </div>`;
+    } else {
+      return `<div class="ma-card" onclick="bukaDetailArsip('rapor','${item.id}')">
+        <div class="ma-card-icon" style="background:#FFF3E0;">🧾</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13.5px;">${item.nama} · Kelompok ${item.kelompok || '-'}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">${PERIODE_LABEL[item.periode] || item.periode}</div>
           <div style="margin-top:6px;">${statusBadgeHtml(item.status)}</div>
         </div>
         <span class="chevron">›</span>
@@ -7460,9 +7703,12 @@ function renderArsipKepala() {
 function esc(s) { return (s || '-').toString().replace(/\\n/g, '<br>'); }
 
 function bukaDetailArsip(type, id) {
-  const item = (type === 'modul' ? getModulList() : getAsesmenList()).find(x => x.id === id);
+  let item;
+  if (type === 'modul') item = getModulList().find(x => x.id === id);
+  else if (type === 'asesmen') item = getAsesmenList().find(x => x.id === id);
+  else item = getRaporFlatList().find(x => x.id === id);
   if (!item) return;
-  document.getElementById('akd-title').textContent = type === 'modul' ? 'Detail Modul Pembelajaran' : 'Detail Lembar Asesmen';
+  document.getElementById('akd-title').textContent = type === 'modul' ? 'Detail Modul Pembelajaran' : (type === 'asesmen' ? 'Detail Lembar Asesmen' : 'Detail Rapor Murid');
   let html = '';
 
   if (type === 'modul') {
@@ -7501,7 +7747,7 @@ function bukaDetailArsip(type, id) {
       ${detailSectionHtml('Asesmen Proses', item.asesmen_proses)}
       ${detailSectionHtml('Asesmen Akhir', item.asesmen_akhir)}
     `;
-  } else {
+  } else if (type === 'asesmen') {
     const cfg = JENIS_ASESMEN_CONFIG[item.jenis];
     const rowsHtml = (item.rows || []).map(r => {
       return '<tr>' + cfg.cols.map(c => {
@@ -7524,6 +7770,32 @@ function bukaDetailArsip(type, id) {
         <table class="asesmen-table"><thead><tr>${cfg.cols.map(c=>`<th>${c.l}</th>`).join('')}</tr></thead><tbody>${rowsHtml}</tbody></table>
       </div>
     `;
+  } else {
+    const tally = { BB:0, MB:0, BSH:0, BSB:0 };
+    Object.values(item.radio || {}).forEach(v => { if (tally[v] !== undefined) tally[v]++; });
+    html = `
+      <div style="text-align:center;">${statusBadgeHtml(item.status)}</div>
+      <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;">
+        <div style="font-weight:800;font-size:15px;margin-bottom:8px;">${esc(item.nama)}</div>
+        <div style="font-size:12px;color:var(--gray-600);line-height:1.8;">
+          <b>Kelompok:</b> ${esc(item.kelompok)} &nbsp;·&nbsp; <b>Periode:</b> ${PERIODE_LABEL[item.periode] || item.periode}<br>
+          <b>Tinggi/Berat:</b> ${esc(item.tinggi)} cm / ${esc(item.berat)} kg<br>
+          <b>Kehadiran:</b> Sakit ${esc(item.hadir_sakit)} · Izin ${esc(item.hadir_izin)} · Alpa ${esc(item.hadir_alpa)} · Total Hadir ${esc(item.hadir_total)}
+        </div>
+      </div>
+      <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;display:flex;justify-content:space-around;text-align:center;">
+        <div><div style="font-weight:800;font-size:16px;color:#E53935;">${tally.BB}</div><div style="font-size:10px;color:var(--gray-500);">BB</div></div>
+        <div><div style="font-weight:800;font-size:16px;color:#FB8C00;">${tally.MB}</div><div style="font-size:10px;color:var(--gray-500);">MB</div></div>
+        <div><div style="font-weight:800;font-size:16px;color:#43A047;">${tally.BSH}</div><div style="font-size:10px;color:var(--gray-500);">BSH</div></div>
+        <div><div style="font-weight:800;font-size:16px;color:#1E88E5;">${tally.BSB}</div><div style="font-size:10px;color:var(--gray-500);">BSB</div></div>
+      </div>
+      ${detailSectionHtml('Capaian Nilai Agama & Budi Pekerti', item.agama_narasi)}
+      ${detailSectionHtml('Capaian Jati Diri', item.jatidiri_narasi)}
+      ${detailSectionHtml('Capaian Dasar Literasi/Matematika/Sains/Seni', item.literasi_narasi)}
+      ${detailSectionHtml('Proyek Penguatan Profil Pelajar Pancasila', item.pancasila_narasi)}
+      ${detailSectionHtml('Iqro', 'Jilid ' + (item.iqro_jilid || '-') + ' · Halaman ' + (item.iqro_hal || '-'))}
+      ${detailSectionHtml('Pesan & Harapan Guru', item.pesan_guru)}
+    `;
   }
 
   html += `<div id="akd-ttd">${ttdBoxHtml(item)}</div>`;
@@ -7544,6 +7816,19 @@ function detailSectionHtml(title, content) {
 
 function tandaTanganSetujui(type, id) {
   if (!confirm('Setujui dan tanda tangani berkas ini sebagai Kepala Sekolah?')) return;
+  if (type === 'rapor') {
+    const [periode, nama] = id.split('|||');
+    const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+    if (!all[periode] || !all[periode][nama]) return;
+    all[periode][nama].status = 'disetujui';
+    all[periode][nama].approvedBy = 'Kepala Sekolah';
+    all[periode][nama].approvedAt = new Date().toLocaleString('id-ID');
+    localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+    showToast('Rapor disetujui & diarsipkan ✅ — dikembalikan ke Guru');
+    updateBadgeArsip();
+    bukaDetailArsip(type, id);
+    return;
+  }
   const list = type === 'modul' ? getModulList() : getAsesmenList();
   const idx = list.findIndex(x => x.id === id);
   if (idx === -1) return;
@@ -7656,6 +7941,7 @@ function bukaFormTambahMurid() {
   editMuridId = null; selectedJK = '';
   document.getElementById('form-murid-judul').textContent = 'Tambah Murid';
   ['fm-nama','fm-tgl','fm-ortu','fm-hp','fm-catatan','fm-avatar'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('fm-kelompok').value = 'A';
   document.getElementById('btn-hapus-murid').style.display = 'none';
   resetPilihJK();
   setTimeout(() => resetAvatarGrid(''), 100);
@@ -7674,6 +7960,7 @@ function bukaEditMurid(id) {
   document.getElementById('fm-hp').value = m.hp || '';
   document.getElementById('fm-catatan').value = m.catatan || '';
   document.getElementById('fm-avatar').value = m.avatar || '';
+  document.getElementById('fm-kelompok').value = m.kelompok || 'A';
   document.getElementById('btn-hapus-murid').style.display = 'block';
   resetPilihJK(); pilihJK(m.jk);
   setTimeout(() => resetAvatarGrid(m.avatar || ''), 100);
@@ -7738,11 +8025,13 @@ function simpanMurid() {
   if (!nama) { showToast('Nama murid wajib diisi! ⚠️'); return; }
   if (!selectedJK) { showToast('Pilih jenis kelamin! ⚠️'); return; }
   const avatarPilihan = document.getElementById('fm-avatar').value || (selectedJK === 'L' ? '👦' : '👧');
+  const kelompokPilihan = document.getElementById('fm-kelompok').value || 'A';
   const list = getMuridList();
   if (editMuridId) {
     const idx = list.findIndex(m => m.id === editMuridId);
     if (idx !== -1) list[idx] = {...list[idx], nama, jk: selectedJK,
       avatar: avatarPilihan,
+      kelompok: kelompokPilihan,
       tgl: document.getElementById('fm-tgl').value,
       ortu: document.getElementById('fm-ortu').value.trim(),
       hp: document.getElementById('fm-hp').value.trim(),
@@ -7751,6 +8040,7 @@ function simpanMurid() {
   } else {
     list.push({id: Date.now().toString(), nama, jk: selectedJK,
       avatar: avatarPilihan,
+      kelompok: kelompokPilihan,
       tgl: document.getElementById('fm-tgl').value,
       ortu: document.getElementById('fm-ortu').value.trim(),
       hp: document.getElementById('fm-hp').value.trim(),
