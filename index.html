@@ -4872,7 +4872,10 @@
     <div class="scroll-content">
       <!-- Header -->
       <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);padding:16px 16px 32px;text-align:center;">
-        <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 10px;">👩</div>
+        <div style="position:relative;width:72px;height:72px;margin:0 auto 10px;">
+          <div id="ortu-avatar-display" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:36px;">👩</div>
+          <button onclick="bukaAvatarPicker('ortu')" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:12px;cursor:pointer;">✏️</button>
+        </div>
         <div style="font-weight:700;font-size:17px;color:white;">Ibu Sari Dewi</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:3px;">Orang Tua · sari.dewi@email.com</div>
         <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;">
@@ -4883,7 +4886,10 @@
       <div style="margin:-16px 16px 0;background:white;border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,0.12);padding:16px;position:relative;z-index:1;">
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);text-transform:uppercase;margin-bottom:12px;">👧 Informasi Anak</div>
         <div style="display:flex;align-items:center;gap:14px;">
-          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">👧</div>
+          <div style="position:relative;width:52px;height:52px;flex-shrink:0;">
+            <div id="ortu-anak-avatar-display" style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:26px;">👧</div>
+            <button onclick="bukaAvatarPicker('anak')" style="position:absolute;bottom:-3px;right:-3px;width:20px;height:20px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:9px;cursor:pointer;padding:0;">✏️</button>
+          </div>
           <div style="flex:1;">
             <div style="font-weight:700;font-size:15px;">Aisyah Putri</div>
             <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Kelompok A · TK SchoolID</div>
@@ -4909,7 +4915,7 @@
             <div class="menu-item-text"><div class="menu-item-label">Data Orang Tua</div><div style="font-size:11px;color:var(--gray-400);">Suami, istri & alamat tinggal</div></div>
             <span class="menu-chevron">›</span>
           </div>
-          <div class="menu-item" onclick="goToFromDashboard('ortu-data-anak','profil-ortu')">
+          <div class="menu-item" onclick="goToFromDashboard('ortu-data-anak','profil-ortu');applyOrtuAvatars()">
             <div class="menu-item-icon" style="background:#F3E5F5;">👧</div>
             <div class="menu-item-text"><div class="menu-item-label">Data Anak</div><div style="font-size:11px;color:var(--gray-400);">Profil lengkap anak</div></div>
             <span class="menu-chevron">›</span>
@@ -5044,7 +5050,10 @@
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Data Anak</h2></div>
     <div class="form-body">
       <div style="text-align:center;padding:12px 0;">
-        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 8px;">👧</div>
+        <div style="position:relative;width:72px;height:72px;margin:0 auto 8px;">
+          <div id="anak-avatar-display" style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:36px;">👧</div>
+          <button onclick="bukaAvatarPicker('anak')" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:12px;cursor:pointer;">✏️</button>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Nama Lengkap Anak</label>
@@ -5341,33 +5350,33 @@
       </div>
       <div class="form-group">
         <label class="form-label">Nama Sekolah</label>
-        <input type="text" class="form-input" value="TK SchoolID Indonesia">
+        <input type="text" id="is-nama" class="form-input" value="KB-TKIT Istiqomah Penumping">
       </div>
       <div class="form-group">
         <label class="form-label">NPSN</label>
-        <input type="text" class="form-input" value="12345678">
+        <input type="text" id="is-npsn" class="form-input" value="">
       </div>
       <div class="form-group">
         <label class="form-label">Alamat</label>
-        <textarea class="form-textarea">Jl. Pendidikan No. 1, Jakarta Selatan</textarea>
+        <textarea id="is-alamat" class="form-textarea">Penumping, Surakarta</textarea>
       </div>
       <div class="form-group">
         <label class="form-label">Nomor Telepon</label>
-        <input type="tel" class="form-input" value="021-1234-5678">
+        <input type="tel" id="is-telp" class="form-input" value="">
       </div>
       <div class="form-group">
         <label class="form-label">Email Sekolah</label>
-        <input type="email" class="form-input" value="info@tkschooolid.sch.id">
+        <input type="email" id="is-email" class="form-input" value="">
       </div>
       <div class="form-group">
         <label class="form-label">Kepala Sekolah</label>
-        <input type="text" class="form-input" value="Bapak Ahmad Fauzi">
+        <input type="text" id="is-kepsek" class="form-input" value="">
       </div>
       <div class="form-group">
         <label class="form-label">Tahun Ajaran Aktif</label>
-        <input type="text" class="form-input" value="2025/2026">
+        <input type="text" id="is-tahun-ajaran" class="form-input" value="2026/2027">
       </div>
-      <button class="btn-save" onclick="saveAndBack('Informasi sekolah berhasil disimpan! ✅')">💾 Simpan</button>
+      <button class="btn-save" onclick="simpanInfoSekolah()">💾 Simpan</button>
     </div>
   </div>
 
@@ -5377,30 +5386,38 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Kelola Guru</h2>
-      <button onclick="showToast('Fitur tambah guru segera hadir!')" style="border:none;background:var(--green);color:white;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">+ Tambah</button>
+      <button onclick="bukaModalGuruBaru()" style="border:none;background:var(--green);color:white;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">+ Tambah</button>
     </div>
     <div class="scroll-content">
-      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
-        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;">
-          <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">👩🏻‍🏫</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;">Bu Rina</div>
-            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Guru Kelas A · Aktif</div>
-          </div>
-          <span style="background:#E8F5E9;color:var(--green);font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;">Aktif</span>
-        </div>
-        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;">
-          <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#BBDEFB,#90CAF9);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">👨‍🏫</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;">Pak Budi</div>
-            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Guru Kelas B · Aktif</div>
-          </div>
-          <span style="background:#E8F5E9;color:var(--green);font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;">Aktif</span>
-        </div>
-        <div style="text-align:center;padding:16px;background:#F5F5F5;border-radius:var(--radius);color:var(--gray-500);font-size:13px;">
-          + Fitur kelola guru lengkap segera hadir
-        </div>
+      <div id="kg-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL TAMBAH/EDIT GURU ===== -->
+  <div class="modal-overlay" id="modalGuru" onclick="closeModalGuru()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="mg-title">Tambah Guru</div>
+      <div class="form-group">
+        <label class="form-label">Nama Guru</label>
+        <input type="text" id="mg-nama" class="form-input" placeholder="cth: Bu Rina">
       </div>
+      <div class="form-group">
+        <label class="form-label">Kelas yang Diampu</label>
+        <select id="mg-kelas" class="form-input"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select id="mg-status" class="form-input">
+          <option value="aktif">Aktif</option>
+          <option value="nonaktif">Non-aktif</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button onclick="closeModalGuru()" style="flex:1;padding:13px;border:2px solid var(--gray-200);background:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">Batal</button>
+        <button onclick="simpanGuru()" style="flex:1;padding:13px;border:none;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan</button>
+      </div>
+      <button id="mg-btn-hapus" onclick="hapusGuru()" style="display:none;width:100%;margin-top:10px;padding:12px;border:2px solid #F44336;background:white;color:#F44336;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;">🗑️ Hapus Guru Ini</button>
     </div>
   </div>
 
@@ -5410,28 +5427,65 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Kelola Kelas</h2>
+      <button onclick="bukaModalKelasBaru()" style="border:none;background:var(--green);color:white;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;">+ Tambah</button>
     </div>
     <div class="scroll-content">
       <div style="padding:12px 16px 4px;font-size:12px;color:var(--gray-500);">
-        Kelompok kelas sudah baku (KB, A, B) mengikuti struktur rapor sekolah. Kepala Sekolah dapat mengatur nama Wali Kelas untuk masing-masing kelompok.
+        Setiap kelompok (KB/A/B) bisa punya lebih dari satu kelas, misalnya "Kelompok A1" dan "Kelompok A2" jika muridnya dipisah ke beberapa ruang/wali kelas. Kegiatan &amp; template rapor tetap mengikuti kategori dasarnya (KB/A/B).
       </div>
       <div id="kk-list" style="padding:10px 16px;display:flex;flex-direction:column;gap:8px;"></div>
     </div>
   </div>
 
-  <!-- ===== MODAL EDIT WALI KELAS ===== -->
+  <!-- ===== MODAL TAMBAH/EDIT KELAS ===== -->
   <div class="modal-overlay" id="modalKelas" onclick="closeModalKelas()">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>
-      <div class="modal-title" id="mk-title">Edit Kelompok</div>
+      <div class="modal-title" id="mk-title">Edit Kelas</div>
+      <div class="form-group">
+        <label class="form-label">Nama Kelas</label>
+        <input type="text" id="mk-nama" class="form-input" placeholder="cth: Kelompok A1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategori Dasar (menentukan template rapor)</label>
+        <select id="mk-kategori" class="form-input">
+          <option value="KB">KB (Kelompok Bermain)</option>
+          <option value="A">Kelompok A</option>
+          <option value="B">Kelompok B</option>
+        </select>
+      </div>
       <div class="form-group">
         <label class="form-label">Nama Wali Kelas</label>
         <input type="text" id="mk-wali" class="form-input" placeholder="cth: Bu Rina">
       </div>
       <div style="display:flex;gap:10px;margin-top:6px;">
         <button onclick="closeModalKelas()" style="flex:1;padding:13px;border:2px solid var(--gray-200);background:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">Batal</button>
-        <button onclick="simpanWaliKelas()" style="flex:1;padding:13px;border:none;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan</button>
+        <button onclick="simpanKelas()" style="flex:1;padding:13px;border:none;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan</button>
       </div>
+      <button id="mk-btn-hapus" onclick="hapusKelas()" style="display:none;width:100%;margin-top:10px;padding:12px;border:2px solid #F44336;background:white;color:#F44336;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;">🗑️ Hapus Kelas Ini</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL PILIH AVATAR (ORTU / ANAK) ===== -->
+  <div class="modal-overlay" id="modalAvatarPicker" onclick="closeAvatarPicker()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="mav-title">Pilih Foto Profil</div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;">
+        <div onclick="pilihAvatarPicker(this,'👩')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👩</div>
+        <div onclick="pilihAvatarPicker(this,'👨')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#BBDEFB,#90CAF9);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👨</div>
+        <div onclick="pilihAvatarPicker(this,'🧕')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#F8BBD0,#F48FB1);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">🧕</div>
+        <div onclick="pilihAvatarPicker(this,'👳')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#D1C4E9,#B39DDB);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👳</div>
+        <div onclick="pilihAvatarPicker(this,'👦')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#BBDEFB,#90CAF9);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👦</div>
+        <div onclick="pilihAvatarPicker(this,'👧')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👧</div>
+        <div onclick="pilihAvatarPicker(this,'🧒')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#D1C4E9,#B39DDB);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">🧒</div>
+        <div onclick="pilihAvatarPicker(this,'👶')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#B2EBF2,#80DEEA);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👶</div>
+        <div onclick="pilihAvatarPicker(this,'👼')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#DCEDC8,#AED581);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👼</div>
+        <div onclick="pilihAvatarPicker(this,'🐻')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">🐻</div>
+        <div onclick="pilihAvatarPicker(this,'🐰')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#F8BBD0,#F48FB1);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">🐰</div>
+        <div onclick="pilihAvatarPicker(this,'🦊')" class="mav-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#FFCCBC,#FFAB91);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">🦊</div>
+      </div>
+      <button onclick="closeAvatarPicker()" style="width:100%;padding:13px;border:2px solid var(--gray-200);background:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">Tutup</button>
     </div>
   </div>
 
@@ -5771,11 +5825,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Kelompok / Kelas *</label>
-        <select id="fm-kelompok" class="form-input">
-          <option value="KB">KB (Kelompok Bermain)</option>
-          <option value="A">Kelompok A</option>
-          <option value="B">Kelompok B</option>
-        </select>
+        <select id="fm-kelompok" class="form-input"></select>
       </div>
       <div class="form-group">
         <label class="form-label">Tanggal Lahir</label>
@@ -5809,9 +5859,9 @@
       <div class="settings-section" style="padding-top:14px;">
         <div style="padding:0 16px;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--gray-500);">INFORMASI UMUM</div>
         <div class="settings-group">
-          <div class="menu-item" onclick="goToFromDashboard('info-sekolah-view','pengaturan')">
+          <div class="menu-item" onclick="goToFromDashboard('info-sekolah','pengaturan');loadInfoSekolah()">
             <div class="menu-item-icon" style="background:#E8F5E9;">🏫</div>
-            <div class="menu-item-text"><div class="menu-item-label">Informasi Sekolah</div><div style="font-size:11px;color:var(--gray-400);">Hanya lihat</div></div>
+            <div class="menu-item-text"><div class="menu-item-label">Edit Informasi Sekolah</div><div style="font-size:11px;color:var(--gray-400);">Ubah data & profil sekolah</div></div>
             <span class="menu-chevron">›</span>
           </div>
         </div>
@@ -5820,6 +5870,11 @@
           <div class="menu-item" onclick="goToFromDashboard('kelola-kelas','pengaturan');renderKelolaKelas()">
             <div class="menu-item-icon" style="background:#E3F2FD;">🎒</div>
             <div class="menu-item-text"><div class="menu-item-label">Kelola Kelas</div></div>
+            <span class="menu-chevron">›</span>
+          </div>
+          <div class="menu-item" onclick="goToFromDashboard('kelola-guru','pengaturan');renderKelolaGuru()">
+            <div class="menu-item-icon" style="background:#FFF3E0;">🧑‍🏫</div>
+            <div class="menu-item-text"><div class="menu-item-label">Kelola Guru</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('kelola-murid','pengaturan');initKelolaMusid()">
@@ -6373,8 +6428,9 @@ function loadIndikator() {
   try {
     const list = getMuridList();
     const m = list[guruRaporMuridIdx];
-    const kelompok = (m && m.kelompok) || 'A';
-    const data = getIndikatorEfektif(kelompok, guruRaporPeriode);
+    const kelasId = (m && m.kelompok) || 'A';
+    const kategori = kategoriDasarKelas(kelasId);
+    const data = getIndikatorEfektif(kategori, guruRaporPeriode);
     document.querySelectorAll('#guru-form-rapor .indikator-cell').forEach(cell => {
       const key = cell.dataset.key;
       const span = cell.querySelector('.indikator-text');
@@ -7213,61 +7269,316 @@ function simpanPenilaian() {
 // ===================================================================
 
 // ===================================================================
-// ===== KELOLA KELAS (Kepala Sekolah) - real data, 3 kelompok baku =====
+// ===== KELOLA KELAS (dinamis, bisa lebih dari 1 kelas per kelompok) =====
 // ===================================================================
-const KELAS_INFO_KEY = 'schoolid_kelas_info';
-const KELOMPOK_LIST = [
-  { id: 'KB', label: 'Kelompok Bermain (KB)', warna: 'linear-gradient(135deg,#FFF3E0,#FFCC80)', teks: '#E65100' },
-  { id: 'A', label: 'Kelompok A', warna: 'linear-gradient(135deg,#E8F5E9,#A5D6A7)', teks: 'var(--green-dark)' },
-  { id: 'B', label: 'Kelompok B', warna: 'linear-gradient(135deg,#E3F2FD,#90CAF9)', teks: '#1565C0' }
-];
-let kelasModalAktif = null;
+const KELAS_LIST_KEY = 'schoolid_kelas_list';
+let kelasModalMode = 'edit'; // 'baru' | 'edit'
+let kelasModalId = null;
 
-function getKelasInfoAll() { try { return JSON.parse(localStorage.getItem(KELAS_INFO_KEY) || '{}'); } catch(e) { return {}; } }
-function saveKelasInfoAll(all) { localStorage.setItem(KELAS_INFO_KEY, JSON.stringify(all)); }
+function getKelasList() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(KELAS_LIST_KEY) || 'null');
+    if (saved && saved.length) return saved;
+  } catch(e) {}
+  const migrasi = (() => { try { return JSON.parse(localStorage.getItem('schoolid_kelas_info') || '{}'); } catch(e) { return {}; } })();
+  const defaultList = [
+    { id: 'KB', nama: 'Kelompok Bermain (KB)', kategori: 'KB', wali: (migrasi.KB && migrasi.KB.wali) || '' },
+    { id: 'A', nama: 'Kelompok A', kategori: 'A', wali: (migrasi.A && migrasi.A.wali) || '' },
+    { id: 'B', nama: 'Kelompok B', kategori: 'B', wali: (migrasi.B && migrasi.B.wali) || '' }
+  ];
+  saveKelasList(defaultList);
+  return defaultList;
+}
+function saveKelasList(list) { localStorage.setItem(KELAS_LIST_KEY, JSON.stringify(list)); }
+
+function kategoriDasarKelas(kelasId) {
+  const k = getKelasList().find(x => x.id === kelasId);
+  return k ? k.kategori : 'A';
+}
+
+const WARNA_KATEGORI = {
+  KB: { warna: 'linear-gradient(135deg,#FFF3E0,#FFCC80)', teks: '#E65100' },
+  A: { warna: 'linear-gradient(135deg,#E8F5E9,#A5D6A7)', teks: 'var(--green-dark)' },
+  B: { warna: 'linear-gradient(135deg,#E3F2FD,#90CAF9)', teks: '#1565C0' }
+};
+
+function isiDropdownKelas(selectId) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  const list = getKelasList();
+  sel.innerHTML = list.map(k => `<option value="${k.id}">${k.nama}</option>`).join('');
+}
 
 function renderKelolaKelas() {
   const murid = getMuridList();
-  const info = getKelasInfoAll();
+  const list = getKelasList();
   const container = document.getElementById('kk-list');
   if (!container) return;
-  container.innerHTML = KELOMPOK_LIST.map(k => {
+  container.innerHTML = list.map(k => {
     const jumlah = murid.filter(m => (m.kelompok || 'A') === k.id).length;
-    const wali = (info[k.id] && info[k.id].wali) || 'Belum diatur';
-    return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="bukaModalKelas('${k.id}')">
-      <div style="width:46px;height:46px;border-radius:12px;background:${k.warna};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:${k.teks};flex-shrink:0;">${k.id}</div>
+    const w = WARNA_KATEGORI[k.kategori] || WARNA_KATEGORI.A;
+    return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="bukaModalKelasEdit('${k.id}')">
+      <div style="width:46px;height:46px;border-radius:12px;background:${w.warna};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${w.teks};flex-shrink:0;text-align:center;">${k.kategori}</div>
       <div style="flex:1;">
-        <div style="font-weight:700;font-size:14px;">${k.label}</div>
-        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Wali: ${wali} · ${jumlah} Murid</div>
+        <div style="font-weight:700;font-size:14px;">${k.nama}</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Wali: ${k.wali || 'Belum diatur'} · ${jumlah} Murid</div>
       </div>
       <span style="color:var(--gray-300);font-size:20px;">✏️</span>
     </div>`;
   }).join('');
 }
 
-function bukaModalKelas(kelompokId) {
-  kelasModalAktif = kelompokId;
-  const k = KELOMPOK_LIST.find(x => x.id === kelompokId);
-  const info = getKelasInfoAll();
-  document.getElementById('mk-title').textContent = 'Wali Kelas — ' + (k ? k.label : kelompokId);
-  document.getElementById('mk-wali').value = (info[kelompokId] && info[kelompokId].wali) || '';
+function bukaModalKelasBaru() {
+  kelasModalMode = 'baru';
+  kelasModalId = null;
+  document.getElementById('mk-title').textContent = 'Tambah Kelas Baru';
+  document.getElementById('mk-nama').value = '';
+  document.getElementById('mk-kategori').value = 'A';
+  document.getElementById('mk-wali').value = '';
+  document.getElementById('mk-btn-hapus').style.display = 'none';
+  document.getElementById('modalKelas').classList.add('show');
+}
+
+function bukaModalKelasEdit(id) {
+  kelasModalMode = 'edit';
+  kelasModalId = id;
+  const k = getKelasList().find(x => x.id === id);
+  if (!k) return;
+  document.getElementById('mk-title').textContent = 'Edit Kelas';
+  document.getElementById('mk-nama').value = k.nama;
+  document.getElementById('mk-kategori').value = k.kategori;
+  document.getElementById('mk-wali').value = k.wali || '';
+  document.getElementById('mk-btn-hapus').style.display = 'block';
   document.getElementById('modalKelas').classList.add('show');
 }
 
 function closeModalKelas() {
   document.getElementById('modalKelas').classList.remove('show');
-  kelasModalAktif = null;
 }
 
-function simpanWaliKelas() {
-  if (!kelasModalAktif) return;
-  const nama = document.getElementById('mk-wali').value.trim();
-  const all = getKelasInfoAll();
-  all[kelasModalAktif] = { wali: nama, updatedAt: new Date().toISOString() };
-  saveKelasInfoAll(all);
+function simpanKelas() {
+  const nama = document.getElementById('mk-nama').value.trim();
+  if (!nama) { showToast('Nama kelas wajib diisi! ⚠️'); return; }
+  const kategori = document.getElementById('mk-kategori').value;
+  const wali = document.getElementById('mk-wali').value.trim();
+  const list = getKelasList();
+  if (kelasModalMode === 'baru') {
+    const id = 'kls_' + Date.now();
+    list.push({ id, nama, kategori, wali });
+    showToast('Kelas baru ditambahkan ✅');
+  } else {
+    const idx = list.findIndex(x => x.id === kelasModalId);
+    if (idx !== -1) list[idx] = { ...list[idx], nama, kategori, wali };
+    showToast('Data kelas diperbarui ✅');
+  }
+  saveKelasList(list);
   closeModalKelas();
   renderKelolaKelas();
-  showToast('Data Wali Kelas disimpan ✅');
+}
+
+function hapusKelas() {
+  if (!kelasModalId) return;
+  const murid = getMuridList();
+  const jumlah = murid.filter(m => (m.kelompok || 'A') === kelasModalId).length;
+  if (jumlah > 0) { showToast(`Tidak bisa dihapus, masih ada ${jumlah} murid di kelas ini ⚠️`); return; }
+  if (!confirm('Hapus kelas ini?')) return;
+  const list = getKelasList().filter(x => x.id !== kelasModalId);
+  saveKelasList(list);
+  closeModalKelas();
+  renderKelolaKelas();
+  showToast('Kelas dihapus 🗑️');
+}
+
+// ===================================================================
+// ===== KELOLA GURU (dinamis, terhubung ke daftar kelas) =====
+// ===================================================================
+const GURU_LIST_KEY = 'schoolid_guru_list';
+let guruModalMode = 'baru';
+let guruModalId = null;
+
+function getGuruList() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GURU_LIST_KEY) || 'null');
+    if (saved && saved.length) return saved;
+  } catch(e) {}
+  const defaultList = [
+    { id: 'g1', nama: 'Bu Rina', kelasId: 'A', status: 'aktif', avatar: '👩🏻‍🏫' },
+    { id: 'g2', nama: 'Pak Budi', kelasId: 'B', status: 'aktif', avatar: '👨‍🏫' }
+  ];
+  saveGuruList(defaultList);
+  return defaultList;
+}
+function saveGuruList(list) { localStorage.setItem(GURU_LIST_KEY, JSON.stringify(list)); }
+
+function renderKelolaGuru() {
+  const guru = getGuruList();
+  const kelas = getKelasList();
+  const container = document.getElementById('kg-list');
+  if (!container) return;
+  if (guru.length === 0) { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray-400);">Belum ada data guru</div>'; return; }
+  container.innerHTML = guru.map(g => {
+    const k = kelas.find(x => x.id === g.kelasId);
+    const aktif = g.status === 'aktif';
+    return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="bukaModalGuruEdit('${g.id}')">
+      <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${g.avatar || '🧑‍🏫'}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:14px;">${g.nama}</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">${k ? k.nama : 'Belum ada kelas'} · ${aktif ? 'Aktif' : 'Non-aktif'}</div>
+      </div>
+      <span style="background:${aktif ? '#E8F5E9' : '#FFEBEE'};color:${aktif ? 'var(--green)' : '#F44336'};font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;">${aktif ? 'Aktif' : 'Non-aktif'}</span>
+    </div>`;
+  }).join('');
+}
+
+function bukaModalGuruBaru() {
+  guruModalMode = 'baru';
+  guruModalId = null;
+  document.getElementById('mg-title').textContent = 'Tambah Guru';
+  document.getElementById('mg-nama').value = '';
+  isiDropdownKelas('mg-kelas');
+  document.getElementById('mg-status').value = 'aktif';
+  document.getElementById('mg-btn-hapus').style.display = 'none';
+  document.getElementById('modalGuru').classList.add('show');
+}
+
+function bukaModalGuruEdit(id) {
+  guruModalMode = 'edit';
+  guruModalId = id;
+  const g = getGuruList().find(x => x.id === id);
+  if (!g) return;
+  document.getElementById('mg-title').textContent = 'Edit Guru';
+  document.getElementById('mg-nama').value = g.nama;
+  isiDropdownKelas('mg-kelas');
+  document.getElementById('mg-kelas').value = g.kelasId;
+  document.getElementById('mg-status').value = g.status;
+  document.getElementById('mg-btn-hapus').style.display = 'block';
+  document.getElementById('modalGuru').classList.add('show');
+}
+
+function closeModalGuru() {
+  document.getElementById('modalGuru').classList.remove('show');
+}
+
+function simpanGuru() {
+  const nama = document.getElementById('mg-nama').value.trim();
+  if (!nama) { showToast('Nama guru wajib diisi! ⚠️'); return; }
+  const kelasId = document.getElementById('mg-kelas').value;
+  const status = document.getElementById('mg-status').value;
+  const list = getGuruList();
+  if (guruModalMode === 'baru') {
+    list.push({ id: 'g_' + Date.now(), nama, kelasId, status, avatar: '🧑‍🏫' });
+    showToast('Guru baru ditambahkan ✅');
+  } else {
+    const idx = list.findIndex(x => x.id === guruModalId);
+    if (idx !== -1) list[idx] = { ...list[idx], nama, kelasId, status };
+    showToast('Data guru diperbarui ✅');
+  }
+  saveGuruList(list);
+  closeModalGuru();
+  renderKelolaGuru();
+}
+
+function hapusGuru() {
+  if (!guruModalId) return;
+  if (!confirm('Hapus data guru ini?')) return;
+  const list = getGuruList().filter(x => x.id !== guruModalId);
+  saveGuruList(list);
+  closeModalGuru();
+  renderKelolaGuru();
+  showToast('Data guru dihapus 🗑️');
+}
+
+// ===================================================================
+// ===== INFO SEKOLAH (Kepala Sekolah - benar-benar tersimpan) =====
+// ===================================================================
+const INFO_SEKOLAH_KEY = 'schoolid_info_sekolah';
+const INFO_SEKOLAH_DEFAULT = {
+  nama: 'KB-TKIT Istiqomah Penumping',
+  npsn: '',
+  alamat: 'Penumping, Surakarta',
+  telp: '',
+  email: '',
+  kepsek: '',
+  tahunAjaran: '2026/2027'
+};
+
+function getInfoSekolah() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(INFO_SEKOLAH_KEY) || 'null');
+    return saved ? { ...INFO_SEKOLAH_DEFAULT, ...saved } : { ...INFO_SEKOLAH_DEFAULT };
+  } catch(e) { return { ...INFO_SEKOLAH_DEFAULT }; }
+}
+
+function loadInfoSekolah() {
+  const d = getInfoSekolah();
+  document.getElementById('is-nama').value = d.nama;
+  document.getElementById('is-npsn').value = d.npsn;
+  document.getElementById('is-alamat').value = d.alamat;
+  document.getElementById('is-telp').value = d.telp;
+  document.getElementById('is-email').value = d.email;
+  document.getElementById('is-kepsek').value = d.kepsek;
+  document.getElementById('is-tahun-ajaran').value = d.tahunAjaran;
+}
+
+function simpanInfoSekolah() {
+  const data = {
+    nama: document.getElementById('is-nama').value.trim(),
+    npsn: document.getElementById('is-npsn').value.trim(),
+    alamat: document.getElementById('is-alamat').value.trim(),
+    telp: document.getElementById('is-telp').value.trim(),
+    email: document.getElementById('is-email').value.trim(),
+    kepsek: document.getElementById('is-kepsek').value.trim(),
+    tahunAjaran: document.getElementById('is-tahun-ajaran').value.trim()
+  };
+  localStorage.setItem(INFO_SEKOLAH_KEY, JSON.stringify(data));
+  showToast('Informasi sekolah berhasil disimpan! ✅');
+  setTimeout(goBack, 300);
+}
+
+
+// ===================================================================
+// ===== GANTI FOTO PROFIL (Ortu & Data Anak) =====
+// ===================================================================
+const ORTU_AVATAR_KEY = 'schoolid_ortu_avatar';
+let avatarPickerTarget = null;
+
+function getOrtuAvatars() {
+  try { return JSON.parse(localStorage.getItem(ORTU_AVATAR_KEY) || '{}'); } catch(e) { return {}; }
+}
+function saveOrtuAvatars(obj) { localStorage.setItem(ORTU_AVATAR_KEY, JSON.stringify(obj)); }
+
+function applyOrtuAvatars() {
+  const a = getOrtuAvatars();
+  const ortuEl = document.getElementById('ortu-avatar-display');
+  const anakEl1 = document.getElementById('ortu-anak-avatar-display');
+  const anakEl2 = document.getElementById('anak-avatar-display');
+  if (ortuEl && a.ortu) ortuEl.textContent = a.ortu;
+  if (anakEl1 && a.anak) anakEl1.textContent = a.anak;
+  if (anakEl2 && a.anak) anakEl2.textContent = a.anak;
+}
+
+function bukaAvatarPicker(target) {
+  avatarPickerTarget = target;
+  document.getElementById('mav-title').textContent = target === 'ortu' ? 'Pilih Foto Profil Orang Tua' : 'Pilih Foto Profil Anak';
+  document.querySelectorAll('.mav-opt').forEach(el => { el.style.border = '2px solid transparent'; el.style.transform = 'scale(1)'; });
+  document.getElementById('modalAvatarPicker').classList.add('show');
+}
+
+function closeAvatarPicker() {
+  document.getElementById('modalAvatarPicker').classList.remove('show');
+  avatarPickerTarget = null;
+}
+
+function pilihAvatarPicker(el, emoji) {
+  document.querySelectorAll('.mav-opt').forEach(a => { a.style.border = '2px solid transparent'; a.style.transform = 'scale(1)'; });
+  el.style.border = '2px solid var(--green)';
+  el.style.transform = 'scale(1.15)';
+  const all = getOrtuAvatars();
+  all[avatarPickerTarget] = emoji;
+  saveOrtuAvatars(all);
+  applyOrtuAvatars();
+  showToast('Foto profil diperbarui ✅');
+  setTimeout(closeAvatarPicker, 350);
 }
 
 const TEMPLATE_RAPOR_KEY = 'schoolid_template_rapor';
@@ -7998,6 +8309,7 @@ function bukaFormTambahMurid() {
   editMuridId = null; selectedJK = '';
   document.getElementById('form-murid-judul').textContent = 'Tambah Murid';
   ['fm-nama','fm-tgl','fm-ortu','fm-hp','fm-catatan','fm-avatar'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  isiDropdownKelas('fm-kelompok');
   document.getElementById('fm-kelompok').value = 'A';
   document.getElementById('btn-hapus-murid').style.display = 'none';
   resetPilihJK();
@@ -8017,6 +8329,7 @@ function bukaEditMurid(id) {
   document.getElementById('fm-hp').value = m.hp || '';
   document.getElementById('fm-catatan').value = m.catatan || '';
   document.getElementById('fm-avatar').value = m.avatar || '';
+  isiDropdownKelas('fm-kelompok');
   document.getElementById('fm-kelompok').value = m.kelompok || 'A';
   document.getElementById('btn-hapus-murid').style.display = 'block';
   resetPilihJK(); pilihJK(m.jk);
@@ -8351,6 +8664,7 @@ function switchTabOrtu(btn, screenId) {
 
   if (screenId === 'dokumentasi') updateDokumentasiNav();
   if (screenId === 'pesan') updatePesanNav();
+  if (screenId === 'profil-ortu') applyOrtuAvatars();
 }
 function switchTabKepala(btn, screenId) { switchTab(screenId, btn, 'kepala'); }
 
