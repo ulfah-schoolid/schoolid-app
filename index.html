@@ -65,11 +65,13 @@
       overflow: hidden;
       height: 100vh;
       height: 100dvh;
+      height: var(--app-height, 100dvh);
     }
     .app-frame { 
       width: 100vw; 
       height: 100vh;
       height: 100dvh;
+      height: var(--app-height, 100dvh);
       border-radius: 0; 
       box-shadow: none;
     }
@@ -9181,6 +9183,14 @@ function setDate() {
 }
 
 // ===== INIT: SPLASH → LOGIN =====
+// ===== Perbaikan tinggi viewport mobile (address bar browser bikin 100vh tidak akurat) =====
+function setAppHeight() {
+  document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', setAppHeight);
+
 window.addEventListener('DOMContentLoaded', () => {
   setDate();
   // Splash → Login after 2.8s
