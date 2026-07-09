@@ -2735,6 +2735,13 @@
         <b>Keterangan:</b> BB = Belum Berkembang | MB = Mulai Berkembang | BSH = Berkembang Sesuai Harapan | BSB = Berkembang Sangat Baik
       </div>
 
+      <div id="ai-narasi-wrap" style="margin-bottom:14px;">
+        <button id="btn-generate-ai" onclick="generateNarasiAI()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7B1FA2,#9C27B0);color:white;border:none;border-radius:var(--radius);font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(123,31,162,0.3);">
+          <span>✨</span> Generate Narasi Rapor dengan AI
+        </button>
+        <div style="font-size:11px;color:var(--gray-500);text-align:center;margin-top:6px;">AI akan membuat draft narasi berdasarkan hasil ceklis. Kamu tetap bisa edit hasilnya sebelum disimpan.</div>
+      </div>
+
       <div class="section-hdr" style="margin-top:8px;">CAPAIAN PEMBELAJARAN NILAI AGAMA DAN BUDI PEKERTI</div>
       <div style="border:1px solid #ddd;border-top:none;border-radius:0 0 6px 6px;padding:8px;background:white;margin-bottom:12px;">
         <textarea id="gr-agama-narasi" class="narasi-box" placeholder="Narasi capaian nilai agama dan budi pekerti..."></textarea>
@@ -6760,6 +6767,69 @@ function loadFormRaporGuru(idx) {
   // Scroll ke atas
   const sc = document.getElementById('guru-form-rapor')?.querySelector('.scroll-content');
   if (sc) sc.scrollTop = 0;
+}
+
+// ===== GENERATE NARASI RAPOR DENGAN AI =====
+const KATEGORI_PREFIX = {
+  'd': 'Diniyyah', 'sb': 'Seni Batik', 'ba': 'Bahasa Arab',
+  'ks': 'Kesehatan', 'eb': 'Ekstrakurikuler', 'eg': 'Ekstrakurikuler',
+  'ei': 'Ekstrakurikuler', 'em': 'Ekstrakurikuler', 'er': 'Ekstrakurikuler', 'et': 'Ekstrakurikuler'
+};
+
+function ringkasanChecklistUntukAI() {
+  const tally = {};
+  document.querySelectorAll('#guru-form-rapor input[type=radio]:checked').forEach(r => {
+    const m = r.name.match(/^gr-([a-z]+)\d/);
+    const kategori = m ? (KATEGORI_PREFIX[m[1]] || 'Lainnya') : 'Lainnya';
+    if (!tally[kategori]) tally[kategori] = { BB: 0, MB: 0, BSH: 0, BSB: 0 };
+    if (tally[kategori][r.value] !== undefined) tally[kategori][r.value]++;
+  });
+  return Object.entries(tally).map(([k, v]) =>
+    `${k}: BB=${v.BB}, MB=${v.MB}, BSH=${v.BSH}, BSB=${v.BSB}`
+  ).join('\n');
+}
+
+async function generateNarasiAI() {
+  const list = getMuridList();
+  const m = list[guruRaporMuridIdx];
+  if (!m) { showToast('Data murid tidak ditemukan ⚠️'); return; }
+
+  const ringkasan = ringkasanChecklistUntukAI();
+  if (!ringkasan) { showToast('Isi dulu ceklis kegiatan sebelum generate narasi ⚠️'); return; }
+
+  const btn = document.getElementById('btn-generate-ai');
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Sedang membuat narasi...';
+
+  try {
+    const res = await fetch('/api/generate-narasi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nama: m.nama,
+        jk: m.jk === 'L' ? 'laki-laki' : 'perempuan',
+        kelompok: m.kelompok || 'A',
+        ringkasan
+      })
+    });
+
+    if (!res.ok) throw new Error('Gagal menghubungi server AI');
+    const data = await res.json();
+
+    if (data.agama) document.getElementById('gr-agama-narasi').value = data.agama;
+    if (data.jatidiri) document.getElementById('gr-jatidiri-narasi').value = data.jatidiri;
+    if (data.literasi) document.getElementById('gr-literasi-narasi').value = data.literasi;
+    if (data.pancasila) document.getElementById('gr-pancasila-narasi').value = data.pancasila;
+    if (data.pesan) document.getElementById('gr-pesan-guru').value = data.pesan;
+
+    showToast('Narasi berhasil dibuat AI ✨ — silakan cek & edit jika perlu');
+  } catch (e) {
+    showToast('Gagal generate narasi. Coba lagi ya ⚠️');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
 }
 
 function simpanRaporGuru(silent) {
