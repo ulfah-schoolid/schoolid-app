@@ -7689,21 +7689,60 @@ const KELAS_LIST_KEY = 'schoolid_kelas_list';
 let kelasModalMode = 'edit'; // 'baru' | 'edit'
 let kelasModalId = null;
 
-function getKelasList() {
+// ===== KELAS: sekarang tersimpan di Supabase (cache di memori utk kecepatan) =====
+let kelasCache = null;
+let kelasIdSebelumnya = [];
+
+async function muatKelasDariSupabase() {
   try {
-    const saved = JSON.parse(localStorage.getItem(KELAS_LIST_KEY) || 'null');
-    if (saved && saved.length) return saved;
-  } catch(e) {}
-  const migrasi = (() => { try { return JSON.parse(localStorage.getItem('schoolid_kelas_info') || '{}'); } catch(e) { return {}; } })();
-  const defaultList = [
-    { id: 'KB', nama: 'Kelompok Bermain (KB)', kategori: 'KB', wali: (migrasi.KB && migrasi.KB.wali) || '' },
-    { id: 'A', nama: 'Kelompok A', kategori: 'A', wali: (migrasi.A && migrasi.A.wali) || '' },
-    { id: 'B', nama: 'Kelompok B', kategori: 'B', wali: (migrasi.B && migrasi.B.wali) || '' }
-  ];
-  saveKelasList(defaultList);
-  return defaultList;
+    const { data, error } = await supabaseClient.from('kelas').select('*').order('id');
+    if (error) throw error;
+    if (data && data.length) {
+      kelasCache = data;
+    } else {
+      // Belum ada data di Supabase -> isi default awal
+      kelasCache = [
+        { id: 'KB', nama: 'Kelompok Bermain (KB)', kategori: 'KB', wali: '' },
+        { id: 'A', nama: 'Kelompok A', kategori: 'A', wali: '' },
+        { id: 'B', nama: 'Kelompok B', kategori: 'B', wali: '' }
+      ];
+      await supabaseClient.from('kelas').upsert(kelasCache);
+    }
+    kelasIdSebelumnya = kelasCache.map(k => k.id);
+  } catch (e) {
+    console.error('Gagal muat kelas dari Supabase:', e);
+    kelasCache = kelasCache || [
+      { id: 'KB', nama: 'Kelompok Bermain (KB)', kategori: 'KB', wali: '' },
+      { id: 'A', nama: 'Kelompok A', kategori: 'A', wali: '' },
+      { id: 'B', nama: 'Kelompok B', kategori: 'B', wali: '' }
+    ];
+  }
 }
-function saveKelasList(list) { localStorage.setItem(KELAS_LIST_KEY, JSON.stringify(list)); }
+
+function getKelasList() {
+  return kelasCache || [];
+}
+
+async function saveKelasList(list) {
+  kelasCache = list;
+  try {
+    if (list.length) {
+      const { error } = await supabaseClient.from('kelas').upsert(list.map(k => ({
+        id: k.id, nama: k.nama, kategori: k.kategori, wali: k.wali || null
+      })));
+      if (error) throw error;
+    }
+    const idSekarang = list.map(k => k.id);
+    const dihapus = kelasIdSebelumnya.filter(id => !idSekarang.includes(id));
+    if (dihapus.length) {
+      await supabaseClient.from('kelas').delete().in('id', dihapus);
+    }
+    kelasIdSebelumnya = idSekarang;
+  } catch (e) {
+    console.error('Gagal simpan kelas ke Supabase:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
+}
 
 function kategoriDasarKelas(kelasId) {
   const k = getKelasList().find(x => x.id === kelasId);
@@ -8761,30 +8800,49 @@ const MURID_KEY = 'schoolid_murid';
 let selectedJK = '';
 let editMuridId = null;
 
-function getMuridList() {
+// ===== MURID: sekarang tersimpan di Supabase (cache di memori utk kecepatan) =====
+let muridCache = null;
+let muridIdSebelumnya = [];
+
+async function muatMuridDariSupabase() {
   try {
-    const data = localStorage.getItem(MURID_KEY);
-    if (data) return JSON.parse(data);
-  } catch(e) {}
-  const awal = [
-    {id:'1',nama:'Aisyah Putri',jk:'P',tgl:'2020-03-16',ortu:'Ibu Sari Dewi',hp:'0812-3456-7890',catatan:''},
-    {id:'2',nama:'Rafa Ardian',jk:'L',tgl:'2020-05-20',ortu:'Bapak Ardi',hp:'0813-2345-6789',catatan:''},
-    {id:'3',nama:'Nabila Zahrah',jk:'P',tgl:'2020-07-11',ortu:'Ibu Zahrah',hp:'0814-3456-7890',catatan:''},
-    {id:'4',nama:'Dimas Saputra',jk:'L',tgl:'2020-01-05',ortu:'Bapak Dimas',hp:'0815-4567-8901',catatan:''},
-    {id:'5',nama:'Zahra Amelia',jk:'P',tgl:'2020-09-22',ortu:'Ibu Amelia',hp:'0816-5678-9012',catatan:''},
-    {id:'6',nama:'Bintang Pratama',jk:'L',tgl:'2020-04-14',ortu:'Bapak Pratama',hp:'0817-6789-0123',catatan:''},
-    {id:'7',nama:'Citra Lestari',jk:'P',tgl:'2020-06-30',ortu:'Ibu Lestari',hp:'0818-7890-1234',catatan:''},
-    {id:'8',nama:'Faiz Ramadan',jk:'L',tgl:'2020-02-18',ortu:'Bapak Faiz',hp:'0819-8901-2345',catatan:''},
-    {id:'9',nama:'Hana Safitri',jk:'P',tgl:'2020-08-25',ortu:'Ibu Hana',hp:'0820-9012-3456',catatan:''},
-    {id:'10',nama:'Ilham Putra',jk:'L',tgl:'2020-11-10',ortu:'Bapak Ilham',hp:'0821-0123-4567',catatan:''},
-  ];
-  localStorage.setItem(MURID_KEY, JSON.stringify(awal));
-  return awal;
+    const { data, error } = await supabaseClient.from('murid').select('*').order('nama');
+    if (error) throw error;
+    muridCache = data || [];
+    muridIdSebelumnya = muridCache.map(m => m.id);
+    syncDataMurid(muridCache);
+  } catch (e) {
+    console.error('Gagal muat murid dari Supabase:', e);
+    muridCache = muridCache || [];
+  }
 }
 
-function saveMuridList(list) {
-  localStorage.setItem(MURID_KEY, JSON.stringify(list));
+function getMuridList() {
+  return muridCache || [];
+}
+
+async function saveMuridList(list) {
+  muridCache = list;
   syncDataMurid(list);
+  try {
+    if (list.length) {
+      const { error } = await supabaseClient.from('murid').upsert(list.map(m => ({
+        id: m.id, nama: m.nama, jk: m.jk, avatar: m.avatar || null,
+        kelompok: m.kelompok || null, tgl: m.tgl || null, ortu: m.ortu || null,
+        hp: m.hp || null, catatan: m.catatan || null
+      })));
+      if (error) throw error;
+    }
+    const idSekarang = list.map(m => m.id);
+    const dihapus = muridIdSebelumnya.filter(id => !idSekarang.includes(id));
+    if (dihapus.length) {
+      await supabaseClient.from('murid').delete().in('id', dihapus);
+    }
+    muridIdSebelumnya = idSekarang;
+  } catch (e) {
+    console.error('Gagal simpan murid ke Supabase:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
 }
 
 function syncDataMurid(list) {
@@ -8979,10 +9037,7 @@ function hapusMurid() {
   setTimeout(() => renderDaftarMuridKelola(), 150);
 }
 
-// Sync murid dari localStorage saat halaman pertama kali load
-(function() {
-  try { syncDataMurid(getMuridList()); } catch(e) {}
-})();
+// (Sync murid sekarang dilakukan lewat muatMuridDariSupabase() saat login)
 
 // ===== DATA MURID =====
 const dataMurid = [
@@ -9128,7 +9183,8 @@ async function doLogin() {
   const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
   if (error) {
     hideLoading();
-    showToast('Login gagal: email atau password salah ⚠️');
+    console.error('Error login:', error);
+    showToast('Login gagal: ' + error.message + ' ⚠️');
     return;
   }
   await masukKeDashboardSesuaiProfil(data.user.id);
@@ -9141,8 +9197,8 @@ async function masukKeDashboardSesuaiProfil(userId) {
     .eq('id', userId)
     .single();
 
-  hideLoading();
   if (error || !profile) {
+    hideLoading();
     console.error('Error ambil profil:', error);
     showToast('Gagal muat profil: ' + (error?.message || 'tidak ditemukan') + ' ⚠️');
     return;
@@ -9151,6 +9207,10 @@ async function masukKeDashboardSesuaiProfil(userId) {
   currentRole = profile.role;
   currentUserProfile = profile;
   screenHistory = [];
+
+  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase()]);
+  hideLoading();
+
   document.querySelector('.screen.active')?.classList.remove('active');
 
   if (profile.role === 'guru') goTo('dashboard-guru');
