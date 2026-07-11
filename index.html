@@ -9143,7 +9143,8 @@ async function masukKeDashboardSesuaiProfil(userId) {
 
   hideLoading();
   if (error || !profile) {
-    showToast('Gagal memuat profil pengguna ⚠️');
+    console.error('Error ambil profil:', error);
+    showToast('Gagal muat profil: ' + (error?.message || 'tidak ditemukan') + ' ⚠️');
     return;
   }
 
