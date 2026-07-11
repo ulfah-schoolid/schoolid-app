@@ -7849,19 +7849,56 @@ const GURU_LIST_KEY = 'schoolid_guru_list';
 let guruModalMode = 'baru';
 let guruModalId = null;
 
-function getGuruList() {
+// ===== GURU: sekarang tersimpan di Supabase (cache di memori utk kecepatan) =====
+let guruCache = null;
+let guruIdSebelumnya = [];
+
+async function muatGuruDariSupabase() {
   try {
-    const saved = JSON.parse(localStorage.getItem(GURU_LIST_KEY) || 'null');
-    if (saved && saved.length) return saved;
-  } catch(e) {}
-  const defaultList = [
-    { id: 'g1', nama: 'Bu Rina', kelasId: 'A', status: 'aktif', avatar: '👩🏻‍🏫' },
-    { id: 'g2', nama: 'Pak Budi', kelasId: 'B', status: 'aktif', avatar: '👨‍🏫' }
-  ];
-  saveGuruList(defaultList);
-  return defaultList;
+    const { data, error } = await supabaseClient.from('guru').select('*').order('nama');
+    if (error) throw error;
+    if (data && data.length) {
+      guruCache = data.map(g => ({ id: g.id, nama: g.nama, kelasId: g.kelas_id, status: g.status, avatar: g.avatar }));
+    } else {
+      guruCache = [
+        { id: 'g1', nama: 'Bu Rina', kelasId: 'A', status: 'aktif', avatar: '👩🏻‍🏫' },
+        { id: 'g2', nama: 'Pak Budi', kelasId: 'B', status: 'aktif', avatar: '👨‍🏫' }
+      ];
+      await supabaseClient.from('guru').upsert(guruCache.map(g => ({
+        id: g.id, nama: g.nama, kelas_id: g.kelasId, status: g.status, avatar: g.avatar
+      })));
+    }
+    guruIdSebelumnya = guruCache.map(g => g.id);
+  } catch (e) {
+    console.error('Gagal muat guru dari Supabase:', e);
+    guruCache = guruCache || [];
+  }
 }
-function saveGuruList(list) { localStorage.setItem(GURU_LIST_KEY, JSON.stringify(list)); }
+
+function getGuruList() {
+  return guruCache || [];
+}
+
+async function saveGuruList(list) {
+  guruCache = list;
+  try {
+    if (list.length) {
+      const { error } = await supabaseClient.from('guru').upsert(list.map(g => ({
+        id: g.id, nama: g.nama, kelas_id: g.kelasId || null, status: g.status, avatar: g.avatar || null
+      })));
+      if (error) throw error;
+    }
+    const idSekarang = list.map(g => g.id);
+    const dihapus = guruIdSebelumnya.filter(id => !idSekarang.includes(id));
+    if (dihapus.length) {
+      await supabaseClient.from('guru').delete().in('id', dihapus);
+    }
+    guruIdSebelumnya = idSekarang;
+  } catch (e) {
+    console.error('Gagal simpan guru ke Supabase:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
+}
 
 function renderKelolaGuru() {
   const guru = getGuruList();
@@ -9208,7 +9245,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
   currentUserProfile = profile;
   screenHistory = [];
 
-  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase()]);
+  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase(), muatGuruDariSupabase()]);
   hideLoading();
 
   document.querySelector('.screen.active')?.classList.remove('active');
