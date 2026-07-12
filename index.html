@@ -6786,6 +6786,54 @@ function loadIndikator() {
 
 // ===== RAPOR SISWA GURU =====
 const RAPOR_GURU_KEY = 'schoolid_rapor_guru';
+
+// ===== RAPOR MURID: sekarang tersimpan di Supabase (cache di memori) =====
+let raporGuruCache = null;
+
+async function muatRaporGuruDariSupabase() {
+  try {
+    const { data, error } = await supabaseClient.from('rapor_murid').select('*');
+    if (error) throw error;
+    raporGuruCache = {};
+    (data || []).forEach(row => {
+      if (!raporGuruCache[row.periode]) raporGuruCache[row.periode] = {};
+      raporGuruCache[row.periode][row.murid_nama] = { ...row.data, status: row.status };
+    });
+  } catch (e) {
+    console.error('Gagal muat rapor murid dari Supabase:', e);
+    raporGuruCache = raporGuruCache || {};
+  }
+}
+
+function getRaporGuruAll() {
+  return raporGuruCache || {};
+}
+
+async function saveRaporGuruAll(all) {
+  raporGuruCache = all;
+  try {
+    const rows = [];
+    Object.entries(all).forEach(([periode, muridMap]) => {
+      Object.entries(muridMap || {}).forEach(([nama, dataObj]) => {
+        rows.push({
+          id: periode + '|||' + nama,
+          murid_nama: nama,
+          periode,
+          status: dataObj.status || 'draft',
+          data: dataObj,
+          updated_at: new Date().toISOString()
+        });
+      });
+    });
+    if (rows.length) {
+      const { error } = await supabaseClient.from('rapor_murid').upsert(rows);
+      if (error) throw error;
+    }
+  } catch (e) {
+    console.error('Gagal simpan rapor murid ke Supabase:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
+}
 let guruRaporPeriode = 'semester2';
 let guruRaporMuridIdx = 0;
 
@@ -6807,7 +6855,7 @@ function renderDaftarMuridRapor() {
   if (!container) return;
 
   // Hitung progress
-  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const all = getRaporGuruAll();
   const periodeData = all[guruRaporPeriode] || {};
   const sudahIsi = list.filter(m => periodeData[m.nama]).length;
 
@@ -6887,7 +6935,7 @@ function loadFormRaporGuru(idx) {
 
   // Load data tersimpan
   try {
-    const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+    const all = getRaporGuruAll();
     const data = all[guruRaporPeriode]?.[m.nama];
     if (!data) return;
 
@@ -6983,12 +7031,12 @@ async function generateNarasiAI() {
   }
 }
 
-function simpanRaporGuru(silent) {
+async function simpanRaporGuru(silent) {
   const list = getMuridList();
   const m = list[guruRaporMuridIdx];
   if (!m) return;
 
-  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const all = getRaporGuruAll();
   const existing = all[guruRaporPeriode]?.[m.nama] || {};
   if (existing.status === 'dikirim' || existing.status === 'disetujui') {
     if (!silent) showToast('Rapor sudah dikirim, tidak bisa diubah lagi 🔒');
@@ -7024,7 +7072,7 @@ function simpanRaporGuru(silent) {
       status: existing.status || 'draft',
       tgl_simpan: new Date().toLocaleDateString('id-ID')
     };
-    localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+    await saveRaporGuruAll(all);
     if (!silent) showToast(`Rapor ${m.nama} tersimpan! ✅`);
   } catch(e) {
     showToast('Gagal menyimpan ⚠️');
@@ -8310,28 +8358,28 @@ function simpanTemplateRapor(status) {
 }
 
 // ---------- GURU: status workflow rapor per murid ----------
-function kirimRaporKeKepala() {
-  simpanRaporGuru(true);
+async function kirimRaporKeKepala() {
+  await simpanRaporGuru(true);
   const list = getMuridList();
   const m = list[guruRaporMuridIdx];
   if (!m) return;
-  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const all = getRaporGuruAll();
   if (!all[guruRaporPeriode]) all[guruRaporPeriode] = {};
   if (!all[guruRaporPeriode][m.nama]) all[guruRaporPeriode][m.nama] = {};
   all[guruRaporPeriode][m.nama].status = 'dikirim';
   all[guruRaporPeriode][m.nama].sentAt = new Date().toLocaleString('id-ID');
-  localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+  await saveRaporGuruAll(all);
   showToast('Rapor dikirim ke Kepala Sekolah untuk ditandatangani ✅');
   updateBadgeArsip();
   renderStatusRaporGuru();
   renderDaftarMuridRapor();
 }
 
-function bagikanRaporKeOrtu() {
+async function bagikanRaporKeOrtu() {
   const list = getMuridList();
   const m = list[guruRaporMuridIdx];
   if (!m) return;
-  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const all = getRaporGuruAll();
   const data = all[guruRaporPeriode]?.[m.nama];
   if (!data || data.status !== 'disetujui') { showToast('Rapor belum disetujui Kepala Sekolah ⚠️'); return; }
   data.dibagikan = true;
@@ -8341,7 +8389,7 @@ function bagikanRaporKeOrtu() {
     rk[guruRaporPeriode] = Object.assign({}, data, { tgl_simpan: new Date().toLocaleDateString('id-ID') });
     localStorage.setItem(RAPOR_KEY, JSON.stringify(rk));
   } catch(e) {}
-  localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+  await saveRaporGuruAll(all);
   showToast('Rapor berhasil dibagikan ke Wali Murid 📨');
   renderStatusRaporGuru();
 }
@@ -8350,7 +8398,7 @@ function renderStatusRaporGuru() {
   const list = getMuridList();
   const m = list[guruRaporMuridIdx];
   if (!m) return;
-  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const all = getRaporGuruAll();
   const data = all[guruRaporPeriode]?.[m.nama] || {};
   const status = data.status || 'draft';
   const badge = document.getElementById('gr-status-badge');
@@ -8635,7 +8683,7 @@ let arsipTabAktif = 'modul';
 let arsipFilterAktif = 'semua';
 
 function getRaporFlatList() {
-  const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+  const all = getRaporGuruAll();
   const list = [];
   Object.entries(all).forEach(([periode, muridMap]) => {
     Object.entries(muridMap || {}).forEach(([nama, data]) => {
@@ -8838,16 +8886,16 @@ function detailSectionHtml(title, content) {
   </div>`;
 }
 
-function tandaTanganSetujui(type, id) {
+async function tandaTanganSetujui(type, id) {
   if (!confirm('Setujui dan tanda tangani berkas ini sebagai Kepala Sekolah?')) return;
   if (type === 'rapor') {
     const [periode, nama] = id.split('|||');
-    const all = JSON.parse(localStorage.getItem(RAPOR_GURU_KEY) || '{}');
+    const all = getRaporGuruAll();
     if (!all[periode] || !all[periode][nama]) return;
     all[periode][nama].status = 'disetujui';
     all[periode][nama].approvedBy = 'Kepala Sekolah';
     all[periode][nama].approvedAt = new Date().toLocaleString('id-ID');
-    localStorage.setItem(RAPOR_GURU_KEY, JSON.stringify(all));
+    await saveRaporGuruAll(all);
     showToast('Rapor disetujui & diarsipkan ✅ — dikembalikan ke Guru');
     updateBadgeArsip();
     bukaDetailArsip(type, id);
@@ -9291,7 +9339,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
   currentUserProfile = profile;
   screenHistory = [];
 
-  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase(), muatGuruDariSupabase(), muatTemplateRaporDariSupabase()]);
+  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase(), muatGuruDariSupabase(), muatTemplateRaporDariSupabase(), muatRaporGuruDariSupabase()]);
   hideLoading();
 
   document.querySelector('.screen.active')?.classList.remove('active');
