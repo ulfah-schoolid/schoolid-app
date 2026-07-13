@@ -7245,8 +7245,21 @@ function initPendaftaranMasuk() {
   updateBadgePendaftaran();
 }
 
+let pendaftaranCache = null;
+
+async function muatPendaftaranDariSupabase() {
+  try {
+    const { data, error } = await supabaseClient.from('pendaftaran').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    pendaftaranCache = (data || []).map(row => ({ ...row.data, id: row.id, status: row.status }));
+  } catch (e) {
+    console.error('Gagal muat pendaftaran dari Supabase:', e);
+    pendaftaranCache = pendaftaranCache || [];
+  }
+}
+
 function getPendaftaranList() {
-  try { return JSON.parse(localStorage.getItem(DAFTAR_KEY) || '[]'); } catch(e) { return []; }
+  return pendaftaranCache || [];
 }
 
 function updateBadgePendaftaran() {
@@ -7444,12 +7457,19 @@ function bukaDetailPendaftaran(id) {
   goToFromDashboard('detail-pendaftaran', 'pendaftaran-masuk');
 }
 
-function updateStatusPendaftaran(status) {
+async function updateStatusPendaftaran(status) {
   const list = getPendaftaranList();
   const idx = list.findIndex(x => x.id === selectedPendaftaranId);
   if (idx === -1) return;
   list[idx].status = status;
-  localStorage.setItem(DAFTAR_KEY, JSON.stringify(list));
+  pendaftaranCache = list;
+  try {
+    const { error } = await supabaseClient.from('pendaftaran').update({ status }).eq('id', selectedPendaftaranId);
+    if (error) throw error;
+  } catch (e) {
+    console.error('Gagal update status pendaftaran:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
   const emoji = status === 'Diterima' ? '✅' : status === 'Ditolak' ? '❌' : '🔄';
   showToast(`${emoji} Pendaftaran ${status}`);
   goBack();
@@ -7482,7 +7502,7 @@ function togglePindahan(select) {
   if (box) box.style.display = select.value === 'Ya' ? 'block' : 'none';
 }
 
-function submitPendaftaran() {
+async function submitPendaftaran() {
   const nama = document.getElementById('pd-nama')?.value.trim();
   const ayah = document.getElementById('pd-ayah-nama')?.value.trim();
   const ibu = document.getElementById('pd-ibu-nama')?.value.trim();
@@ -7561,12 +7581,22 @@ function submitPendaftaran() {
     }
   };
 
-  // Simpan ke localStorage
+  // Kirim ke Supabase (form ini dipakai sebelum login, jadi insert langsung)
+  showLoading();
   try {
-    const existing = JSON.parse(localStorage.getItem(DAFTAR_KEY) || '[]');
-    existing.push(data);
-    localStorage.setItem(DAFTAR_KEY, JSON.stringify(existing));
-  } catch(e) {}
+    const { error } = await supabaseClient.from('pendaftaran').insert({
+      id: data.id,
+      status: data.status,
+      data: data
+    });
+    if (error) throw error;
+  } catch (e) {
+    console.error('Gagal kirim pendaftaran:', e);
+    hideLoading();
+    showToast('Gagal mengirim pendaftaran, coba lagi ⚠️');
+    return;
+  }
+  hideLoading();
 
   // Tampilkan halaman sukses
   goTo('daftar-sukses');
@@ -8187,17 +8217,48 @@ function loadInfoSekolahView() {
 // ===================================================================
 const PENGUMUMAN_GURU_KEY = 'schoolid_pengumuman_guru';
 
-function getPengumumanGuru() {
-  try { return JSON.parse(localStorage.getItem(PENGUMUMAN_GURU_KEY) || '[]'); } catch(e) { return []; }
-}
-function savePengumumanGuru(list) { localStorage.setItem(PENGUMUMAN_GURU_KEY, JSON.stringify(list)); }
+let pengumumanCache = null;
 
-function kirimPengumumanGuru() {
+async function muatPengumumanDariSupabase() {
+  try {
+    const { data, error } = await supabaseClient.from('pengumuman_guru').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    pengumumanCache = (data || []).map(row => ({
+      id: row.id, isi: row.isi, tanggal: new Date(row.created_at).toLocaleString('id-ID'),
+      dibaca: localStorage.getItem('schoolid_pengumuman_dibaca_' + row.id) === '1'
+    }));
+  } catch (e) {
+    console.error('Gagal muat pengumuman dari Supabase:', e);
+    pengumumanCache = pengumumanCache || [];
+  }
+}
+
+function getPengumumanGuru() { return pengumumanCache || []; }
+
+async function savePengumumanBaru(isi) {
+  const item = { id: 'pg_' + Date.now(), isi, created_at: new Date().toISOString() };
+  try {
+    const { error } = await supabaseClient.from('pengumuman_guru').insert(item);
+    if (error) throw error;
+  } catch (e) {
+    console.error('Gagal kirim pengumuman ke Supabase:', e);
+    showToast('Gagal kirim ke server, coba lagi ⚠️');
+    return false;
+  }
+  pengumumanCache = [{ id: item.id, isi, tanggal: new Date().toLocaleString('id-ID'), dibaca: false }, ...(pengumumanCache || [])];
+  return true;
+}
+
+function tandaiPengumumanDibaca() {
+  (pengumumanCache || []).forEach(p => localStorage.setItem('schoolid_pengumuman_dibaca_' + p.id, '1'));
+  if (pengumumanCache) pengumumanCache = pengumumanCache.map(p => ({ ...p, dibaca: true }));
+}
+
+async function kirimPengumumanGuru() {
   const isi = document.getElementById('pg-isi').value.trim();
   if (!isi) { showToast('Isi pengumuman tidak boleh kosong! ⚠️'); return; }
-  const list = getPengumumanGuru();
-  list.unshift({ id: 'pg_' + Date.now(), isi, tanggal: new Date().toLocaleString('id-ID'), dibaca: false });
-  savePengumumanGuru(list);
+  const berhasil = await savePengumumanBaru(isi);
+  if (!berhasil) return;
   document.getElementById('pg-isi').value = '';
   showToast('Pengumuman terkirim ke semua guru ✅');
   renderRiwayatPengumuman();
@@ -8239,8 +8300,7 @@ function renderPengumumanGuruTerima() {
     }
   }
   // tandai semua sudah dibaca
-  const updated = list.map(p => ({ ...p, dibaca: true }));
-  savePengumumanGuru(updated);
+  tandaiPengumumanDibaca();
   updateBadgePengumumanGuru();
 }
 
@@ -8464,10 +8524,63 @@ const JENIS_ASESMEN_CONFIG = {
   }
 };
 
-function getModulList() { try { return JSON.parse(localStorage.getItem(MODUL_KEY) || '[]'); } catch(e) { return []; } }
-function saveModulList(list) { localStorage.setItem(MODUL_KEY, JSON.stringify(list)); }
-function getAsesmenList() { try { return JSON.parse(localStorage.getItem(ASESMEN_KEY) || '[]'); } catch(e) { return []; } }
-function saveAsesmenList(list) { localStorage.setItem(ASESMEN_KEY, JSON.stringify(list)); }
+// ===== MODUL & ASESMEN: sekarang tersimpan di Supabase (cache di memori) =====
+let modulCache = null;
+let asesmenCache = null;
+
+async function muatModulDariSupabase() {
+  try {
+    const { data, error } = await supabaseClient.from('modul_ajar').select('*');
+    if (error) throw error;
+    modulCache = (data || []).map(row => ({ ...row.data, id: row.id, status: row.status }));
+  } catch (e) {
+    console.error('Gagal muat modul dari Supabase:', e);
+    modulCache = modulCache || [];
+  }
+}
+
+async function muatAsesmenDariSupabase() {
+  try {
+    const { data, error } = await supabaseClient.from('lembar_asesmen').select('*');
+    if (error) throw error;
+    asesmenCache = (data || []).map(row => ({ ...row.data, id: row.id, status: row.status }));
+  } catch (e) {
+    console.error('Gagal muat asesmen dari Supabase:', e);
+    asesmenCache = asesmenCache || [];
+  }
+}
+
+function getModulList() { return modulCache || []; }
+
+async function saveModulList(list) {
+  modulCache = list;
+  try {
+    if (list.length) {
+      const rows = list.map(m => ({ id: m.id, status: m.status || 'draft', data: m, updated_at: new Date().toISOString() }));
+      const { error } = await supabaseClient.from('modul_ajar').upsert(rows);
+      if (error) throw error;
+    }
+  } catch (e) {
+    console.error('Gagal simpan modul ke Supabase:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
+}
+
+function getAsesmenList() { return asesmenCache || []; }
+
+async function saveAsesmenList(list) {
+  asesmenCache = list;
+  try {
+    if (list.length) {
+      const rows = list.map(a => ({ id: a.id, status: a.status || 'draft', data: a, updated_at: new Date().toISOString() }));
+      const { error } = await supabaseClient.from('lembar_asesmen').upsert(rows);
+      if (error) throw error;
+    }
+  } catch (e) {
+    console.error('Gagal simpan asesmen ke Supabase:', e);
+    showToast('Gagal simpan ke server, coba lagi ⚠️');
+  }
+}
 
 function statusBadgeHtml(status) {
   if (status === 'dikirim') return '<span class="status-badge status-dikirim">⏳ Menunggu Kepala Sekolah</span>';
@@ -8534,7 +8647,7 @@ function ttdBoxHtml(item) {
   return '';
 }
 
-function simpanModul(status) {
+async function simpanModul(status) {
   const list = getModulList();
   let item = currentModulId ? list.find(x => x.id === currentModulId) : null;
   const isNew = !item;
@@ -8549,7 +8662,7 @@ function simpanModul(status) {
   if (isNew) { list.push(item); currentModulId = item.id; } else {
     const idx = list.findIndex(x => x.id === item.id); list[idx] = item;
   }
-  saveModulList(list);
+  await saveModulList(list);
   updateBadgeArsip();
 
   if (status === 'dikirim') {
@@ -8661,7 +8774,7 @@ function hapusBarisAsesmen(idx) {
   renderAsesmenTable();
 }
 
-function simpanAsesmen(status) {
+async function simpanAsesmen(status) {
   simpanBarisDariForm();
   const list = getAsesmenList();
   let item = currentAsesmenId ? list.find(x => x.id === currentAsesmenId) : null;
@@ -8681,7 +8794,7 @@ function simpanAsesmen(status) {
   if (isNew) { list.push(item); currentAsesmenId = item.id; } else {
     const idx = list.findIndex(x => x.id === item.id); list[idx] = item;
   }
-  saveAsesmenList(list);
+  await saveAsesmenList(list);
   updateBadgeArsip();
 
   if (status === 'dikirim') {
@@ -8922,7 +9035,7 @@ async function tandaTanganSetujui(type, id) {
   list[idx].status = 'disetujui';
   list[idx].approvedBy = 'Kepala Sekolah';
   list[idx].approvedAt = new Date().toLocaleString('id-ID');
-  if (type === 'modul') saveModulList(list); else saveAsesmenList(list);
+  if (type === 'modul') await saveModulList(list); else await saveAsesmenList(list);
   showToast('Berkas disetujui & diarsipkan ✅');
   updateBadgeArsip();
   bukaDetailArsip(type, id);
@@ -9354,7 +9467,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
   currentUserProfile = profile;
   screenHistory = [];
 
-  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase(), muatGuruDariSupabase(), muatTemplateRaporDariSupabase(), muatRaporGuruDariSupabase()]);
+  await Promise.all([muatKelasDariSupabase(), muatMuridDariSupabase(), muatGuruDariSupabase(), muatTemplateRaporDariSupabase(), muatRaporGuruDariSupabase(), muatModulDariSupabase(), muatAsesmenDariSupabase(), muatPendaftaranDariSupabase(), muatPengumumanDariSupabase()]);
   hideLoading();
 
   document.querySelector('.screen.active')?.classList.remove('active');
