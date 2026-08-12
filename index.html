@@ -1696,7 +1696,10 @@
       </div>
       <div class="login-welcome-actions">
         <button class="btn-white-rounded" onclick="goTo('login-form')">Masuk</button>
-        <button class="btn-gold-rounded" onclick="goTo('form-pendaftaran')">Daftar</button>
+        <button class="btn-gold-rounded" onclick="goTo('daftar-akun-ortu')">Daftar</button>
+        <button id="btn-install-app" onclick="installAplikasi()" style="display:none;width:100%;padding:15px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.6);color:white;border-radius:14px;font-size:15px;font-weight:800;font-family:var(--font);cursor:pointer;">
+          📲 Install Aplikasi di HP
+        </button>
       </div>
       <div class="login-welcome-forgot">
         <a href="#" onclick="showToast('Link reset password telah dikirim!')">Lupa Kata Sandi?</a>
@@ -1728,6 +1731,12 @@
       </div>
       <div class="forgot"><a href="#" onclick="showToast('Link reset password telah dikirim!')">Lupa Password?</a></div>
       <button class="btn-primary" onclick="doLogin()">Masuk</button>
+
+      <!-- LINK DAFTAR AKUN ORTU -->
+      <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-600);">
+        Belum punya akun? <a href="#" onclick="goTo('daftar-akun-ortu')" style="color:var(--green);font-weight:700;">Daftar di sini</a>
+      </div>
+
       <div class="divider">atau masuk dengan</div>
       <button class="btn-google" onclick="showToast('Fitur Google Sign-In segera hadir!')">
         <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
@@ -1749,6 +1758,69 @@
     </div>
   </div>
 
+
+  <!-- ===== DAFTAR AKUN BARU (ORTU) ===== -->
+  <div id="daftar-akun-ortu" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
+      <button class="back-btn" style="color:white;" onclick="goTo('login-form')">‹</button>
+      <h2 style="color:white;">Daftar Akun Baru</h2>
+    </div>
+    <div class="login-body">
+      <div style="background:#E8F5E9;border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--green-dark);">
+        👋 Halaman ini khusus untuk <b>Orang Tua / Wali Murid</b>.<br>
+        Untuk akun Guru & Kepala Sekolah, hubungi pihak sekolah.
+      </div>
+
+      <div class="input-group">
+        <label>Nama Lengkap Orang Tua</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="reg-nama" placeholder="cth: Ibu Siti Aminah">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Nama Lengkap Anak</label>
+        <div class="input-wrap">
+          <span class="input-icon">👧</span>
+          <input type="text" id="reg-anak" placeholder="cth: Ahmad Fauzan">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="reg-email" placeholder="contoh@email.com">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="reg-password" placeholder="Minimal 6 karakter">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Konfirmasi Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="reg-password2" placeholder="Ulangi password">
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="daftarAkunOrtu()" style="margin-top:8px;">
+        ✅ Daftar &amp; Masuk
+      </button>
+
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--gray-600);">
+        Sudah punya akun? <a href="#" onclick="goTo('login-form')" style="color:var(--green);font-weight:700;">Masuk di sini</a>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== FORM PENDAFTARAN ===== -->
   <div id="form-pendaftaran" class="screen">
@@ -5750,9 +5822,23 @@
           <option value="nonaktif">Non-aktif</option>
         </select>
       </div>
+      <div id="mg-akun-baru-wrap">
+        <div style="border-top:1.5px dashed var(--gray-200);margin:10px 0 14px;padding-top:14px;">
+          <div style="font-size:12px;font-weight:700;color:var(--green-dark);margin-bottom:8px;">🔑 Akun Login untuk Guru Ini</div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="mg-email" class="form-input" placeholder="cth: guru.siti@gmail.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password Awal</label>
+            <input type="text" id="mg-password" class="form-input" placeholder="Minimal 6 karakter">
+            <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">Beri tahu password ini ke guru yang bersangkutan. Guru bisa ganti nanti.</div>
+          </div>
+        </div>
+      </div>
       <div style="display:flex;gap:10px;margin-top:6px;">
         <button onclick="closeModalGuru()" style="flex:1;padding:13px;border:2px solid var(--gray-200);background:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">Batal</button>
-        <button onclick="simpanGuru()" style="flex:1;padding:13px;border:none;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan</button>
+        <button id="mg-btn-simpan" onclick="simpanGuru()" style="flex:1;padding:13px;border:none;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;">💾 Simpan</button>
       </div>
       <button id="mg-btn-hapus" onclick="hapusGuru()" style="display:none;width:100%;margin-top:10px;padding:12px;border:2px solid #F44336;background:white;color:#F44336;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;">🗑️ Hapus Guru Ini</button>
     </div>
@@ -8017,6 +8103,9 @@ function bukaModalGuruBaru() {
   document.getElementById('mg-nama').value = '';
   isiDropdownKelas('mg-kelas');
   document.getElementById('mg-status').value = 'aktif';
+  document.getElementById('mg-email').value = '';
+  document.getElementById('mg-password').value = '';
+  document.getElementById('mg-akun-baru-wrap').style.display = 'block';
   document.getElementById('mg-btn-hapus').style.display = 'none';
   document.getElementById('modalGuru').classList.add('show');
 }
@@ -8031,6 +8120,7 @@ function bukaModalGuruEdit(id) {
   isiDropdownKelas('mg-kelas');
   document.getElementById('mg-kelas').value = g.kelasId;
   document.getElementById('mg-status').value = g.status;
+  document.getElementById('mg-akun-baru-wrap').style.display = 'none';
   document.getElementById('mg-btn-hapus').style.display = 'block';
   document.getElementById('modalGuru').classList.add('show');
 }
@@ -8039,28 +8129,58 @@ function closeModalGuru() {
   document.getElementById('modalGuru').classList.remove('show');
 }
 
-function simpanGuru() {
+async function simpanGuru() {
   const nama = document.getElementById('mg-nama').value.trim();
   if (!nama) { showToast('Nama guru wajib diisi! ⚠️'); return; }
   const kelasId = document.getElementById('mg-kelas').value;
   const status = document.getElementById('mg-status').value;
   const list = getGuruList();
+
   if (guruModalMode === 'baru') {
-    list.push({ id: 'g_' + Date.now(), nama, kelasId, status, avatar: '🧑‍🏫' });
-    showToast('Guru baru ditambahkan ✅');
+    const email = document.getElementById('mg-email').value.trim();
+    const password = document.getElementById('mg-password').value;
+    if (!email || !password) { showToast('Email dan password wajib diisi untuk akun baru! ⚠️'); return; }
+    if (password.length < 6) { showToast('Password minimal 6 karakter! ⚠️'); return; }
+
+    const btn = document.getElementById('mg-btn-simpan');
+    btn.disabled = true; btn.textContent = '⏳ Membuat akun...';
+
+    try {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const res = await fetch('/api/create-guru-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({ nama, email, password, kelasId })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Gagal membuat akun');
+
+      list.push({ id: result.userId, nama, kelasId, status, avatar: '🧑‍🏫' });
+      await saveGuruList(list);
+      showToast(`Akun Guru "${nama}" berhasil dibuat ✅ — beri tahu email & password ke guru tsb`);
+      closeModalGuru();
+      renderKelolaGuru();
+    } catch (e) {
+      showToast('Gagal: ' + e.message + ' ⚠️');
+    } finally {
+      btn.disabled = false; btn.textContent = '💾 Simpan';
+    }
   } else {
     const idx = list.findIndex(x => x.id === guruModalId);
     if (idx !== -1) list[idx] = { ...list[idx], nama, kelasId, status };
+    await saveGuruList(list);
     showToast('Data guru diperbarui ✅');
+    closeModalGuru();
+    renderKelolaGuru();
   }
-  saveGuruList(list);
-  closeModalGuru();
-  renderKelolaGuru();
 }
 
 function hapusGuru() {
   if (!guruModalId) return;
-  if (!confirm('Hapus data guru ini?')) return;
+  if (!confirm('Hapus data guru ini? (Catatan: ini hanya menghapus data guru, akun login-nya tidak terhapus otomatis)')) return;
   const list = getGuruList().filter(x => x.id !== guruModalId);
   saveGuruList(list);
   closeModalGuru();
@@ -9442,6 +9562,107 @@ const SUPABASE_URL = 'https://qjtyndbcaxdczphnxivv.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_VRREbQBCZ5Ud0uC3Si7GPQ_XshWKR13';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUserProfile = null;
+
+// ===== PWA INSTALL PROMPT =====
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Tampilkan tombol install kalau user ada di halaman sambutan
+  const btn = document.getElementById('btn-install-app');
+  if (btn) btn.style.display = 'block';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('btn-install-app');
+  if (btn) btn.style.display = 'none';
+  showToast('SchoolID berhasil diinstall di HP kamu! 🎉');
+});
+
+async function installAplikasi() {
+  if (!deferredInstallPrompt) {
+    showToast('Buka aplikasi lewat Chrome untuk install, atau gunakan menu ⋮ → "Add to Home Screen"');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') {
+    showToast('Menginstall SchoolID... 📲');
+  }
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('btn-install-app');
+  if (btn) btn.style.display = 'none';
+}
+
+// ===== DAFTAR AKUN ORTU =====
+async function daftarAkunOrtu() {
+  const nama = document.getElementById('reg-nama').value.trim();
+  const anak = document.getElementById('reg-anak').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const pass2 = document.getElementById('reg-password2').value;
+
+  if (!nama || !anak || !email || !pass || !pass2) {
+    showToast('Semua kolom wajib diisi ⚠️'); return;
+  }
+  if (pass.length < 6) {
+    showToast('Password minimal 6 karakter ⚠️'); return;
+  }
+  if (pass !== pass2) {
+    showToast('Password tidak sama ⚠️'); return;
+  }
+
+  showLoading();
+
+  // 1. Daftar akun di Supabase Auth
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password: pass,
+    options: {
+      data: { role: 'ortu', nama }
+    }
+  });
+
+  if (error) {
+    hideLoading();
+    showToast('Gagal daftar: ' + error.message + ' ⚠️');
+    return;
+  }
+
+  // 2. Update profil dengan nama anak (trigger otomatis bikin row profiles, kita update nama_anak-nya)
+  if (data.user) {
+    await supabaseClient.from('profiles').upsert({
+      id: data.user.id,
+      role: 'ortu',
+      nama,
+      anak_nama: anak
+    });
+  }
+
+  hideLoading();
+
+  // 3. Kosongkan form
+  ['reg-nama','reg-anak','reg-email','reg-password','reg-password2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // 4. Langsung login dan masuk ke dashboard Ortu
+  showToast('Akun berhasil dibuat! Selamat datang 🎉');
+  setTimeout(async () => {
+    showLoading();
+    const { data: loginData, error: loginErr } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+    if (loginErr || !loginData.user) {
+      hideLoading();
+      showToast('Akun dibuat, silakan login manual');
+      goTo('login-form');
+      return;
+    }
+    await masukKeDashboardSesuaiProfil(loginData.user.id);
+  }, 800);
+}
 
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
