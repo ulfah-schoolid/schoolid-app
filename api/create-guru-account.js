@@ -1,93 +1,126 @@
-// api/create-guru-account.js
-// Serverless function Vercel — hanya Kepala Sekolah yang boleh pakai ini
-// untuk membuat akun login Guru baru. Pakai SUPABASE_SERVICE_ROLE_KEY
-// yang PUNYA AKSES PENUH, makanya HARUS jalan di server, tidak boleh
-// pernah ditaruh di kode index.html.
+import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
-  }
-
-  const supabaseUrl = process.env.SUPABASE_URL || 'https://qjtyndbcaxdczphnxivv.supabase.co';
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!serviceKey) {
-    res.status(500).json({ error: 'SUPABASE_SERVICE_ROLE_KEY belum diatur di Environment Variables Vercel.' });
-    return;
-  }
-
-  const authHeader = req.headers.authorization || '';
-  const callerToken = authHeader.replace('Bearer ', '');
-  if (!callerToken) {
-    res.status(401).json({ error: 'Tidak ada sesi login. Silakan login ulang.' });
-    return;
-  }
-
-  const { nama, email, password, kelasId } = req.body || {};
-  if (!nama || !email || !password || password.length < 6) {
-    res.status(400).json({ error: 'Nama, email, dan password (min 6 karakter) wajib diisi.' });
-    return;
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // 1. Cek identitas pemanggil (harus user yang sedang login)
-    const callerRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: { Authorization: `Bearer ${callerToken}`, apikey: serviceKey }
-    });
-    if (!callerRes.ok) {
-      res.status(401).json({ error: 'Sesi login tidak valid. Silakan login ulang.' });
-      return;
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ 
+        error: 'Token tidak ditemukan. Pastikan Anda sudah login.' 
+      });
     }
-    const callerUser = await callerRes.json();
+    const token = authHeader.split(' ')[1];
 
-    // 2. Cek peran pemanggil di tabel profiles — HARUS 'kepala'
-    const profileRes = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?id=eq.${callerUser.id}&select=role`,
-      { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+    const supabaseUser = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
     );
-    const profileData = await profileRes.json();
-    if (!profileData?.[0] || profileData[0].role !== 'kepala') {
-      res.status(403).json({ error: 'Hanya Kepala Sekolah yang boleh membuat akun Guru.' });
-      return;
+
+    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+    if (userError || !user) {
+      return res.status(401).json({ 
+        error: 'Token tidak valid atau sesi sudah habis. Silakan login ulang.',
+        detail: userError?.message 
+      });
     }
 
-    // 3. Buat akun Auth baru untuk Guru (pakai Admin API, otomatis terverifikasi)
-    const createRes = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
-      method: 'POST',
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    const { data: profile, error: profileError } = await supabaseUser
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return res.status(403).json({ 
+        error: 'Profil tidak ditemukan.',
+        detail: profileError?.message 
+      });
+    }
+
+    if (profile.role !== 'kepala_sekolah') {
+      return res.status(403).json({ 
+        error: `Akses ditolak. Role Anda: "${profile.role}". Hanya Kepala Sekolah yang boleh membuat akun Guru.`
+      });
+    }
+
+    const { email, password, nama, nip } = req.body;
+    if (!email || !password || !nama) {
+      return res.status(400).json({ 
+        error: 'Data tidak lengkap. Email, password, dan nama wajib diisi.' 
+      });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ 
+        error: 'Password minimal 6 karakter.' 
+      });
+    }
+
+    const supabaseAdmin = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { nama, role: 'guru' }
+    });
+
+    if (createError) {
+      let pesanError = createError.message;
+      if (pesanError.includes('already registered')) {
+        pesanError = `Email "${email}" sudah terdaftar. Gunakan email lain.`;
+      }
+      return res.status(400).json({ error: pesanError });
+    }
+
+    const { error: profileInsertError } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: newUser.user.id,
         email,
-        password,
-        email_confirm: true,
-        user_metadata: { role: 'guru', nama }
-      })
-    });
-    const createData = await createRes.json();
-    if (!createRes.ok) {
-      res.status(400).json({ error: createData?.msg || createData?.error_description || 'Gagal membuat akun. Mungkin email sudah dipakai.' });
-      return;
+        nama,
+        role: 'guru',
+        nip: nip || null
+      });
+
+    if (profileInsertError) {
+      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
+      return res.status(500).json({ 
+        error: 'Gagal menyimpan profil guru.',
+        detail: profileInsertError.message 
+      });
     }
 
-    // 4. Simpan/perbarui data profil (role, nama, kelas)
-    await fetch(`${supabaseUrl}/rest/v1/profiles`, {
-      method: 'POST',
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        'Content-Type': 'application/json',
-        Prefer: 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({ id: createData.id, role: 'guru', nama, kelas_id: kelasId || null })
+    await supabaseAdmin
+      .from('guru')
+      .insert({
+        user_id: newUser.user.id,
+        nama,
+        nip: nip || null,
+        email
+      });
+
+    return res.status(200).json({ 
+      success: true, 
+      message: `Akun guru untuk ${nama} (${email}) berhasil dibuat.`,
+      userId: newUser.user.id
     });
 
-    res.status(200).json({ success: true, userId: createData.id });
-  } catch (e) {
-    res.status(500).json({ error: 'Terjadi kesalahan server: ' + e.message });
+  } catch (err) {
+    return res.status(500).json({ 
+      error: 'Terjadi kesalahan server.',
+      detail: err.message 
+    });
   }
 }
