@@ -46,7 +46,7 @@ export default async function handler(req, res) {
       });
     }
 
-    if (profile.role !== 'kepala_sekolah') {
+    if (profile.role !== 'kepala_sekolah' && profile.role !== 'kepala') {
       return res.status(403).json({ 
         error: `Akses ditolak. Role Anda: "${profile.role}". Hanya Kepala Sekolah yang boleh membuat akun Guru.`
       });
