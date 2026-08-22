@@ -88,10 +88,8 @@ export default async function handler(req, res) {
       .from('profiles')
       .insert({
         id: newUser.user.id,
-        email,
         nama,
         role: 'guru',
-        nip: nip || null
       });
 
     if (profileInsertError) {
