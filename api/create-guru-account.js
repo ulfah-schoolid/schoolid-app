@@ -13,8 +13,8 @@ export default async function handler(req, res) {
   try {
     const authHeader = req.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        error: 'Token tidak ditemukan. Pastikan Anda sudah login.' 
+      return res.status(401).json({
+        error: 'Token tidak ditemukan. Pastikan Anda sudah login.'
       });
     }
     const token = authHeader.split(' ')[1];
@@ -27,9 +27,9 @@ export default async function handler(req, res) {
 
     const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
     if (userError || !user) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         error: 'Token tidak valid atau sesi sudah habis. Silakan login ulang.',
-        detail: userError?.message 
+        detail: userError?.message
       });
     }
 
@@ -40,27 +40,27 @@ export default async function handler(req, res) {
       .single();
 
     if (profileError || !profile) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Profil tidak ditemukan.',
-        detail: profileError?.message 
+        detail: profileError?.message
       });
     }
 
     if (profile.role !== 'kepala_sekolah' && profile.role !== 'kepala') {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: `Akses ditolak. Role Anda: "${profile.role}". Hanya Kepala Sekolah yang boleh membuat akun Guru.`
       });
     }
 
     const { email, password, nama, nip } = req.body;
     if (!email || !password || !nama) {
-      return res.status(400).json({ 
-        error: 'Data tidak lengkap. Email, password, dan nama wajib diisi.' 
+      return res.status(400).json({
+        error: 'Data tidak lengkap. Email, password, dan nama wajib diisi.'
       });
     }
     if (password.length < 6) {
-      return res.status(400).json({ 
-        error: 'Password minimal 6 karakter.' 
+      return res.status(400).json({
+        error: 'Password minimal 6 karakter.'
       });
     }
 
@@ -84,22 +84,24 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: pesanError });
     }
 
-    const { error: profileInsertError } = await supabaseAdmin
-      .from('profiles')
-      .insert({
-        id: newUser.user.id,
-        nama,
-        role: 'guru',
-      });
+    // Tunggu sebentar agar trigger on_auth_user_created selesai
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (profileInsertError) {
+    // Update profil yang sudah dibuat oleh trigger
+    const { error: updateError } = await supabaseAdmin
+      .from('profiles')
+      .update({ nama, role: 'guru' })
+      .eq('id', newUser.user.id);
+
+    if (updateError) {
       await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
-      return res.status(500).json({ 
-        error: 'Gagal menyimpan profil guru.',
-        detail: profileInsertError.message 
+      return res.status(500).json({
+        error: 'Gagal mengupdate profil guru.',
+        detail: updateError.message
       });
     }
 
+    // Insert ke tabel guru
     await supabaseAdmin
       .from('guru')
       .insert({
@@ -109,16 +111,17 @@ export default async function handler(req, res) {
         email
       });
 
-    return res.status(200).json({ 
-      success: true, 
+    return res.status(200).json({
+      success: true,
       message: `Akun guru untuk ${nama} (${email}) berhasil dibuat.`,
       userId: newUser.user.id
     });
 
   } catch (err) {
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Terjadi kesalahan server.',
-      detail: err.message 
+      detail: err.message
     });
   }
 }
+
