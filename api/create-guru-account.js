@@ -84,23 +84,22 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: pesanError });
     }
 
-    // Upsert profil (insert atau update jika sudah ada)
-    const { error: upsertError } = await supabaseAdmin
-      .from('profiles')
-      .upsert({
-        id: newUser.user.id,
-        nama,
-        role: 'guru'
-      }, { onConflict: 'id' });
+    // Panggil fungsi SQL untuk buat/update profil
+    const { error: fnError } = await supabaseAdmin
+      .rpc('create_guru_profile', {
+        user_id: newUser.user.id,
+        user_nama: nama
+      });
 
-    if (upsertError) {
+    if (fnError) {
       await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
       return res.status(500).json({
         error: 'Gagal menyimpan profil guru.',
-        detail: upsertError.message
+        detail: fnError.message
       });
     }
 
+    
     // Insert ke tabel guru
     await supabaseAdmin
       .from('guru')
@@ -123,5 +122,4 @@ export default async function handler(req, res) {
       detail: err.message
     });
   }
-}
-
+      }
