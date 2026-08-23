@@ -84,20 +84,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: pesanError });
     }
 
-    // Tunggu sebentar agar trigger on_auth_user_created selesai
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Update profil yang sudah dibuat oleh trigger
-    const { error: updateError } = await supabaseAdmin
+    // Upsert profil (insert atau update jika sudah ada)
+    const { error: upsertError } = await supabaseAdmin
       .from('profiles')
-      .update({ nama, role: 'guru' })
-      .eq('id', newUser.user.id);
+      .upsert({
+        id: newUser.user.id,
+        nama,
+        role: 'guru'
+      }, { onConflict: 'id' });
 
-    if (updateError) {
+    if (upsertError) {
       await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
       return res.status(500).json({
-        error: 'Gagal mengupdate profil guru.',
-        detail: updateError.message
+        error: 'Gagal menyimpan profil guru.',
+        detail: upsertError.message
       });
     }
 
@@ -123,4 +123,5 @@ export default async function handler(req, res) {
       detail: err.message
     });
   }
-  }
+}
+
