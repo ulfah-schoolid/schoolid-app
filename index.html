@@ -1737,6 +1737,11 @@
         Belum punya akun? <a href="#" onclick="goTo('daftar-akun-ortu')" style="color:var(--green);font-weight:700;">Daftar di sini</a>
       </div>
 
+      <!-- LINK DAFTAR AKUN GURU -->
+      <div style="text-align:center;margin-top:8px;font-size:13px;color:var(--gray-600);">
+        Guru baru? <a href="#" onclick="goTo('daftar-akun-guru')" style="color:#1565C0;font-weight:700;">Daftar akun guru</a>
+      </div>
+
       <div class="divider">atau masuk dengan</div>
       <button class="btn-google" onclick="showToast('Fitur Google Sign-In segera hadir!')">
         <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
@@ -1818,6 +1823,61 @@
 
       <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--gray-600);">
         Sudah punya akun? <a href="#" onclick="goTo('login-form')" style="color:var(--green);font-weight:700;">Masuk di sini</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DAFTAR AKUN BARU (GURU) ===== -->
+  <div id="daftar-akun-guru" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar" style="background:linear-gradient(135deg,#1565C0,#1976D2);border-bottom:none;">
+      <button class="back-btn" style="color:white;" onclick="goTo('login-form')">‹</button>
+      <h2 style="color:white;">Daftar Akun Guru</h2>
+    </div>
+    <div class="login-body">
+      <div style="background:#E3F2FD;border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:#1565C0;">
+        👩‍🏫 Halaman ini khusus untuk <b>Guru KB-TKIT Istiqomah</b>.<br>
+        Akun Anda akan aktif setelah disetujui Kepala Sekolah.
+      </div>
+
+      <div class="input-group">
+        <label>Nama Lengkap</label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="guru-reg-nama" placeholder="cth: Ustadzah Fatimah">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="guru-reg-email" placeholder="contoh@email.com">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="guru-reg-password" placeholder="Minimal 6 karakter">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Konfirmasi Password</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" id="guru-reg-password2" placeholder="Ulangi password">
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="daftarAkunGuru()" style="margin-top:8px;background:linear-gradient(135deg,#1565C0,#1976D2);">
+        ✅ Kirim Permohonan
+      </button>
+
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--gray-600);">
+        Sudah punya akun? <a href="#" onclick="goTo('login-form')" style="color:#1565C0;font-weight:700;">Masuk di sini</a>
       </div>
     </div>
   </div>
@@ -9597,6 +9657,68 @@ async function installAplikasi() {
 }
 
 // ===== DAFTAR AKUN ORTU =====
+async function daftarAkunGuru() {
+  const nama = document.getElementById('guru-reg-nama').value.trim();
+  const email = document.getElementById('guru-reg-email').value.trim();
+  const pass = document.getElementById('guru-reg-password').value;
+  const pass2 = document.getElementById('guru-reg-password2').value;
+
+  if (!nama || !email || !pass || !pass2) {
+    showToast('Semua kolom wajib diisi ⚠️'); return;
+  }
+  if (pass.length < 6) {
+    showToast('Password minimal 6 karakter ⚠️'); return;
+  }
+  if (pass !== pass2) {
+    showToast('Password tidak sama ⚠️'); return;
+  }
+
+  showLoading();
+
+  // 1. Buat akun di Supabase Auth
+  const { data, error } = await supabaseClient.auth.signUp({
+    email,
+    password: pass,
+    options: {
+      data: { role: 'guru', nama }
+    }
+  });
+
+  if (error) {
+    hideLoading();
+    showToast('Gagal daftar: ' + error.message + ' ⚠️');
+    return;
+  }
+
+  // 2. Insert ke profiles dengan role guru
+  if (data.user) {
+    await supabaseClient.from('profiles').upsert({
+      id: data.user.id,
+      role: 'guru',
+      nama
+    });
+
+    // 3. Insert ke tabel guru dengan status pending
+    await supabaseClient.from('guru').insert({
+      nama,
+      email,
+      status: 'pending'
+    });
+  }
+
+  hideLoading();
+
+  // 4. Kosongkan form
+  ['guru-reg-nama','guru-reg-email','guru-reg-password','guru-reg-password2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // 5. Tampilkan pesan & arahkan ke login
+  showToast('Permohonan terkirim! Tunggu persetujuan Kepala Sekolah 🎉');
+  setTimeout(() => goTo('login-form'), 2000);
+}
+
 async function daftarAkunOrtu() {
   const nama = document.getElementById('reg-nama').value.trim();
   const anak = document.getElementById('reg-anak').value.trim();
