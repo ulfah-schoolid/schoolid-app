@@ -9867,7 +9867,8 @@ async function daftarAkunGuru() {
     await supabaseClient.from('guru').insert({
       nama,
       email,
-      status: 'pending'
+      status: 'pending',
+      user_id: data.user.id
     });
   }
 
@@ -9992,7 +9993,32 @@ async function masukKeDashboardSesuaiProfil(userId) {
 
   document.querySelector('.screen.active')?.classList.remove('active');
 
-  if (profile.role === 'guru') goTo('dashboard-guru');
+  if (profile.role === 'guru') {
+    // Cek status guru di tabel guru berdasarkan user_id
+    const { data: dataGuru } = await supabaseClient
+      .from('guru')
+      .select('status')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const statusGuru = dataGuru?.status;
+
+    if (statusGuru === 'pending') {
+      await supabaseClient.auth.signOut();
+      hideLoading();
+      showToast('Akun Anda belum disetujui Kepala Sekolah. Mohon tunggu. ⏳');
+      goTo('login-form');
+      return;
+    }
+    if (statusGuru === 'ditolak') {
+      await supabaseClient.auth.signOut();
+      hideLoading();
+      showToast('Permohonan akun Anda ditolak. Hubungi Kepala Sekolah. ❌');
+      goTo('login-form');
+      return;
+    }
+    goTo('dashboard-guru');
+  }
   else if (profile.role === 'ortu') goTo('timeline-ortu');
   else if (profile.role === 'kepala') goTo('dashboard-kepala');
 }
