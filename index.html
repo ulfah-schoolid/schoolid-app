@@ -4756,6 +4756,17 @@
             </div>
           </div>
           <div class="section">
+            <div class="section-title">Permohonan Guru Baru</div>
+            <div onclick="goToFromDashboard('approval-guru','dashboard-kepala');initApprovalGuru()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#1565C0,#1976D2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">👩‍🏫</div>
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;">Approval Akun Guru</div>
+                <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Review & setujui permohonan guru baru</div>
+              </div>
+              <div id="badge-guru-pending" style="background:#4CAF50;color:white;font-size:11px;font-weight:800;padding:4px 8px;border-radius:10px;flex-shrink:0;">0</div>
+            </div>
+          </div>
+          <div class="section">
             <div class="section-title">Template Rapor</div>
             <div onclick="goToFromDashboard('kelola-template-rapor','dashboard-kepala');pilihTemplateKelompok('KB')" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
               <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#00897B,#26A69A);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🧾</div>
@@ -4810,6 +4821,42 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== APPROVAL GURU (KEPALA SEKOLAH) ===== -->
+  <div id="approval-guru" class="screen">
+    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
+    <div class="top-bar" style="background:linear-gradient(135deg,#1565C0,#1976D2);border-bottom:none;">
+      <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
+      <h2 style="color:white;">Permohonan Guru Baru</h2>
+    </div>
+    <div class="scroll-content">
+      <!-- Ringkasan -->
+      <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
+          <div id="ag-total" style="font-size:22px;font-weight:800;color:#1565C0;">0</div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Total</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
+          <div id="ag-pending" style="font-size:22px;font-weight:800;color:#FF9800;">0</div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Menunggu</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
+          <div id="ag-aktif" style="font-size:22px;font-weight:800;color:#4CAF50;">0</div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Disetujui</div>
+        </div>
+      </div>
+      <!-- Filter -->
+      <div style="padding:0 16px 10px;display:flex;gap:8px;overflow-x:auto;">
+        <button onclick="filterApprovalGuru('semua',this)" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;background:#1565C0;color:white;font-size:12px;font-weight:700;cursor:pointer;">Semua</button>
+        <button onclick="filterApprovalGuru('pending',this)" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #FF9800;color:#FF9800;background:white;font-size:12px;font-weight:700;cursor:pointer;">Menunggu</button>
+        <button onclick="filterApprovalGuru('aktif',this)" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #4CAF50;color:#4CAF50;background:white;font-size:12px;font-weight:700;cursor:pointer;">Disetujui</button>
+        <button onclick="filterApprovalGuru('ditolak',this)" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid #F44336;color:#F44336;background:white;font-size:12px;font-weight:700;cursor:pointer;">Ditolak</button>
+      </div>
+      <!-- Daftar -->
+      <div id="ag-list" style="padding:0 16px;display:flex;flex-direction:column;gap:8px;"></div>
+      <div style="height:16px;"></div>
     </div>
   </div>
 
@@ -6483,6 +6530,7 @@ function goTo(screenId) {
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
+    if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
     if (screenId === 'dashboard-guru') updateBadgePengumumanGuru();
   }
 }
@@ -9657,6 +9705,123 @@ async function installAplikasi() {
 }
 
 // ===== DAFTAR AKUN ORTU =====
+// ===== APPROVAL GURU =====
+let guruPendingCache = [];
+let approvalGuruFilter = 'semua';
+
+async function initApprovalGuru() {
+  await muatGuruPendingDariSupabase();
+  renderApprovalGuru();
+  updateBadgeGuruPending();
+}
+
+async function muatGuruPendingDariSupabase() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('guru')
+      .select('*')
+      .in('status', ['pending', 'aktif', 'ditolak'])
+      .order('nama');
+    if (error) throw error;
+    guruPendingCache = data || [];
+  } catch (e) {
+    console.error('Gagal muat guru pending:', e);
+    guruPendingCache = [];
+  }
+}
+
+function updateBadgeGuruPending() {
+  const pending = guruPendingCache.filter(g => g.status === 'pending').length;
+  const badge = document.getElementById('badge-guru-pending');
+  if (badge) {
+    badge.textContent = pending;
+    badge.style.background = pending > 0 ? '#F44336' : '#4CAF50';
+  }
+}
+
+function filterApprovalGuru(filter, btn) {
+  approvalGuruFilter = filter;
+  document.querySelectorAll('#approval-guru .scroll-content button[onclick^="filterApprovalGuru"]').forEach(b => {
+    b.style.background = 'white';
+    b.style.color = b.style.borderColor || '#888';
+    b.style.border = '1.5px solid ' + (b.style.borderColor || '#888');
+  });
+  btn.style.background = '#1565C0';
+  btn.style.color = 'white';
+  btn.style.border = 'none';
+  renderApprovalGuru();
+}
+
+function renderApprovalGuru() {
+  const list = approvalGuruFilter === 'semua'
+    ? guruPendingCache
+    : guruPendingCache.filter(g => g.status === approvalGuruFilter);
+
+  const pending = guruPendingCache.filter(g => g.status === 'pending').length;
+  const aktif = guruPendingCache.filter(g => g.status === 'aktif').length;
+  const el = id => document.getElementById(id);
+  if (el('ag-total')) el('ag-total').textContent = guruPendingCache.length;
+  if (el('ag-pending')) el('ag-pending').textContent = pending;
+  if (el('ag-aktif')) el('ag-aktif').textContent = aktif;
+
+  const container = el('ag-list');
+  if (!container) return;
+
+  if (list.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:32px 16px;color:var(--gray-400);">
+      <div style="font-size:36px;margin-bottom:8px;">👩‍🏫</div>
+      <div style="font-size:14px;">Tidak ada permohonan</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(g => {
+    const statusColor = g.status === 'pending' ? '#FF9800' : g.status === 'aktif' ? '#4CAF50' : '#F44336';
+    const statusLabel = g.status === 'pending' ? 'Menunggu' : g.status === 'aktif' ? 'Disetujui' : 'Ditolak';
+    const tombolAksi = g.status === 'pending' ? `
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button onclick="prosesApprovalGuru(${g.id},'aktif')" style="flex:1;padding:8px;border-radius:8px;border:none;background:#4CAF50;color:white;font-weight:700;font-size:13px;cursor:pointer;">✅ Setujui</button>
+        <button onclick="prosesApprovalGuru(${g.id},'ditolak')" style="flex:1;padding:8px;border-radius:8px;border:none;background:#F44336;color:white;font-weight:700;font-size:13px;cursor:pointer;">❌ Tolak</button>
+      </div>` : '';
+    return `
+      <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1565C0,#1976D2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👩‍🏫</div>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:14px;">${g.nama}</div>
+            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">${g.email || '-'}</div>
+          </div>
+          <div style="background:${statusColor};color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:12px;">${statusLabel}</div>
+        </div>
+        ${tombolAksi}
+      </div>`;
+  }).join('');
+}
+
+async function prosesApprovalGuru(guruId, statusBaru) {
+  showLoading();
+  try {
+    const { error } = await supabaseClient
+      .from('guru')
+      .update({ status: statusBaru })
+      .eq('id', guruId);
+    if (error) throw error;
+
+    // Update cache lokal
+    const idx = guruPendingCache.findIndex(g => g.id === guruId);
+    if (idx !== -1) guruPendingCache[idx].status = statusBaru;
+
+    hideLoading();
+    const pesan = statusBaru === 'aktif' ? 'Guru berhasil disetujui ✅' : 'Permohonan ditolak ❌';
+    showToast(pesan);
+    renderApprovalGuru();
+    updateBadgeGuruPending();
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal memproses: ' + e.message + ' ⚠️');
+  }
+}
+
 async function daftarAkunGuru() {
   const nama = document.getElementById('guru-reg-nama').value.trim();
   const email = document.getElementById('guru-reg-email').value.trim();
@@ -9899,6 +10064,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
+    if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
     if (screenId === 'dashboard-guru') updateBadgePengumumanGuru();
   }
 }
