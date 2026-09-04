@@ -5134,38 +5134,39 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Informasi Pribadi</h2>
+      <button id="btn-edit-profil" onclick="toggleEditProfil()" style="background:none;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.6);">✏️ Edit</button>
     </div>
     <div class="form-body">
       <div style="text-align:center;padding:16px 0 8px;">
-        <div id="ip-foto-guru" class="av-guru" style="width:80px;height:80px;border-radius:50%;margin:0 auto 8px;cursor:pointer;" onclick="document.getElementById('input-foto-guru').click()"></div>
+        <div id="ip-foto-guru" class="av-guru" style="width:80px;height:80px;border-radius:50%;margin:0 auto 8px;"></div>
         <input type="file" id="input-foto-guru" accept="image/*" style="display:none;" onchange="uploadFotoGuru(this)">
-        <div style="font-size:13px;color:var(--green);font-weight:600;cursor:pointer;" onclick="document.getElementById('input-foto-guru').click()">✏️ Ganti Foto</div>
+        <div id="btn-ganti-foto" style="font-size:13px;color:var(--green);font-weight:600;cursor:pointer;display:none;" onclick="document.getElementById('input-foto-guru').click()">✏️ Ganti Foto</div>
       </div>
       <div class="form-group">
         <label class="form-label">Nama Lengkap</label>
-        <input type="text" class="form-input" id="ip-nama-guru">
+        <input type="text" class="form-input" id="ip-nama-guru" readonly style="background:#f5f5f5;">
       </div>
       <div class="form-group">
         <label class="form-label">NIP / ID Guru</label>
-        <input type="text" class="form-input" id="ip-nip-guru">
+        <input type="text" class="form-input" id="ip-nip-guru" readonly style="background:#f5f5f5;">
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" class="form-input" id="ip-email-guru">
+        <input type="email" class="form-input" id="ip-email-guru" readonly style="background:#f5f5f5;">
       </div>
       <div class="form-group">
         <label class="form-label">Nomor HP</label>
-        <input type="tel" class="form-input" id="ip-hp-guru">
+        <input type="tel" class="form-input" id="ip-hp-guru" readonly style="background:#f5f5f5;">
       </div>
       <div class="form-group">
         <label class="form-label">Jabatan</label>
-        <input type="text" class="form-input" id="ip-jabatan-guru">
+        <input type="text" class="form-input" id="ip-jabatan-guru" readonly style="background:#f5f5f5;">
       </div>
       <div class="form-group">
         <label class="form-label">Tanggal Bergabung</label>
-        <input type="date" class="form-input" id="ip-tanggal-guru">
+        <input type="date" class="form-input" id="ip-tanggal-guru" readonly style="background:#f5f5f5;">
       </div>
-      <button class="btn-save" onclick="simpanProfilGuru()">💾 Simpan Perubahan</button>
+      <button id="btn-simpan-profil" onclick="simpanProfilGuru()" style="display:none;" class="btn-save">💾 Simpan Perubahan</button>
     </div>
   </div>
 
@@ -10248,6 +10249,55 @@ function updateProfilUserView() {
     avatar.classList.add('av-guru');
     name.textContent = namaAsli || 'Guru';
     sub.textContent = jabatanAsli || 'Guru';
+
+    // Terapkan foto profil jika ada
+    if (currentUserProfile?.id) {
+      supabaseClient.from('guru')
+        .select('nama, jabatan, foto_url')
+        .eq('user_id', currentUserProfile.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!data) return;
+          namaAsli = data.nama || namaAsli;
+          jabatanAsli = data.jabatan || jabatanAsli;
+          if (name) name.textContent = namaAsli;
+          if (sub) sub.textContent = jabatanAsli || 'Guru';
+          if (data.foto_url) {
+            avatar.style.backgroundImage = `url(${data.foto_url})`;
+            avatar.style.backgroundSize = 'cover';
+            avatar.style.backgroundPosition = 'center';
+          }
+        });
+    }
+  }
+}
+
+function toggleEditProfil() {
+  const inputs = ['ip-nama-guru','ip-nip-guru','ip-email-guru','ip-hp-guru','ip-jabatan-guru','ip-tanggal-guru'];
+  const isReadOnly = document.getElementById('ip-nama-guru')?.readOnly;
+  const btn = document.getElementById('btn-edit-profil');
+  const btnSimpan = document.getElementById('btn-simpan-profil');
+  const btnFoto = document.getElementById('btn-ganti-foto');
+
+  if (isReadOnly) {
+    // Aktifkan mode edit
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.readOnly = false; el.style.background = 'white'; }
+    });
+    if (btn) btn.textContent = '✕ Batal';
+    if (btnSimpan) btnSimpan.style.display = 'block';
+    if (btnFoto) btnFoto.style.display = 'block';
+  } else {
+    // Kembali ke mode view — reload data
+    inputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.readOnly = true; el.style.background = '#f5f5f5'; }
+    });
+    if (btn) btn.textContent = '✏️ Edit';
+    if (btnSimpan) btnSimpan.style.display = 'none';
+    if (btnFoto) btnFoto.style.display = 'none';
+    isiFormProfilGuru();
   }
 }
 
@@ -10356,6 +10406,7 @@ async function simpanProfilGuru() {
     jabatanAsli = jabatan;
     hideLoading();
     showToast('Informasi pribadi berhasil disimpan! ✅');
+    toggleEditProfil(); // kembali ke mode view
     setTimeout(goBack, 300);
   } catch (e) {
     hideLoading();
