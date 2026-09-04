@@ -1766,7 +1766,6 @@
 
   <!-- ===== DAFTAR AKUN BARU (ORTU) ===== -->
   <div id="daftar-akun-ortu" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goTo('login-form')">‹</button>
       <h2 style="color:white;">Daftar Akun Baru</h2>
@@ -1806,6 +1805,7 @@
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input type="password" id="reg-password" placeholder="Minimal 6 karakter">
+          <button class="eye-toggle" onclick="togglePassById('reg-password')">👁</button>
         </div>
       </div>
 
@@ -1814,6 +1814,7 @@
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input type="password" id="reg-password2" placeholder="Ulangi password">
+          <button class="eye-toggle" onclick="togglePassById('reg-password2')">👁</button>
         </div>
       </div>
 
@@ -1829,7 +1830,6 @@
 
   <!-- ===== DAFTAR AKUN BARU (GURU) ===== -->
   <div id="daftar-akun-guru" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1565C0,#1976D2);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goTo('login-form')">‹</button>
       <h2 style="color:white;">Daftar Akun Guru</h2>
@@ -1861,6 +1861,7 @@
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input type="password" id="guru-reg-password" placeholder="Minimal 6 karakter">
+          <button class="eye-toggle" onclick="togglePassById('guru-reg-password')">👁</button>
         </div>
       </div>
 
@@ -1869,6 +1870,7 @@
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input type="password" id="guru-reg-password2" placeholder="Ulangi password">
+          <button class="eye-toggle" onclick="togglePassById('guru-reg-password2')">👁</button>
         </div>
       </div>
 
@@ -1884,7 +1886,6 @@
 
   <!-- ===== FORM PENDAFTARAN ===== -->
   <div id="form-pendaftaran" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
       <h2 style="color:white;font-size:14px;">Formulir Pendaftaran</h2>
@@ -2288,7 +2289,6 @@
 
   <!-- ===== PENDAFTARAN BERHASIL ===== -->
   <div id="daftar-sukses" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="scroll-content" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;">
       <div style="text-align:center;padding:32px 24px;">
         <div style="font-size:80px;margin-bottom:16px;">🎉</div>
@@ -2376,7 +2376,6 @@
 
   <!-- ===== DASHBOARD GURU ===== -->
   <div id="dashboard-guru" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="dg-topbar">
       <div class="dg-avatar av-guru"></div>
       <div class="dg-greet">
@@ -2509,7 +2508,6 @@
 
   <!-- ===== DAFTAR MURID GURU ===== -->
   <div id="daftar-murid-guru" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="switchTab('dashboard-guru', document.querySelector('#bottomNav-guru .nav-item'), 'guru')">‹</button>
       <h2>Daftar Murid</h2>
@@ -2551,7 +2549,6 @@
 
   <!-- ===== DAFTAR MODUL PEMBELAJARAN (GURU) ===== -->
   <div id="guru-modul-list" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="switchTab('dashboard-guru', document.querySelector('#bottomNav-guru .nav-item'), 'guru')">‹</button>
       <h2>Modul Pembelajaran</h2>
@@ -2570,7 +2567,6 @@
 
   <!-- ===== FORM MODUL PEMBELAJARAN (GURU) ===== -->
   <div id="guru-modul-form" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="switchTab('guru-modul-list', document.querySelector('#bottomNav-guru .nav-item'), 'guru');renderGuruModulList()">‹</button>
       <h2 id="gm-form-title">Modul Pembelajaran</h2>
@@ -2649,7 +2645,6 @@
 
   <!-- ===== DAFTAR LEMBAR ASESMEN (GURU) ===== -->
   <div id="guru-asesmen-list" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="switchTab('dashboard-guru', document.querySelector('#bottomNav-guru .nav-item'), 'guru')">‹</button>
       <h2>Lembar Asesmen</h2>
@@ -2668,7 +2663,6 @@
 
   <!-- ===== FORM LEMBAR ASESMEN (GURU) ===== -->
   <div id="guru-asesmen-form" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="switchTab('guru-asesmen-list', document.querySelector('#bottomNav-guru .nav-item'), 'guru');renderGuruAsesmenList()">‹</button>
       <h2>Lembar Asesmen</h2>
@@ -2705,7 +2699,6 @@
 
   <!-- ===== PROFIL DETAIL MURID (GURU) ===== -->
   <div id="profil-detail-murid" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
       <h2 id="pdm-judul" style="color:white;font-size:15px;">Profil Murid</h2>
@@ -2728,7 +2721,6 @@
   <!-- ===== AKTIVITAS HARIAN ===== -->
   <!-- ===== ABSENSI ===== -->
   <div id="absensi" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Absensi Hari Ini</h2>
@@ -2782,7 +2774,6 @@
 
   <!-- ===== RAPOR SISWA (GURU) ===== -->
   <div id="guru-rapor-siswa" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Rapor Siswa</h2>
@@ -2842,7 +2833,6 @@
 
   <!-- ===== FORM RAPOR GURU (INPUT PER MURID) ===== -->
   <div id="guru-form-rapor" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="gap:6px;">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2 id="guru-rapor-judul" style="font-size:12px;flex:1;">Isi Rapor</h2>
@@ -3646,7 +3636,6 @@
   </div>
 
   <div id="aktivitas" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Aktivitas Baru</h2>
@@ -3711,7 +3700,6 @@
 
   <!-- ===== PENILAIAN CEPAT ===== -->
   <div id="penilaian" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Penilaian Murid</h2>
@@ -3789,7 +3777,6 @@
 
   <!-- ===== PROFIL MURID ===== -->
   <div id="profil-murid" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Profil Murid</h2>
@@ -3948,7 +3935,6 @@
 
   <!-- ===== TIMELINE ORANG TUA ===== -->
   <div id="timeline-ortu" class="screen">
-    <div class="status-bar" style="flex-shrink:0;"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="flex-direction:column;align-items:flex-start;height:auto;padding:10px 16px;gap:2px;flex-shrink:0;">
       <div style="display:flex;align-items:center;gap:12px;width:100%;">
         <button class="back-btn" onclick="goBack()">‹</button>
@@ -4059,7 +4045,6 @@
 
   <!-- ===== DOKUMENTASI FOTO ===== -->
   <div id="dokumentasi" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Dokumentasi</h2>
@@ -4104,7 +4089,6 @@
 
   <!-- ===== LAPORAN HARIAN ===== -->
   <div id="laporan-harian" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Laporan Harian</h2>
@@ -4147,7 +4131,6 @@
 
   <!-- ===== LAPORAN BULANAN ===== -->
   <div id="laporan-bulanan" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Laporan Perkembangan</h2>
@@ -4293,7 +4276,6 @@
 
   <!-- ===== RAPOR OTOMATIS ===== -->
   <div id="rapor" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Rapor Digital</h2>
@@ -4365,7 +4347,6 @@
 
   <!-- ===== DETAIL RAPOR TKIT ISTIQOMAH ===== -->
   <div id="detail-rapor" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2 id="detail-rapor-judul" style="font-size:13px;">Rapor</h2>
@@ -4826,7 +4807,6 @@
 
   <!-- ===== APPROVAL GURU (KEPALA SEKOLAH) ===== -->
   <div id="approval-guru" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1565C0,#1976D2);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
       <h2 style="color:white;">Permohonan Guru Baru</h2>
@@ -4862,7 +4842,6 @@
 
   <!-- ===== PENDAFTARAN MASUK (KEPALA SEKOLAH) ===== -->
   <div id="pendaftaran-masuk" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Pendaftaran Masuk</h2>
@@ -4898,7 +4877,6 @@
 
   <!-- ===== DETAIL PENDAFTARAN ===== -->
   <div id="detail-pendaftaran" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Detail Pendaftaran</h2>
@@ -4911,7 +4889,6 @@
 
   <!-- ===== ARSIP MODUL & ASESMEN (KEPALA SEKOLAH) ===== -->
   <div id="kepala-arsip" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Arsip Modul &amp; Asesmen</h2>
@@ -4938,7 +4915,6 @@
 
   <!-- ===== DETAIL ARSIP MODUL/ASESMEN (KEPALA SEKOLAH) ===== -->
   <div id="kepala-arsip-detail" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2 id="akd-title">Detail Berkas</h2>
@@ -4951,7 +4927,6 @@
 
   <!-- ===== KELOLA TEMPLATE RAPOR (KEPALA SEKOLAH) ===== -->
   <div id="kelola-template-rapor" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Kelola Template Rapor</h2>
@@ -4988,7 +4963,6 @@
 
   <!-- ===== PENGUMUMAN KE GURU (KEPALA SEKOLAH - KIRIM) ===== -->
   <div id="pengumuman-guru-kepala" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Pengumuman ke Guru</h2>
@@ -5013,7 +4987,6 @@
 
   <!-- ===== PENGUMUMAN SEKOLAH (GURU - TERIMA) ===== -->
   <div id="pengumuman-guru-terima" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="switchTab('dashboard-guru', document.querySelector('#bottomNav-guru .nav-item'), 'guru')">‹</button>
       <h2>Pengumuman Sekolah</h2>
@@ -5030,7 +5003,6 @@
 
   <!-- ===== NOTIFIKASI ===== -->
   <div id="notifikasi" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Notifikasi</h2>
@@ -5095,7 +5067,6 @@
 
   <!-- ===== PESAN/CHAT ===== -->
   <div id="pesan" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Pesan</h2>
@@ -5154,7 +5125,6 @@
 
   <!-- ===== PROFIL USER ===== -->
   <div id="profil-user" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Profil</h2>
@@ -5204,7 +5174,6 @@
 
   <!-- ===== INFO PRIBADI GURU ===== -->
   <div id="info-pribadi" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Informasi Pribadi</h2>
@@ -5216,35 +5185,34 @@
       </div>
       <div class="form-group">
         <label class="form-label">Nama Lengkap</label>
-        <input type="text" class="form-input" id="ip-nama-guru" value="Guru">
+        <input type="text" class="form-input" id="ip-nama-guru">
       </div>
       <div class="form-group">
         <label class="form-label">NIP / ID Guru</label>
-        <input type="text" class="form-input" value="198501012010012001">
+        <input type="text" class="form-input" id="ip-nip-guru">
       </div>
       <div class="form-group">
         <label class="form-label">Email</label>
-        <input type="email" class="form-input" value="burina@schoolid.com">
+        <input type="email" class="form-input" id="ip-email-guru">
       </div>
       <div class="form-group">
         <label class="form-label">Nomor HP</label>
-        <input type="tel" class="form-input" value="0812-3456-7890">
+        <input type="tel" class="form-input" id="ip-hp-guru">
       </div>
       <div class="form-group">
         <label class="form-label">Jabatan</label>
-        <input type="text" class="form-input" value="Guru Kelas A">
+        <input type="text" class="form-input" id="ip-jabatan-guru">
       </div>
       <div class="form-group">
         <label class="form-label">Tanggal Bergabung</label>
-        <input type="date" class="form-input" value="2020-01-01">
+        <input type="date" class="form-input" id="ip-tanggal-guru">
       </div>
-      <button class="btn-save" onclick="saveAndBack('Informasi pribadi berhasil disimpan! ✅')">💾 Simpan Perubahan</button>
+      <button class="btn-save" onclick="simpanProfilGuru()">💾 Simpan Perubahan</button>
     </div>
   </div>
 
   <!-- ===== UBAH PASSWORD ===== -->
   <div id="ubah-password" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Ubah Password</h2>
@@ -5280,7 +5248,6 @@
 
   <!-- ===== BANTUAN ===== -->
   <div id="bantuan" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Bantuan</h2>
@@ -5333,7 +5300,6 @@
 
   <!-- ===== TENTANG SCHOOLID ===== -->
   <div id="tentang-app" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Tentang SchoolID</h2>
@@ -5381,7 +5347,6 @@
 
   <!-- ===== PROFIL ORANG TUA ===== -->
   <div id="profil-ortu" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
       <h2 style="color:white;font-size:17px;">Profil Saya</h2>
     </div>
@@ -5502,7 +5467,6 @@
 
   <!-- ===== DATA ORANG TUA ===== -->
   <div id="ortu-info-pribadi" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Data Orang Tua</h2></div>
     <div class="form-body">
       <div style="background:#E8F5E9;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#1B5E20;font-weight:600;margin-bottom:4px;">👨 Data Suami / Ayah</div>
@@ -5562,7 +5526,6 @@
 
   <!-- ===== DATA ANAK ===== -->
   <div id="ortu-data-anak" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Data Anak</h2></div>
     <div class="form-body">
       <div style="text-align:center;padding:12px 0;">
@@ -5632,7 +5595,6 @@
 
   <!-- ===== UBAH NOMOR HP ORTU ===== -->
   <div id="ortu-ubah-hp" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Ubah Nomor HP</h2></div>
     <div class="form-body">
       <div style="background:#E3F2FD;border-radius:var(--radius);padding:12px 14px;font-size:13px;color:#1565C0;margin-bottom:8px;">
@@ -5656,7 +5618,6 @@
 
   <!-- ===== NOTIFIKASI ORTU ===== -->
   <div id="ortu-notifikasi" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Pengaturan Notifikasi</h2></div>
     <div class="scroll-content">
       <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
@@ -5701,7 +5662,6 @@
 
   <!-- ===== UBAH PASSWORD ORTU ===== -->
   <div id="ortu-ubah-password" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Ubah Password</h2></div>
     <div class="form-body">
       <div style="background:#E8F5E9;border-radius:var(--radius);padding:12px 14px;font-size:13px;color:#1B5E20;margin-bottom:8px;">
@@ -5734,7 +5694,6 @@
 
   <!-- ===== PROFIL GURU (VIEW ORTU) ===== -->
   <div id="ortu-profil-guru" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Profil Guru</h2></div>
     <div class="scroll-content">
       <div style="padding:12px 16px;background:linear-gradient(135deg,#1B5E20,#2E7D32);">
@@ -5776,7 +5735,6 @@
 
   <!-- ===== DETAIL GURU 1 ===== -->
   <div id="ortu-detail-guru-1" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
       <h2 style="color:white;">Profil Guru</h2>
@@ -5815,7 +5773,6 @@
 
   <!-- ===== DETAIL GURU 2 ===== -->
   <div id="ortu-detail-guru-2" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
       <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
       <h2 style="color:white;">Profil Guru</h2>
@@ -5854,7 +5811,6 @@
 
   <!-- ===== INFO SEKOLAH ===== -->
   <div id="info-sekolah" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Informasi Sekolah</h2>
@@ -5898,7 +5854,6 @@
 
   <!-- ===== KELOLA GURU ===== -->
   <div id="kelola-guru" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Kelola Guru</h2>
@@ -5953,7 +5908,6 @@
 
   <!-- ===== KELOLA KELAS ===== -->
   <div id="kelola-kelas" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Kelola Kelas</h2>
@@ -6021,7 +5975,6 @@
 
   <!-- ===== INFO SEKOLAH VIEW ONLY (GURU) ===== -->
   <div id="info-sekolah-view" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Informasi Sekolah</h2>
@@ -6064,7 +6017,6 @@
 
   <!-- ===== PENGATURAN PENILAIAN LENGKAP ===== -->
   <div id="pengaturan-penilaian" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Pengaturan Penilaian</h2>
@@ -6240,7 +6192,6 @@
 
   <!-- ===== BACKUP & RESTORE ===== -->
   <div id="backup-restore" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Backup & Restore</h2>
@@ -6271,7 +6222,6 @@
 
   <!-- ===== KELOLA MURID ===== -->
   <div id="kelola-murid" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Kelola Murid</h2>
@@ -6310,7 +6260,6 @@
 
   <!-- ===== FORM TAMBAH/EDIT MURID ===== -->
   <div id="form-murid" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2 id="form-murid-judul">Tambah Murid</h2>
@@ -6377,7 +6326,6 @@
 
   <!-- ===== PENGATURAN ===== -->
   <div id="pengaturan" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Pengaturan Akun</h2>
@@ -6438,7 +6386,6 @@
 
   <!-- ===== EMPTY STATE ===== -->
   <div id="empty-state" class="screen">
-    <div class="status-bar"><span class="status-time">09:41</span><span class="status-icons">📶 🔋</span></div>
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Aktivitas</h2>
@@ -10050,7 +9997,17 @@ function doLoginLama() {
 
 function togglePass() {
   const input = document.getElementById('loginPass');
+  const btn = input.parentElement.querySelector('.eye-toggle');
   input.type = input.type === 'password' ? 'text' : 'password';
+  if (btn) btn.textContent = input.type === 'password' ? '👁' : '🙈';
+}
+
+function togglePassById(id) {
+  const input = document.getElementById(id);
+  if (!input) return;
+  const btn = input.parentElement.querySelector('.eye-toggle');
+  input.type = input.type === 'password' ? 'text' : 'password';
+  if (btn) btn.textContent = input.type === 'password' ? '👁' : '🙈';
 }
 
 // ===== ROLE SELECTION =====
@@ -10089,6 +10046,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'dokumentasi') updateDokumentasiNav();
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
+    if (screenId === 'info-pribadi' && currentRole === 'guru') isiFormProfilGuru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
     if (screenId === 'dashboard-guru') updateBadgePengumumanGuru();
@@ -10175,6 +10133,60 @@ function updateProfilUserView() {
     avatar.classList.add('av-guru');
     name.textContent = namaAsli || 'Guru';
     sub.textContent = 'Guru Kelas A';
+  }
+}
+
+async function isiFormProfilGuru() {
+  if (!currentUserProfile) return;
+  const userId = currentUserProfile.id;
+  const { data } = await supabaseClient
+    .from('guru')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  if (!data) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('ip-nama-guru', data.nama);
+  set('ip-nip-guru', data.nip || '');
+  set('ip-email-guru', data.email || '');
+  set('ip-hp-guru', data.no_hp || '');
+  set('ip-jabatan-guru', data.jabatan || '');
+  set('ip-tanggal-guru', data.tanggal_bergabung || '');
+}
+
+async function simpanProfilGuru() {
+  if (!currentUserProfile) return;
+  const userId = currentUserProfile.id;
+  const nama = document.getElementById('ip-nama-guru')?.value.trim();
+  const nip = document.getElementById('ip-nip-guru')?.value.trim();
+  const email = document.getElementById('ip-email-guru')?.value.trim();
+  const no_hp = document.getElementById('ip-hp-guru')?.value.trim();
+  const jabatan = document.getElementById('ip-jabatan-guru')?.value.trim();
+  const tanggal_bergabung = document.getElementById('ip-tanggal-guru')?.value;
+
+  if (!nama) { showToast('Nama tidak boleh kosong ⚠️'); return; }
+
+  showLoading();
+  try {
+    const { error: errGuru } = await supabaseClient
+      .from('guru')
+      .update({ nama, nip, email, no_hp, jabatan, tanggal_bergabung })
+      .eq('user_id', userId);
+    if (errGuru) throw errGuru;
+
+    const { error: errProfile } = await supabaseClient
+      .from('profiles')
+      .update({ nama })
+      .eq('id', userId);
+    if (errProfile) throw errProfile;
+
+    namaAsli = nama;
+    hideLoading();
+    showToast('Informasi pribadi berhasil disimpan! ✅');
+    setTimeout(goBack, 300);
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal menyimpan: ' + e.message + ' ⚠️');
   }
 }
 
