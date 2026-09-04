@@ -5180,8 +5180,9 @@
     </div>
     <div class="form-body">
       <div style="text-align:center;padding:16px 0 8px;">
-        <div class="av-guru" style="width:80px;height:80px;border-radius:50%;margin:0 auto 8px;"></div>
-        <div style="font-size:13px;color:var(--green);font-weight:600;cursor:pointer;">✏️ Ganti Foto</div>
+        <div id="ip-foto-guru" class="av-guru" style="width:80px;height:80px;border-radius:50%;margin:0 auto 8px;cursor:pointer;" onclick="document.getElementById('input-foto-guru').click()"></div>
+        <input type="file" id="input-foto-guru" accept="image/*" style="display:none;" onchange="uploadFotoGuru(this)">
+        <div style="font-size:13px;color:var(--green);font-weight:600;cursor:pointer;" onclick="document.getElementById('input-foto-guru').click()">✏️ Ganti Foto</div>
       </div>
       <div class="form-group">
         <label class="form-label">Nama Lengkap</label>
@@ -10132,7 +10133,14 @@ function updateProfilUserView() {
   } else {
     avatar.classList.add('av-guru');
     name.textContent = namaAsli || 'Guru';
-    sub.textContent = 'Guru Kelas A';
+    // Ambil jabatan dari Supabase
+    if (currentUserProfile?.id) {
+      supabaseClient.from('guru').select('jabatan').eq('user_id', currentUserProfile.id).maybeSingle().then(({ data }) => {
+        if (sub) sub.textContent = data?.jabatan || 'Guru';
+      });
+    } else {
+      sub.textContent = 'Guru';
+    }
   }
 }
 
@@ -10152,6 +10160,62 @@ async function isiFormProfilGuru() {
   set('ip-hp-guru', data.no_hp || '');
   set('ip-jabatan-guru', data.jabatan || '');
   set('ip-tanggal-guru', data.tanggal_bergabung || '');
+
+  // Tampilkan foto jika ada
+  if (data.foto_url) {
+    const fotoEl = document.getElementById('ip-foto-guru');
+    if (fotoEl) {
+      fotoEl.style.backgroundImage = `url(${data.foto_url})`;
+      fotoEl.style.backgroundSize = 'cover';
+      fotoEl.style.backgroundPosition = 'center';
+    }
+  }
+}
+
+async function uploadFotoGuru(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (!file.type.startsWith('image/')) { showToast('File harus berupa gambar ⚠️'); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('Ukuran foto maksimal 2MB ⚠️'); return; }
+
+  showLoading();
+  try {
+    const userId = currentUserProfile.id;
+    const ext = file.name.split('.').pop();
+    const path = `guru-foto/${userId}.${ext}`;
+
+    const { error: uploadError } = await supabaseClient.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true });
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = supabaseClient.storage
+      .from('avatars')
+      .getPublicUrl(path);
+    const fotoUrl = urlData.publicUrl;
+
+    await supabaseClient.from('guru').update({ foto_url: fotoUrl }).eq('user_id', userId);
+
+    // Update tampilan foto
+    const fotoEl = document.getElementById('ip-foto-guru');
+    if (fotoEl) {
+      fotoEl.style.backgroundImage = `url(${fotoUrl})`;
+      fotoEl.style.backgroundSize = 'cover';
+      fotoEl.style.backgroundPosition = 'center';
+    }
+    // Update avatar di dashboard
+    document.querySelectorAll('.av-guru').forEach(el => {
+      el.style.backgroundImage = `url(${fotoUrl})`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+    });
+
+    hideLoading();
+    showToast('Foto profil berhasil diperbarui ✅');
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal upload foto: ' + e.message + ' ⚠️');
+  }
 }
 
 async function simpanProfilGuru() {
