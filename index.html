@@ -8341,7 +8341,7 @@ async function muatLaporanHarian(tanggal) {
     // Kehadiran di tanggal ini
     const { count: jmlHadir } = await supabaseClient
       .from('murid').select('*', { count: 'exact', head: true })
-      .eq('kelompok', currentUserProfile?.kelas_id);
+      .eq('kelompok', kelasGuru);
     if (el('lh-hadir')) el('lh-hadir').textContent = `- / ${jmlHadir ?? 0}`;
 
   } catch (e) {
@@ -8362,7 +8362,7 @@ async function muatRingkasanDashboardGuru() {
     const { count: jumlahMurid } = await supabaseClient
       .from('murid')
       .select('*', { count: 'exact', head: true })
-      .eq('kelompok', currentUserProfile.kelas_id);
+      .eq('kelompok', kelasGuru);
 
     // Aktivitas hari ini
     const { count: jumlahAktivitas } = await supabaseClient
@@ -8416,7 +8416,7 @@ async function muatRingkasanDashboardGuru() {
     const { data: muridList } = await supabaseClient
       .from('murid')
       .select('id, nama, jk')
-      .eq('kelompok', currentUserProfile.kelas_id)
+      .eq('kelompok', kelasGuru)
       .order('created_at', { ascending: false })
       .limit(5);
 
@@ -8442,8 +8442,8 @@ async function muatRingkasanDashboardGuru() {
 
 function terapkanNamaGuruAsli() {
   const namaGuru = currentUserProfile?.nama || 'Guru';
-  const kelasMilik = getKelasList().find(k => k.id === currentUserProfile?.kelas_id);
-  const namaKelas = kelasMilik ? kelasMilik.nama : (currentUserProfile?.kelas_id || 'Kelas belum diatur');
+  const kelasMilik = getKelasList().find(k => k.id === kelasGuru);
+  const namaKelas = kelasMilik ? kelasMilik.nama : (kelasGuru || 'Kelas belum diatur');
   const greetEl = document.getElementById('dg-greet-nama');
   if (greetEl) greetEl.textContent = `Assalamu'alaikum, Ustadzah ${namaGuru}`;
   const kelompokEl = document.getElementById('dmg-kelompok');
@@ -9717,6 +9717,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUserProfile = null;
 let namaAsli = '';
 let jabatanAsli = '';
+let kelasGuru = '';
 
 // ===== PWA INSTALL PROMPT =====
 let deferredInstallPrompt = null;
@@ -10067,6 +10068,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
     // Ambil semua data profil guru saat login
     jabatanAsli = dataGuru?.jabatan || '';
     namaAsli = dataGuru?.nama || profile.nama || '';
+    kelasGuru = dataGuru?.kelas_id || '';
 
     // Muat dan terapkan foto profil
     if (dataGuru?.foto_url) {
