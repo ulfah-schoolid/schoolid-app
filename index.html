@@ -2450,27 +2450,8 @@
       </div>
       <div class="section" style="padding-top:0;">
         <div class="section-title">Aktivitas Hari Ini</div>
-        <div class="activity-list" style="padding:0;">
-          <div class="activity-item">
-            <div class="act-time-badge">08:00–09:00</div>
-            <div class="act-info"><div class="act-name">Melipat Kertas</div><div class="act-cat">Motorik Halus</div></div>
-            <div class="grade-badge grade-BSH">BSH</div>
-          </div>
-          <div class="activity-item" style="margin-top:8px;">
-            <div class="act-time-badge">09:30–10:00</div>
-            <div class="act-info"><div class="act-name">Bernyanyi Bersama</div><div class="act-cat">Bahasa</div></div>
-            <div class="grade-badge grade-BSB">BSB</div>
-          </div>
-          <div class="activity-item" style="margin-top:8px;">
-            <div class="act-time-badge">10:00–11:00</div>
-            <div class="act-info"><div class="act-name">Mewarnai Gambar</div><div class="act-cat">Seni</div></div>
-            <div class="grade-badge grade-BSH">BSH</div>
-          </div>
-          <div class="activity-item" style="margin-top:8px;">
-            <div class="act-time-badge">13:00–13:30</div>
-            <div class="act-info"><div class="act-name">Bermain Puzzle</div><div class="act-cat">Kognitif</div></div>
-            <div class="grade-badge grade-MB">MB</div>
-          </div>
+        <div id="dg-aktivitas-hari-ini" class="activity-list" style="padding:0;">
+          <div style="text-align:center;padding:24px;color:var(--gray-400);font-size:13px;">Memuat aktivitas...</div>
         </div>
       </div>
       <div class="section" style="padding-top:0;">
@@ -4078,37 +4059,30 @@
     </div>
     <div class="scroll-content">
       <div style="padding:14px 16px 4px;display:flex;justify-content:flex-end;">
-        <select style="font-size:13px;font-weight:700;color:var(--gray-900);border:1.5px solid var(--gray-300);border-radius:20px;padding:7px 14px;background:white;cursor:pointer;outline:none;">
-          <option>16 Juni 2026</option>
-          <option>15 Juni 2026</option>
-          <option>14 Juni 2026</option>
-        </select>
+        <input type="date" id="lh-tanggal" style="font-size:13px;font-weight:700;color:var(--gray-900);border:1.5px solid var(--gray-300);border-radius:20px;padding:7px 14px;background:white;cursor:pointer;outline:none;" onchange="muatLaporanHarian(this.value)">
       </div>
       <div class="section" style="padding-top:8px;">
         <div class="section-title">Ringkasan</div>
         <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:0 16px;">
-          <div class="lh-row"><span class="lh-icon">👥</span><span class="lh-label">Jumlah Murid Hadir</span><span class="lh-val">18 / 20</span></div>
-          <div class="lh-row"><span class="lh-icon">📌</span><span class="lh-label">Aktivitas Dilakukan</span><span class="lh-val">4</span></div>
-          <div class="lh-row"><span class="lh-icon">📁</span><span class="lh-label">Dokumentasi</span><span class="lh-val">12 Foto</span></div>
-          <div class="lh-row" style="border-bottom:none;"><span class="lh-icon">⭐</span><span class="lh-label">Penilaian</span><span class="lh-val">18</span></div>
+          <div class="lh-row"><span class="lh-icon">👥</span><span class="lh-label">Jumlah Murid Hadir</span><span class="lh-val" id="lh-hadir">-</span></div>
+          <div class="lh-row"><span class="lh-icon">📌</span><span class="lh-label">Aktivitas Dilakukan</span><span class="lh-val" id="lh-aktivitas">-</span></div>
+          <div class="lh-row"><span class="lh-icon">📁</span><span class="lh-label">Dokumentasi</span><span class="lh-val" id="lh-dokumentasi">-</span></div>
+          <div class="lh-row" style="border-bottom:none;"><span class="lh-icon">⭐</span><span class="lh-label">Penilaian</span><span class="lh-val" id="lh-penilaian">-</span></div>
         </div>
       </div>
       <div class="section" style="padding-top:0;">
         <div class="section-title">Aktivitas Hari Ini</div>
-        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:0 16px;">
-          <div class="lh-act-row"><span class="lh-act-time">08:00–09:00</span><span class="lh-act-name">Melipat Kertas</span></div>
-          <div class="lh-act-row"><span class="lh-act-time">09:30–10:00</span><span class="lh-act-name">Bernyanyi Bersama</span></div>
-          <div class="lh-act-row"><span class="lh-act-time">10:30–11:00</span><span class="lh-act-name">Mewarnai Gambar</span></div>
-          <div class="lh-act-row" style="border-bottom:none;"><span class="lh-act-time">13:00–13:30</span><span class="lh-act-name">Bermain Puzzle</span></div>
+        <div id="lh-aktivitas-list" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:0 16px;">
+          <div style="padding:16px;text-align:center;color:var(--gray-400);font-size:13px;">Pilih tanggal untuk melihat aktivitas</div>
         </div>
       </div>
       <div class="section" style="padding-top:0;">
         <div class="section-title">Catatan Guru</div>
         <div style="background:white;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);">
-          <div class="timeline-note">Hari ini kegiatan berjalan lancar. Murid sangat antusias terutama saat melipat kertas origami. 2 anak tidak hadir karena sakit.</div>
+          <textarea id="lh-catatan" placeholder="Tulis catatan harian..." style="width:100%;border:none;outline:none;font-size:13px;color:var(--gray-700);resize:none;min-height:80px;font-family:inherit;"></textarea>
         </div>
       </div>
-      <button class="btn-export" onclick="showToast('Membuat PDF laporan harian...')">📄 Export PDF</button>
+      <button class="btn-export" onclick="simpanCatatanHarian()">💾 Simpan Catatan</button>
     </div>
   </div>
 
@@ -8326,6 +8300,59 @@ function terapkanNamaAnakOrtu() {
 }
 
 function terapkanDataAnakAsli() { terapkanNamaAnakOrtu(); }
+async function muatLaporanHarian(tanggal) {
+  const today = tanggal || new Date().toISOString().split('T')[0];
+  const el = id => document.getElementById(id);
+  if (el('lh-tanggal')) el('lh-tanggal').value = today;
+
+  try {
+    // Aktivitas di tanggal ini
+    const { data: aktivitas, count: jmlAktivitas } = await supabaseClient
+      .from('modul_ajar').select('nama, waktu_mulai, waktu_selesai', { count: 'exact' })
+      .eq('tanggal', today).order('waktu_mulai');
+
+    if (el('lh-aktivitas')) el('lh-aktivitas').textContent = jmlAktivitas ?? 0;
+
+    const listEl = el('lh-aktivitas-list');
+    if (listEl) {
+      if (!aktivitas || aktivitas.length === 0) {
+        listEl.innerHTML = `<div style="padding:16px;text-align:center;color:var(--gray-400);font-size:13px;">Belum ada aktivitas di tanggal ini</div>`;
+      } else {
+        listEl.innerHTML = aktivitas.map((a, i) => {
+          const waktu = a.waktu_mulai && a.waktu_selesai ? `${a.waktu_mulai.slice(0,5)}–${a.waktu_selesai.slice(0,5)}` : '';
+          const border = i < aktivitas.length - 1 ? '' : 'border-bottom:none;';
+          return `<div class="lh-act-row" style="${border}"><span class="lh-act-time">${waktu}</span><span class="lh-act-name">${a.nama}</span></div>`;
+        }).join('');
+      }
+    }
+
+    // Dokumentasi di tanggal ini
+    const { count: jmlDok } = await supabaseClient
+      .from('lembar_asesmen').select('*', { count: 'exact', head: true })
+      .eq('jenis', 'dokumentasi').eq('tanggal', today);
+    if (el('lh-dokumentasi')) el('lh-dokumentasi').textContent = `${jmlDok ?? 0} Foto`;
+
+    // Penilaian di tanggal ini
+    const { count: jmlPenilaian } = await supabaseClient
+      .from('lembar_asesmen').select('*', { count: 'exact', head: true })
+      .eq('tanggal', today);
+    if (el('lh-penilaian')) el('lh-penilaian').textContent = jmlPenilaian ?? 0;
+
+    // Kehadiran di tanggal ini
+    const { count: jmlHadir } = await supabaseClient
+      .from('murid').select('*', { count: 'exact', head: true })
+      .eq('kelas_id', currentUserProfile?.kelas_id);
+    if (el('lh-hadir')) el('lh-hadir').textContent = `- / ${jmlHadir ?? 0}`;
+
+  } catch (e) {
+    console.error('Gagal muat laporan harian:', e);
+  }
+}
+
+async function simpanCatatanHarian() {
+  showToast('Catatan tersimpan ✅');
+}
+
 async function muatRingkasanDashboardGuru() {
   if (!currentUserProfile) return;
   const today = new Date().toISOString().split('T')[0];
@@ -8362,6 +8389,28 @@ async function muatRingkasanDashboardGuru() {
     set('dg-stat-aktivitas', jumlahAktivitas ?? 0);
     set('dg-stat-dokumentasi', jumlahDokumentasi ?? 0);
     set('dg-stat-penilaian', jumlahPenilaian ?? 0);
+
+    // Muat aktivitas hari ini
+    const { data: aktivitasList } = await supabaseClient
+      .from('modul_ajar')
+      .select('nama, aspek, waktu_mulai, waktu_selesai')
+      .eq('tanggal', today)
+      .order('waktu_mulai');
+
+    const kontainerAktivitas = document.getElementById('dg-aktivitas-hari-ini');
+    if (kontainerAktivitas) {
+      if (!aktivitasList || aktivitasList.length === 0) {
+        kontainerAktivitas.innerHTML = `<div style="text-align:center;padding:24px;color:var(--gray-400);font-size:13px;">Belum ada aktivitas hari ini</div>`;
+      } else {
+        kontainerAktivitas.innerHTML = aktivitasList.map((a, i) => {
+          const waktu = a.waktu_mulai && a.waktu_selesai ? `${a.waktu_mulai.slice(0,5)}–${a.waktu_selesai.slice(0,5)}` : '';
+          return `<div class="activity-item" ${i > 0 ? 'style="margin-top:8px;"' : ''}>
+            ${waktu ? `<div class="act-time-badge">${waktu}</div>` : ''}
+            <div class="act-info"><div class="act-name">${a.nama}</div><div class="act-cat">${a.aspek || ''}</div></div>
+          </div>`;
+        }).join('');
+      }
+    }
 
     // Muat murid terbaru (5 murid terakhir di kelas ini)
     const { data: muridList } = await supabaseClient
@@ -10015,8 +10064,18 @@ async function masukKeDashboardSesuaiProfil(userId) {
       goTo('login-form');
       return;
     }
-    // Ambil jabatan untuk ditampilkan di profil
+    // Ambil semua data profil guru saat login
     jabatanAsli = dataGuru?.jabatan || '';
+    namaAsli = dataGuru?.nama || profile.nama || '';
+
+    // Muat dan terapkan foto profil
+    if (dataGuru?.foto_url) {
+      document.querySelectorAll('.av-guru').forEach(el => {
+        el.style.backgroundImage = `url(${dataGuru.foto_url})`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+      });
+    }
     goTo('dashboard-guru');
   }
   else if (profile.role === 'ortu') goTo('timeline-ortu');
@@ -10100,6 +10159,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'info-pribadi' && currentRole === 'guru') isiFormProfilGuru();
+    if (screenId === 'laporan-harian') muatLaporanHarian();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
     if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
