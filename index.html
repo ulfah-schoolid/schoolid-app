@@ -6209,6 +6209,11 @@
         <div style="position:relative;">
           <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px;">🔍</span>
           <input id="km-search" type="text" placeholder="Cari nama murid..." oninput="renderDaftarMuridKelola()" style="width:100%;padding:10px 12px 10px 36px;border:1.5px solid var(--gray-200);border-radius:20px;font-size:13px;outline:none;background:white;">
+      <!-- Tab Aktif / Arsip -->
+      <div style="padding:8px 16px 0;display:flex;gap:8px;">
+        <button id="km-tab-aktif" onclick="renderDaftarMuridKelola(false)" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--green);background:var(--green);color:white;font-size:13px;font-weight:700;cursor:pointer;">✅ Aktif</button>
+        <button id="km-tab-arsip" onclick="renderDaftarMuridKelola(true)" style="flex:1;padding:8px;border-radius:20px;border:1.5px solid var(--green);background:white;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;">📦 Arsip</button>
+      </div>
         </div>
       </div>
       <!-- Daftar murid -->
@@ -6279,7 +6284,8 @@
         <textarea id="fm-catatan" class="form-textarea" placeholder="Alergi, kebutuhan khusus, dll..."></textarea>
       </div>
       <button onclick="simpanMurid()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">💾 Simpan Murid</button>
-      <button id="btn-hapus-murid" onclick="hapusMurid()" style="display:none;width:100%;padding:14px;background:white;color:#F44336;border:2px solid #F44336;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">🗑️ Hapus Murid</button>
+      <button id="btn-nonaktif-murid" onclick="nonaktifkanMurid()" style="display:none;width:100%;padding:14px;background:white;color:#FF9800;border:2px solid #FF9800;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">📦 Nonaktifkan Murid</button>
+      <button id="btn-hapus-murid" onclick="hapusMuridPermanen()" style="display:none;width:100%;padding:14px;background:white;color:#F44336;border:2px solid #F44336;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">🗑️ Hapus Permanen</button>
     </div>
   </div>
 
@@ -6545,7 +6551,7 @@ function filterMuridGuru(filter, btn) {
 }
 
 function renderDaftarMuridGuru() {
-  const list = getMuridList();
+  const list = getMuridAktif();
   const search = (document.getElementById('dmg-search')?.value || '').toLowerCase();
   const filtered = list.filter(m => {
     const matchSearch = m.nama.toLowerCase().includes(search);
@@ -9387,6 +9393,10 @@ function getMuridList() {
   return muridCache || [];
 }
 
+function getMuridAktif() {
+  return (muridCache || []).filter(m => (m.status || 'aktif') === 'aktif');
+}
+
 async function saveMuridList(list) {
   muridCache = list;
   syncDataMurid(list);
@@ -9428,25 +9438,40 @@ function initKelolaMusid() {
   renderDaftarMuridKelola();
 }
 
-function renderDaftarMuridKelola() {
-  const list = getMuridList();
+function renderDaftarMuridKelola(tabArsip = false) {
+  const semuaMurid = getMuridList();
+  const list = tabArsip
+    ? semuaMurid.filter(m => (m.status || 'aktif') === 'nonaktif')
+    : semuaMurid.filter(m => (m.status || 'aktif') === 'aktif');
   const search = (document.getElementById('km-search')?.value || '').toLowerCase();
   const filtered = list.filter(m => m.nama.toLowerCase().includes(search));
-  const laki = list.filter(m => m.jk === 'L').length;
-  const perempuan = list.filter(m => m.jk === 'P').length;
+  const aktif = semuaMurid.filter(m => (m.status || 'aktif') === 'aktif');
+  const laki = aktif.filter(m => m.jk === 'L').length;
+  const perempuan = aktif.filter(m => m.jk === 'P').length;
   const elTotal = document.getElementById('km-total');
   const elLaki = document.getElementById('km-laki');
   const elPerempuan = document.getElementById('km-perempuan');
-  if (elTotal) elTotal.textContent = list.length;
+  if (elTotal) elTotal.textContent = aktif.length;
   if (elLaki) elLaki.textContent = laki;
   if (elPerempuan) elPerempuan.textContent = perempuan;
+
+  // Update tab aktif
+  const btnAktif = document.getElementById('km-tab-aktif');
+  const btnArsip = document.getElementById('km-tab-arsip');
+  if (btnAktif && btnArsip) {
+    btnAktif.style.background = tabArsip ? 'white' : 'var(--green)';
+    btnAktif.style.color = tabArsip ? 'var(--green)' : 'white';
+    btnArsip.style.background = tabArsip ? 'var(--green)' : 'white';
+    btnArsip.style.color = tabArsip ? 'white' : 'var(--green)';
+  }
+
   const container = document.getElementById('km-list');
   if (!container) return;
   if (filtered.length === 0) {
     container.innerHTML = `<div style="text-align:center;padding:40px 16px;color:var(--gray-500);">
-      <div style="font-size:48px;margin-bottom:10px;">👦</div>
-      <div style="font-weight:700;font-size:15px;">Belum ada murid</div>
-      <div style="font-size:13px;margin-top:4px;">Tap "+ Tambah" untuk menambahkan murid pertama</div>
+      <div style="font-size:48px;margin-bottom:10px;">${tabArsip ? '📦' : '👦'}</div>
+      <div style="font-weight:700;font-size:15px;">${tabArsip ? 'Tidak ada murid diarsip' : 'Belum ada murid'}</div>
+      <div style="font-size:13px;margin-top:4px;">${tabArsip ? '' : 'Tap "+ Tambah" untuk menambahkan murid pertama'}</div>
     </div>`;
     return;
   }
@@ -9454,14 +9479,17 @@ function renderDaftarMuridKelola() {
   const warnaP = ['#FFE0B2,#FFCC80','#F8BBD0,#F48FB1','#C8E6C9,#A5D6A7'];
   container.innerHTML = filtered.map((m, i) => {
     const umur = m.tgl ? hitungUmur(m.tgl) : '';
+    const badgeArsip = (m.status || 'aktif') === 'nonaktif'
+      ? `<span style="font-size:10px;background:#FF9800;color:white;padding:2px 6px;border-radius:8px;margin-left:6px;">Nonaktif</span>` : '';
     return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;display:flex;align-items:center;gap:12px;" onclick="bukaEditMurid('${m.id}')">
       ${avatarDivHtml(m, 44)}
       <div style="flex:1;min-width:0;">
-        <div style="font-size:14px;font-weight:700;color:var(--gray-900);">${m.nama}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--gray-900);">${m.nama}${badgeArsip}</div>
         <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">${umur ? umur + ' · ' : ''}${m.ortu || 'Orang tua belum diisi'}</div>
       </div>
       <span style="color:var(--gray-300);font-size:20px;flex-shrink:0;">›</span>
     </div>`;
+  }).join('');
   }).join('');
 }
 
@@ -9481,6 +9509,7 @@ function bukaFormTambahMurid() {
   isiDropdownKelas('fm-kelompok');
   document.getElementById('fm-kelompok').value = 'A';
   document.getElementById('btn-hapus-murid').style.display = 'none';
+  document.getElementById('btn-nonaktif-murid').style.display = 'none';
   resetPilihJK();
   setTimeout(() => resetAvatarGrid(''), 100);
   goToFromDashboard('form-murid', 'kelola-murid');
@@ -9501,6 +9530,19 @@ function bukaEditMurid(id) {
   isiDropdownKelas('fm-kelompok');
   document.getElementById('fm-kelompok').value = m.kelompok || 'A';
   document.getElementById('btn-hapus-murid').style.display = 'block';
+  document.getElementById('btn-nonaktif-murid').style.display = 'block';
+  // Update label tombol nonaktif sesuai status murid
+  const statusMurid = m.status || 'aktif';
+  const btnNonaktif = document.getElementById('btn-nonaktif-murid');
+  if (statusMurid === 'nonaktif') {
+    btnNonaktif.textContent = '✅ Aktifkan Kembali';
+    btnNonaktif.style.color = '#4CAF50';
+    btnNonaktif.style.borderColor = '#4CAF50';
+  } else {
+    btnNonaktif.textContent = '📦 Nonaktifkan Murid';
+    btnNonaktif.style.color = '#FF9800';
+    btnNonaktif.style.borderColor = '#FF9800';
+  }
   resetPilihJK(); pilihJK(m.jk);
   setTimeout(() => resetAvatarGrid(m.avatar || ''), 100);
   goToFromDashboard('form-murid', 'kelola-murid');
@@ -9591,16 +9633,79 @@ function simpanMurid() {
   setTimeout(() => renderDaftarMuridKelola(), 150);
 }
 
-function hapusMurid() {
+async function nonaktifkanMurid() {
   if (!editMuridId) return;
   const list = getMuridList();
   const m = list.find(x => x.id === editMuridId);
   if (!m) return;
-  if (!confirm(`Hapus murid "${m.nama}"?\nData tidak bisa dikembalikan.`)) return;
-  saveMuridList(list.filter(x => x.id !== editMuridId));
-  showToast(`${m.nama} berhasil dihapus`);
-  goBack();
-  setTimeout(() => renderDaftarMuridKelola(), 150);
+
+  const isNonaktif = (m.status || 'aktif') === 'nonaktif';
+  const statusBaru = isNonaktif ? 'aktif' : 'nonaktif';
+  const pesan = isNonaktif
+    ? `Aktifkan kembali murid "${m.nama}"?`
+    : `Nonaktifkan murid "${m.nama}"?\nData tetap tersimpan dan bisa diaktifkan kembali.`;
+
+  if (!confirm(pesan)) return;
+  showLoading();
+  try {
+    const { error } = await supabaseClient
+      .from('murid')
+      .update({ status: statusBaru })
+      .eq('id', editMuridId);
+    if (error) throw error;
+
+    // Update cache lokal
+    const idx = list.findIndex(x => x.id === editMuridId);
+    if (idx !== -1) list[idx].status = statusBaru;
+
+    hideLoading();
+    const toastPesan = isNonaktif ? `${m.nama} diaktifkan kembali ✅` : `${m.nama} dinonaktifkan 📦`;
+    showToast(toastPesan);
+    await muatMuridDariSupabase();
+    goBack();
+    setTimeout(() => renderDaftarMuridKelola(), 150);
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal: ' + e.message + ' ⚠️');
+  }
+}
+
+async function hapusMuridPermanen() {
+  if (!editMuridId) return;
+  const list = getMuridList();
+  const m = list.find(x => x.id === editMuridId);
+  if (!m) return;
+
+  if (!confirm(`⚠️ HAPUS PERMANEN murid "${m.nama}"?\n\nSemua data termasuk rapor dan penilaian akan ikut terhapus.\nTindakan ini TIDAK BISA dibatalkan!`)) return;
+
+  // Konfirmasi kedua
+  const konfirmasi = prompt(`Ketik nama murid "${m.nama}" untuk konfirmasi hapus:`);
+  if (konfirmasi !== m.nama) {
+    showToast('Nama tidak cocok, hapus dibatalkan ⚠️');
+    return;
+  }
+
+  showLoading();
+  try {
+    const { error } = await supabaseClient
+      .from('murid')
+      .delete()
+      .eq('id', editMuridId);
+    if (error) throw error;
+
+    hideLoading();
+    showToast(`${m.nama} berhasil dihapus permanen 🗑️`);
+    await muatMuridDariSupabase();
+    goBack();
+    setTimeout(() => renderDaftarMuridKelola(), 150);
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal hapus: ' + e.message + ' ⚠️');
+  }
+}
+
+function hapusMurid() {
+  hapusMuridPermanen();
 }
 
 // (Sync murid sekarang dilakukan lewat muatMuridDariSupabase() saat login)
@@ -10394,7 +10499,10 @@ async function simpanProfilGuru() {
       .from('guru')
       .update({ nama, nip, email, no_hp, jabatan, tanggal_bergabung })
       .eq('user_id', userId);
-    if (errGuru) throw errGuru;
+    if (errGuru) {
+      console.error('Error update guru:', errGuru);
+      throw errGuru;
+    }
 
     const { error: errProfile } = await supabaseClient
       .from('profiles')
