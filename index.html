@@ -8341,7 +8341,7 @@ async function muatLaporanHarian(tanggal) {
     // Kehadiran di tanggal ini
     const { count: jmlHadir } = await supabaseClient
       .from('murid').select('*', { count: 'exact', head: true })
-      .eq('kelas_id', currentUserProfile?.kelas_id);
+      .eq('kelompok', currentUserProfile?.kelas_id);
     if (el('lh-hadir')) el('lh-hadir').textContent = `- / ${jmlHadir ?? 0}`;
 
   } catch (e) {
@@ -8362,7 +8362,7 @@ async function muatRingkasanDashboardGuru() {
     const { count: jumlahMurid } = await supabaseClient
       .from('murid')
       .select('*', { count: 'exact', head: true })
-      .eq('kelas_id', currentUserProfile.kelas_id);
+      .eq('kelompok', currentUserProfile.kelas_id);
 
     // Aktivitas hari ini
     const { count: jumlahAktivitas } = await supabaseClient
@@ -8415,8 +8415,8 @@ async function muatRingkasanDashboardGuru() {
     // Muat murid terbaru (5 murid terakhir di kelas ini)
     const { data: muridList } = await supabaseClient
       .from('murid')
-      .select('id, nama, jenis_kelamin')
-      .eq('kelas_id', currentUserProfile.kelas_id)
+      .select('id, nama, jk')
+      .eq('kelompok', currentUserProfile.kelas_id)
       .order('created_at', { ascending: false })
       .limit(5);
 
@@ -8426,7 +8426,7 @@ async function muatRingkasanDashboardGuru() {
         container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--gray-400);font-size:13px;">Belum ada murid di kelas ini</div>`;
       } else {
         container.innerHTML = muridList.map(m => {
-          const avClass = m.jenis_kelamin === 'L' ? 'av-murid-l' : 'av-murid-p';
+          const avClass = m.jk === 'L' ? 'av-murid-l' : 'av-murid-p';
           return `<div class="student-row" style="padding:10px 14px;" onclick="bukaProfilMuridById('${m.id}')">
             <div class="student-avatar ${avClass}"></div>
             <div class="student-name">${m.nama}</div>
