@@ -9618,6 +9618,8 @@ const SUPABASE_URL = 'https://qjtyndbcaxdczphnxivv.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_VRREbQBCZ5Ud0uC3Si7GPQ_XshWKR13';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUserProfile = null;
+let namaAsli = '';
+let jabatanAsli = '';
 
 // ===== PWA INSTALL PROMPT =====
 let deferredInstallPrompt = null;
@@ -9965,6 +9967,8 @@ async function masukKeDashboardSesuaiProfil(userId) {
       goTo('login-form');
       return;
     }
+    // Ambil jabatan untuk ditampilkan di profil
+    jabatanAsli = dataGuru?.jabatan || '';
     goTo('dashboard-guru');
   }
   else if (profile.role === 'ortu') goTo('timeline-ortu');
@@ -10133,14 +10137,7 @@ function updateProfilUserView() {
   } else {
     avatar.classList.add('av-guru');
     name.textContent = namaAsli || 'Guru';
-    // Ambil jabatan dari Supabase
-    if (currentUserProfile?.id) {
-      supabaseClient.from('guru').select('jabatan').eq('user_id', currentUserProfile.id).maybeSingle().then(({ data }) => {
-        if (sub) sub.textContent = data?.jabatan || 'Guru';
-      });
-    } else {
-      sub.textContent = 'Guru';
-    }
+    sub.textContent = jabatanAsli || 'Guru';
   }
 }
 
@@ -10153,6 +10150,7 @@ async function isiFormProfilGuru() {
     .eq('user_id', userId)
     .maybeSingle();
   if (!data) return;
+  jabatanAsli = data.jabatan || '';
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
   set('ip-nama-guru', data.nama);
   set('ip-nip-guru', data.nip || '');
@@ -10245,6 +10243,7 @@ async function simpanProfilGuru() {
     if (errProfile) throw errProfile;
 
     namaAsli = nama;
+    jabatanAsli = jabatan;
     hideLoading();
     showToast('Informasi pribadi berhasil disimpan! ✅');
     setTimeout(goBack, 300);
