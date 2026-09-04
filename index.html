@@ -2390,19 +2390,19 @@
         <div class="dg-stats-grid">
           <div class="dg-stat-card">
             <div class="dg-stat-icon" style="background:#E8F5E9;">👦</div>
-            <div><div class="dg-stat-val">20</div><div class="dg-stat-lbl">Jumlah Murid</div></div>
+            <div><div class="dg-stat-val" id="dg-stat-murid">-</div><div class="dg-stat-lbl">Jumlah Murid</div></div>
           </div>
           <div class="dg-stat-card">
             <div class="dg-stat-icon" style="background:#FFF3E0;">📌</div>
-            <div><div class="dg-stat-val">4</div><div class="dg-stat-lbl">Aktivitas Hari Ini</div></div>
+            <div><div class="dg-stat-val" id="dg-stat-aktivitas">-</div><div class="dg-stat-lbl">Aktivitas Hari Ini</div></div>
           </div>
           <div class="dg-stat-card">
             <div class="dg-stat-icon" style="background:#E3F2FD;">📁</div>
-            <div><div class="dg-stat-val">12</div><div class="dg-stat-lbl">Dokumentasi</div></div>
+            <div><div class="dg-stat-val" id="dg-stat-dokumentasi">-</div><div class="dg-stat-lbl">Dokumentasi</div></div>
           </div>
           <div class="dg-stat-card">
             <div class="dg-stat-icon" style="background:#FFF8E1;">⭐</div>
-            <div><div class="dg-stat-val">18</div><div class="dg-stat-lbl">Penilaian</div></div>
+            <div><div class="dg-stat-val" id="dg-stat-penilaian">-</div><div class="dg-stat-lbl">Penilaian</div></div>
           </div>
         </div>
       </div>
@@ -6479,7 +6479,7 @@ function goTo(screenId) {
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
-    if (screenId === 'dashboard-guru') updateBadgePengumumanGuru();
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); }
   }
 }
 
@@ -8343,6 +8343,48 @@ function terapkanNamaAnakOrtu() {
 }
 
 function terapkanDataAnakAsli() { terapkanNamaAnakOrtu(); }
+async function muatRingkasanDashboardGuru() {
+  if (!currentUserProfile) return;
+  const guruId = currentUserProfile.kelas_id || null;
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    // Jumlah murid di kelas guru ini
+    const { count: jumlahMurid } = await supabaseClient
+      .from('murid')
+      .select('*', { count: 'exact', head: true })
+      .eq('kelas_id', currentUserProfile.kelas_id);
+
+    // Aktivitas hari ini
+    const { count: jumlahAktivitas } = await supabaseClient
+      .from('modul_ajar')
+      .select('*', { count: 'exact', head: true })
+      .eq('tanggal', today);
+
+    // Total dokumentasi (lembar asesmen tipe dokumentasi)
+    const { count: jumlahDokumentasi } = await supabaseClient
+      .from('lembar_asesmen')
+      .select('*', { count: 'exact', head: true })
+      .eq('jenis', 'dokumentasi');
+
+    // Total penilaian (semua lembar asesmen)
+    const { count: jumlahPenilaian } = await supabaseClient
+      .from('lembar_asesmen')
+      .select('*', { count: 'exact', head: true });
+
+    const set = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val ?? '-';
+    };
+    set('dg-stat-murid', jumlahMurid ?? 0);
+    set('dg-stat-aktivitas', jumlahAktivitas ?? 0);
+    set('dg-stat-dokumentasi', jumlahDokumentasi ?? 0);
+    set('dg-stat-penilaian', jumlahPenilaian ?? 0);
+  } catch (e) {
+    console.error('Gagal muat ringkasan:', e);
+  }
+}
+
 function terapkanNamaGuruAsli() {
   const namaGuru = currentUserProfile?.nama || 'Guru';
   const kelasMilik = getKelasList().find(k => k.id === currentUserProfile?.kelas_id);
@@ -10054,7 +10096,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'info-pribadi' && currentRole === 'guru') isiFormProfilGuru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
-    if (screenId === 'dashboard-guru') updateBadgePengumumanGuru();
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); }
   }
 }
 
@@ -10114,7 +10156,7 @@ function switchSidebarKepala(btn, screenId) {
     if (sc) sc.scrollTop = 0;
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
-    if (screenId === 'dashboard-guru') updateBadgePengumumanGuru();
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); }
   }
 }
 
