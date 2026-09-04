@@ -2379,7 +2379,7 @@
     <div class="dg-topbar">
       <div class="dg-avatar av-guru"></div>
       <div class="dg-greet">
-        <div class="dg-hi" id="dg-greet-nama">Halo, Guru 👋</div>
+        <div class="dg-hi" id="dg-greet-nama">Assalamu'alaikum, Ustadzah</div>
         <div class="dg-date" id="dashDate">Senin, 16 Juni 2026</div>
       </div>
       <button class="notif-btn" style="position:static;background:var(--gray-100);color:var(--gray-700);border-radius:50%;border:none;" onclick="goTo('notifikasi')">🔔<div class="notif-badge" style="border-color:white;"></div></button>
@@ -8348,7 +8348,7 @@ function terapkanNamaGuruAsli() {
   const kelasMilik = getKelasList().find(k => k.id === currentUserProfile?.kelas_id);
   const namaKelas = kelasMilik ? kelasMilik.nama : (currentUserProfile?.kelas_id || 'Kelas belum diatur');
   const greetEl = document.getElementById('dg-greet-nama');
-  if (greetEl) greetEl.textContent = `Halo, ${namaGuru} 👋`;
+  if (greetEl) greetEl.textContent = `Assalamu'alaikum, Ustadzah ${namaGuru}`;
   const kelompokEl = document.getElementById('dmg-kelompok');
   if (kelompokEl) kelompokEl.textContent = namaKelas;
   const waliEl = document.getElementById('dmg-wali');
