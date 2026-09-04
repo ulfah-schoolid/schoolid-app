@@ -10045,7 +10045,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
     // Cek status guru di tabel guru berdasarkan user_id
     const { data: dataGuru } = await supabaseClient
       .from('guru')
-      .select('status')
+      .select('status, nama, jabatan, kelas_id, foto_url')
       .eq('user_id', userId)
       .maybeSingle();
 
