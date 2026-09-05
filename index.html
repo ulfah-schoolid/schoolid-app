@@ -3602,38 +3602,34 @@
   <div id="aktivitas" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
-      <h2>Aktivitas Baru</h2>
+      <h2 id="ab-judul">Aktivitas Baru</h2>
     </div>
     <div class="form-body">
       <div class="form-group">
         <label class="form-label">Tanggal & Jam</label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <input type="date" class="form-input" value="2026-06-16">
-          <input type="time" class="form-input" value="08:00">
+          <input type="date" class="form-input" id="ab-tanggal">
+          <input type="time" class="form-input" id="ab-waktu-mulai" placeholder="Mulai">
+        </div>
+        <div style="margin-top:6px;">
+          <input type="time" class="form-input" id="ab-waktu-selesai" placeholder="Selesai" style="width:50%;">
+          <span style="font-size:12px;color:var(--gray-500);margin-left:8px;">Waktu selesai</span>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Kategori</label>
-        <select class="form-input" style="cursor:pointer;color:var(--green-dark);font-weight:700;border-color:#C5E1C8;background:var(--green-bg);">
+        <select class="form-input" id="ab-kategori" style="cursor:pointer;color:var(--green-dark);font-weight:700;border-color:#C5E1C8;background:var(--green-bg);">
           <option>Motorik</option><option>Bahasa</option><option>Kognitif</option>
           <option>Seni</option><option>Sosial</option><option>Agama</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Judul Aktivitas</label>
-        <input type="text" class="form-input" placeholder="cth: Melipat Kertas Origami" value="Melipat Kertas">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Aspek Penilaian</label>
-        <div class="chip-group">
-          <button class="chip active" onclick="toggleChip(this)">Motorik Halus</button>
-          <button class="chip" onclick="toggleChip(this)">Motorik Kasar</button>
-          <button class="chip" onclick="toggleChip(this)">Kreativitas</button>
-        </div>
+        <input type="text" class="form-input" id="ab-nama" placeholder="cth: Melipat Kertas Origami">
       </div>
       <div class="form-group">
         <label class="form-label">Deskripsi</label>
-        <textarea class="form-textarea" placeholder="Ceritakan kegiatan yang dilakukan anak-anak...">Anak-anak melipat kertas origami menjadi bentuk sederhana seperti perahu dan burung.</textarea>
+        <textarea class="form-textarea" id="ab-deskripsi" placeholder="Ceritakan kegiatan yang dilakukan anak-anak..."></textarea>
       </div>
       <!-- DAFTAR MURID PESERTA -->
       <div class="form-group">
@@ -3643,22 +3639,20 @@
         </div>
         <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;" id="daftar-murid-aktivitas"></div>
         <div id="ringkasan-peserta" style="margin-top:8px;background:#E8F5E9;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;font-weight:700;color:var(--green);">
-          👥 18 dari 20 murid dipilih
+          👥 0 murid dipilih
         </div>
       </div>
+      <!-- FOTO DOKUMENTASI -->
       <div class="form-group">
         <label class="form-label">Foto Dokumentasi</label>
-        <div class="upload-area" onclick="showToast('Kamera / galeri siap digunakan!')">
+        <div class="upload-area" onclick="document.getElementById('input-foto-aktivitas').click()" style="cursor:pointer;">
+          <input type="file" id="input-foto-aktivitas" accept="image/*" multiple style="display:none;" onchange="tambahFotoAktivitas(this)">
           <div class="upload-icon">📸</div>
           <div class="upload-text">Tap untuk foto atau pilih dari galeri<br><small>Maks. 10 foto per aktivitas</small></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;">
-          <div class="photo-thumb" style="border-radius:8px;height:70px;">🎨</div>
-          <div class="photo-thumb" style="border-radius:8px;height:70px;background:linear-gradient(135deg,#c8e6c9,#81c784);">✂️</div>
-          <div style="height:70px;border:2px dashed var(--gray-300);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--gray-400);font-size:24px;cursor:pointer;">+</div>
-        </div>
+        <div id="preview-foto-aktivitas" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;"></div>
       </div>
-      <button class="btn-save" onclick="saveAndBack('Aktivitas berhasil disimpan! ✅')">💾 Simpan Aktivitas</button>
+      <button class="btn-save" onclick="simpanAktivitasBaru()">💾 Simpan Aktivitas</button>
     </div>
   </div>
 
@@ -9715,6 +9709,130 @@ const dataMurid = []; // diisi otomatis dari Supabase
 const statusAbsensi = {};
 const pesertaAktivitas = {};
 
+// ===== AKTIVITAS BARU =====
+let fotoAktivitasFiles = [];
+
+function initAktivitasBaru() {
+  // Set tanggal hari ini
+  const today = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const jam = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  const elTgl = document.getElementById('ab-tanggal');
+  const elWaktu = document.getElementById('ab-waktu-mulai');
+  if (elTgl) elTgl.value = today;
+  if (elWaktu) elWaktu.value = jam;
+
+  // Reset form
+  ['ab-nama','ab-deskripsi','ab-waktu-selesai'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  fotoAktivitasFiles = [];
+  const preview = document.getElementById('preview-foto-aktivitas');
+  if (preview) preview.innerHTML = '';
+
+  // Render daftar murid aktif
+  renderMuridAktivitas();
+}
+
+function renderMuridAktivitas() {
+  const container = document.getElementById('daftar-murid-aktivitas');
+  if (!container) return;
+  const list = getMuridAktif();
+  if (list.length === 0) {
+    container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--gray-400);font-size:13px;">Belum ada murid di kelas ini</div>';
+    return;
+  }
+  // Reset peserta
+  list.forEach(m => { if (pesertaAktivitas[m.nama] === undefined) pesertaAktivitas[m.nama] = true; });
+  container.innerHTML = list.map(m => `
+    <div onclick="togglePeserta('${m.nama.replace(/'/g,"\\\'")}')" style="padding:10px 14px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--gray-100);cursor:pointer;">
+      ${avatarDivHtml(m, 36)}
+      <div style="flex:1;font-size:13px;font-weight:600;">${m.nama}</div>
+      <div id="check-${m.nama.replace(/ /g,'_')}" style="width:24px;height:24px;border-radius:50%;border:2px solid ${pesertaAktivitas[m.nama]?'var(--green)':'var(--gray-300)'};background:${pesertaAktivitas[m.nama]?'var(--green)':'white'};display:flex;align-items:center;justify-content:center;color:white;font-size:13px;flex-shrink:0;">
+        ${pesertaAktivitas[m.nama]?'✓':''}
+      </div>
+    </div>`).join('');
+  updateRingkasanPeserta();
+}
+
+function updateRingkasanPeserta() {
+  const list = getMuridAktif();
+  const terpilih = list.filter(m => pesertaAktivitas[m.nama]).length;
+  const el = document.getElementById('ringkasan-peserta');
+  if (el) el.textContent = `👥 ${terpilih} dari ${list.length} murid dipilih`;
+}
+
+function tambahFotoAktivitas(input) {
+  if (!input.files) return;
+  const sisa = 10 - fotoAktivitasFiles.length;
+  if (sisa <= 0) { showToast('Maksimal 10 foto per aktivitas ⚠️'); return; }
+  const files = Array.from(input.files).slice(0, sisa);
+  fotoAktivitasFiles = [...fotoAktivitasFiles, ...files];
+  const preview = document.getElementById('preview-foto-aktivitas');
+  if (!preview) return;
+  preview.innerHTML = fotoAktivitasFiles.map((f, i) => {
+    const url = URL.createObjectURL(f);
+    return `<div style="position:relative;height:70px;border-radius:8px;overflow:hidden;">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;">
+      <button onclick="hapusFotoAktivitas(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1;">✕</button>
+    </div>`;
+  }).join('');
+  input.value = '';
+}
+
+function hapusFotoAktivitas(idx) {
+  fotoAktivitasFiles.splice(idx, 1);
+  tambahFotoAktivitas({ files: [] });
+  const preview = document.getElementById('preview-foto-aktivitas');
+  if (!preview) return;
+  preview.innerHTML = fotoAktivitasFiles.map((f, i) => {
+    const url = URL.createObjectURL(f);
+    return `<div style="position:relative;height:70px;border-radius:8px;overflow:hidden;">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;">
+      <button onclick="hapusFotoAktivitas(${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.5);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1;">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function simpanAktivitasBaru() {
+  const nama = document.getElementById('ab-nama')?.value.trim();
+  const tanggal = document.getElementById('ab-tanggal')?.value;
+  const waktuMulai = document.getElementById('ab-waktu-mulai')?.value;
+  const waktuSelesai = document.getElementById('ab-waktu-selesai')?.value;
+  const kategori = document.getElementById('ab-kategori')?.value;
+  const deskripsi = document.getElementById('ab-deskripsi')?.value.trim();
+
+  if (!nama) { showToast('Judul aktivitas wajib diisi ⚠️'); return; }
+  if (!tanggal) { showToast('Tanggal wajib diisi ⚠️'); return; }
+
+  const peserta = getMuridAktif().filter(m => pesertaAktivitas[m.nama]).map(m => m.nama);
+
+  showLoading();
+  try {
+    const { error } = await supabaseClient.from('modul_ajar').insert({
+      nama,
+      tanggal,
+      waktu_mulai: waktuMulai || null,
+      waktu_selesai: waktuSelesai || null,
+      aspek: kategori,
+      deskripsi: deskripsi || null,
+      peserta: peserta
+    });
+    if (error) throw error;
+
+    hideLoading();
+    showToast('Aktivitas berhasil disimpan! ✅');
+    // Reset peserta
+    getMuridAktif().forEach(m => { pesertaAktivitas[m.nama] = true; });
+    fotoAktivitasFiles = [];
+    setTimeout(goBack, 300);
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal simpan: ' + e.message + ' ⚠️');
+  }
+}
+
 function initAbsensi() {
   dataMurid.forEach(m => statusAbsensi[m.nama] = m.status);
   renderAbsensi('semua');
@@ -10267,6 +10385,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'info-pribadi' && currentRole === 'guru') isiFormProfilGuru();
     if (screenId === 'laporan-harian') muatLaporanHarian();
+    if (screenId === 'aktivitas') initAktivitasBaru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
     if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
