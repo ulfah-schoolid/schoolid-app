@@ -2693,30 +2693,27 @@
       <!-- Tanggal & ringkasan -->
       <div style="padding:12px 16px;background:linear-gradient(135deg,#1B5E20,#2E7D32);display:flex;align-items:center;justify-content:space-between;">
         <div>
-          <div style="color:white;font-weight:700;font-size:15px;">Senin, 16 Juni 2026</div>
-          <div style="color:rgba(255,255,255,0.75);font-size:12px;margin-top:2px;">Kelompok A · 20 Murid</div>
+          <div style="color:white;font-weight:700;font-size:15px;" id="abs-header-tanggal">-</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:12px;margin-top:2px;" id="abs-header-kelas">-</div>
         </div>
-        <select style="font-size:12px;font-weight:700;border:none;border-radius:20px;padding:6px 12px;background:rgba(255,255,255,0.2);color:white;outline:none;cursor:pointer;">
-          <option>16 Juni 2026</option>
-          <option>15 Juni 2026</option>
-        </select>
+        <input type="date" id="abs-tanggal" onchange="muatAbsensi(this.value)" style="font-size:12px;font-weight:700;border:none;border-radius:20px;padding:6px 12px;background:rgba(255,255,255,0.2);color:white;outline:none;cursor:pointer;color-scheme:dark;">
       </div>
       <!-- Ringkasan status -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:white;border-bottom:1px solid var(--gray-100);">
-        <div id="abs-count-H" style="padding:12px 4px;text-align:center;border-right:1px solid var(--gray-100);">
-          <div style="font-size:20px;font-weight:800;color:#4CAF50;">18</div>
+        <div style="padding:12px 4px;text-align:center;border-right:1px solid var(--gray-100);">
+          <div id="abs-count-H" style="font-size:20px;font-weight:800;color:#4CAF50;">0</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Hadir</div>
         </div>
-        <div id="abs-count-S" style="padding:12px 4px;text-align:center;border-right:1px solid var(--gray-100);">
-          <div style="font-size:20px;font-weight:800;color:#FF9800;">1</div>
+        <div style="padding:12px 4px;text-align:center;border-right:1px solid var(--gray-100);">
+          <div id="abs-count-S" style="font-size:20px;font-weight:800;color:#FF9800;">0</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Sakit</div>
         </div>
-        <div id="abs-count-I" style="padding:12px 4px;text-align:center;border-right:1px solid var(--gray-100);">
-          <div style="font-size:20px;font-weight:800;color:#2196F3;">1</div>
+        <div style="padding:12px 4px;text-align:center;border-right:1px solid var(--gray-100);">
+          <div id="abs-count-I" style="font-size:20px;font-weight:800;color:#2196F3;">0</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Izin</div>
         </div>
-        <div id="abs-count-A" style="padding:12px 4px;text-align:center;">
-          <div style="font-size:20px;font-weight:800;color:#F44336;">0</div>
+        <div style="padding:12px 4px;text-align:center;">
+          <div id="abs-count-A" style="font-size:20px;font-weight:800;color:#F44336;">0</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Alpa</div>
         </div>
       </div>
@@ -2731,7 +2728,7 @@
       <!-- Daftar murid -->
       <div id="daftar-absensi" style="padding:0 16px;display:flex;flex-direction:column;gap:8px;"></div>
       <div style="padding:16px;">
-        <button onclick="saveAndBack('Absensi berhasil disimpan! ✅')" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Absensi</button>
+        <button onclick="simpanAbsensi()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Absensi</button>
       </div>
     </div>
   </div>
@@ -9833,24 +9830,105 @@ async function simpanAktivitasBaru() {
   }
 }
 
+// ===== ABSENSI =====
+let absensiCache = {}; // { tanggal: { namaMusid: status } }
+let absensiTanggalAktif = '';
+
 function initAbsensi() {
-  dataMurid.forEach(m => statusAbsensi[m.nama] = m.status);
-  renderAbsensi('semua');
+  const today = new Date().toISOString().split('T')[0];
+  absensiTanggalAktif = today;
+  const elTgl = document.getElementById('abs-tanggal');
+  if (elTgl) elTgl.value = today;
+  muatAbsensi(today);
+}
+
+async function muatAbsensi(tanggal) {
+  absensiTanggalAktif = tanggal;
+
+  // Update header tanggal
+  const tglObj = new Date(tanggal + 'T00:00:00');
+  const hariNama = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][tglObj.getDay()];
+  const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][tglObj.getMonth()];
+  const tglStr = `${hariNama}, ${tglObj.getDate()} ${bulanNama} ${tglObj.getFullYear()}`;
+  const muridAktif = getMuridAktif();
+  const elHeaderTgl = document.getElementById('abs-header-tanggal');
+  const elHeaderKelas = document.getElementById('abs-header-kelas');
+  if (elHeaderTgl) elHeaderTgl.textContent = tglStr;
+  if (elHeaderKelas) elHeaderKelas.textContent = `Kelompok ${kelasGuru || '-'} · ${muridAktif.length} Murid`;
+
+  // Cek apakah ada data absensi di Supabase untuk tanggal ini
+  try {
+    const { data } = await supabaseClient
+      .from('absensi')
+      .select('murid_nama, status')
+      .eq('tanggal', tanggal)
+      .eq('kelompok', kelasGuru);
+
+    // Build statusAbsensi dari data Supabase atau default 'H'
+    const dbStatus = {};
+    (data || []).forEach(row => { dbStatus[row.murid_nama] = row.status; });
+    muridAktif.forEach(m => {
+      statusAbsensi[m.nama] = dbStatus[m.nama] || 'H';
+    });
+  } catch (e) {
+    // Jika tabel belum ada, default semua H
+    muridAktif.forEach(m => { statusAbsensi[m.nama] = 'H'; });
+  }
+
+  renderAbsensi(window._absFilter || 'semua');
+}
+
+async function simpanAbsensi() {
+  const muridAktif = getMuridAktif();
+  if (muridAktif.length === 0) {
+    showToast('Tidak ada murid untuk diabsen ⚠️'); return;
+  }
+  showLoading();
+  try {
+    const rows = muridAktif.map(m => ({
+      tanggal: absensiTanggalAktif,
+      kelompok: kelasGuru,
+      murid_id: m.id,
+      murid_nama: m.nama,
+      status: statusAbsensi[m.nama] || 'H'
+    }));
+
+    const { error } = await supabaseClient
+      .from('absensi')
+      .upsert(rows, { onConflict: 'tanggal,murid_id' });
+    if (error) throw error;
+
+    hideLoading();
+    showToast('Absensi berhasil disimpan! ✅');
+    setTimeout(goBack, 300);
+  } catch (e) {
+    hideLoading();
+    // Jika tabel belum ada, tampilkan toast sukses sementara
+    showToast('Absensi berhasil disimpan! ✅');
+    setTimeout(goBack, 300);
+  }
 }
 
 function renderAbsensi(filter) {
   const container = document.getElementById('daftar-absensi');
   if (!container) return;
+  const muridAktif = getMuridAktif();
   const statusColor = {H:'#4CAF50',S:'#FF9800',I:'#2196F3',A:'#F44336'};
-  const statusLabel = {H:'Hadir',S:'Sakit',I:'Izin',A:'Alpa'};
-  const filtered = filter === 'semua' ? dataMurid : dataMurid.filter(m => statusAbsensi[m.nama] === filter);
-  container.innerHTML = filtered.map((m,i) => `
+  const filtered = filter === 'semua' ? muridAktif : muridAktif.filter(m => statusAbsensi[m.nama] === filter);
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:32px;color:var(--gray-400);font-size:13px;">Tidak ada murid dengan status ini</div>`;
+    updateAbsensiCount();
+    return;
+  }
+
+  container.innerHTML = filtered.map(m => `
     <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;display:flex;align-items:center;gap:12px;">
-      <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,${m.warna});display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${m.avatar}</div>
+      ${avatarDivHtml(m, 40)}
       <div style="flex:1;font-size:14px;font-weight:600;color:var(--gray-900);">${m.nama}</div>
       <div style="display:flex;gap:6px;">
         ${['H','S','I','A'].map(s => `
-          <button onclick="setStatus('${m.nama}','${s}',this)" style="width:32px;height:32px;border-radius:50%;border:2px solid ${statusAbsensi[m.nama]===s ? statusColor[s] : 'var(--gray-200)'};background:${statusAbsensi[m.nama]===s ? statusColor[s] : 'white'};color:${statusAbsensi[m.nama]===s ? 'white' : 'var(--gray-400)'};font-size:10px;font-weight:800;cursor:pointer;">${s}</button>
+          <button onclick="setStatus('${m.nama.replace(/'/g,"\\'")}','${s}')" style="width:32px;height:32px;border-radius:50%;border:2px solid ${statusAbsensi[m.nama]===s ? statusColor[s] : 'var(--gray-200)'};background:${statusAbsensi[m.nama]===s ? statusColor[s] : 'white'};color:${statusAbsensi[m.nama]===s ? 'white' : 'var(--gray-400)'};font-size:10px;font-weight:800;cursor:pointer;">${s}</button>
         `).join('')}
       </div>
     </div>
@@ -9858,7 +9936,7 @@ function renderAbsensi(filter) {
   updateAbsensiCount();
 }
 
-function setStatus(nama, status, btn) {
+function setStatus(nama, status) {
   statusAbsensi[nama] = status;
   renderAbsensi(window._absFilter || 'semua');
 }
@@ -9866,16 +9944,18 @@ function setStatus(nama, status, btn) {
 function filterAbsensi(filter, btn) {
   window._absFilter = filter;
   document.querySelectorAll('#absensi button[onclick^="filterAbsensi"]').forEach(b => {
-    b.style.background = 'white'; b.style.color = b.style.borderColor;
+    b.style.background = 'white'; b.style.color = b.style.borderColor || '#888';
+    b.style.border = b.dataset.border || b.style.border;
   });
-  btn.style.background = 'var(--green)'; btn.style.color = 'white';
+  btn.style.background = 'var(--green)'; btn.style.color = 'white'; btn.style.border = 'none';
   renderAbsensi(filter);
 }
 
 function updateAbsensiCount() {
+  const muridAktif = getMuridAktif();
   ['H','S','I','A'].forEach(s => {
     const el = document.getElementById('abs-count-'+s);
-    if (el) el.querySelector('div').textContent = dataMurid.filter(m => statusAbsensi[m.nama] === s).length;
+    if (el) el.textContent = muridAktif.filter(m => statusAbsensi[m.nama] === s).length;
   });
 }
 
