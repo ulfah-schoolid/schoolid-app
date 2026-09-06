@@ -535,6 +535,8 @@
     min-height: 0;
   }
   .scroll-content::-webkit-scrollbar { display: none; }
+  .aspek-scroll { overflow-x: scroll !important; -webkit-overflow-scrolling: touch !important; }
+  .aspek-scroll::-webkit-scrollbar { display: none; }
 
   /* ===== BOTTOM NAV ===== */
   .bottom-nav {
@@ -3668,14 +3670,15 @@
         </select>
       </div>
       <!-- Pilih Aspek -->
-      <div style="padding:10px 0 10px 16px;background:white;border-bottom:1px solid var(--gray-100);">
-        <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:6px;">ASPEK PENILAIAN</div>
-        <div class="aspek-scroll" style="display:flex;gap:8px;overflow-x:scroll;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:32px;">
-          <button onclick="pilihAspek(this,'Motorik Halus')" class="aspek-btn active-aspek" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;background:var(--green);color:white;font-size:12px;font-weight:700;cursor:pointer;">Motorik Halus</button>
-          <button onclick="pilihAspek(this,'Kreativitas')" class="aspek-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Kreativitas</button>
-          <button onclick="pilihAspek(this,'Bahasa')" class="aspek-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Bahasa</button>
-          <button onclick="pilihAspek(this,'Kognitif')" class="aspek-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Kognitif</button>
-          <button onclick="pilihAspek(this,'Sosial')" class="aspek-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Sosial</button>
+      <div style="background:white;border-bottom:1px solid var(--gray-100);padding:10px 0 10px 0;">
+        <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:6px;padding-left:16px;">ASPEK PENILAIAN</div>
+        <div class="aspek-scroll" style="display:flex;gap:8px;padding-left:16px;padding-right:16px;padding-bottom:4px;">
+          <button onclick="pilihAspek(this,'Motorik Halus')" class="aspek-btn active-aspek" style="flex-shrink:0;white-space:nowrap;padding:6px 14px;border-radius:20px;border:none;background:var(--green);color:white;font-size:12px;font-weight:700;cursor:pointer;">Motorik Halus</button>
+          <button onclick="pilihAspek(this,'Kreativitas')" class="aspek-btn" style="flex-shrink:0;white-space:nowrap;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Kreativitas</button>
+          <button onclick="pilihAspek(this,'Bahasa')" class="aspek-btn" style="flex-shrink:0;white-space:nowrap;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Bahasa</button>
+          <button onclick="pilihAspek(this,'Kognitif')" class="aspek-btn" style="flex-shrink:0;white-space:nowrap;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Kognitif</button>
+          <button onclick="pilihAspek(this,'Sosial')" class="aspek-btn" style="flex-shrink:0;white-space:nowrap;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Sosial</button>
+          <button onclick="pilihAspek(this,'Agama')" class="aspek-btn" style="flex-shrink:0;white-space:nowrap;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Agama</button>
         </div>
       </div>
       <!-- Info interval -->
