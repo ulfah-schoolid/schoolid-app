@@ -7776,21 +7776,23 @@ async function initPenilaian() {
     select.innerHTML = '<option value="">-- Pilih Aktivitas --</option>';
     try {
       const today = new Date().toISOString().split('T')[0];
-      const { data } = await supabaseClient
+      const { data: aktivitasData } = await supabaseClient
         .from('modul_ajar')
-        .select('id, nama, waktu_mulai, waktu_selesai, tanggal')
-        .order('tanggal', { ascending: false })
-        .order('waktu_mulai');
-      if (data && data.length > 0) {
-        data.forEach(a => {
-          const waktu = a.waktu_mulai && a.waktu_selesai
-            ? ` · ${a.waktu_mulai.slice(0,5)}–${a.waktu_selesai.slice(0,5)}` : '';
+        .select('id, data')
+        .order('updated_at', { ascending: false });
+      if (aktivitasData && aktivitasData.length > 0) {
+        aktivitasData.forEach(a => {
+          const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+          const namaAkt = d.nama || d.judul || d.title || 'Aktivitas';
+          const waktuMulai = d.waktu_mulai || d.waktuMulai || '';
+          const waktuSelesai = d.waktu_selesai || d.waktuSelesai || '';
+          const waktu = waktuMulai && waktuSelesai ? ` · ${waktuMulai.slice(0,5)}–${waktuSelesai.slice(0,5)}` : waktuMulai ? ` · ${waktuMulai.slice(0,5)}` : '';
           const opt = document.createElement('option');
           opt.value = a.id;
-          opt.textContent = `📄 ${a.nama}${waktu}`;
+          opt.textContent = `📄 ${namaAkt}${waktu}`;
           select.appendChild(opt);
         });
-        select.selectedIndex = 1; // pilih aktivitas pertama
+        select.selectedIndex = 1;
       }
     } catch(e) {
       console.error('Gagal muat aktivitas:', e);
@@ -8349,16 +8351,23 @@ async function muatLaporanHarian(tanggal) {
   if (el('lh-tanggal')) el('lh-tanggal').value = today;
 
   try {
-    // Aktivitas di tanggal ini
-    const { data: aktivitas, count: jmlAktivitas } = await supabaseClient
-      .from('modul_ajar').select('nama, waktu_mulai, waktu_selesai', { count: 'exact' })
-      .eq('tanggal', today).order('waktu_mulai');
+    // Aktivitas di tanggal ini - filter dari data JSONB
+    const { data: semuaModul } = await supabaseClient
+      .from('modul_ajar').select('id, data');
+    const aktivitas = (semuaModul || []).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+      return d.tanggal === tanggal;
+    }).map(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+      return { nama: d.nama || 'Aktivitas', waktu_mulai: d.waktu_mulai, waktu_selesai: d.waktu_selesai };
+    });
+    const jmlAktivitas = aktivitas.length;
 
     if (el('lh-aktivitas')) el('lh-aktivitas').textContent = jmlAktivitas ?? 0;
 
     const listEl = el('lh-aktivitas-list');
     if (listEl) {
-      if (!aktivitas || aktivitas.length === 0) {
+      if (aktivitas.length === 0) {
         listEl.innerHTML = `<div style="padding:16px;text-align:center;color:var(--gray-400);font-size:13px;">Belum ada aktivitas di tanggal ini</div>`;
       } else {
         listEl.innerHTML = aktivitas.map((a, i) => {
@@ -8407,11 +8416,15 @@ async function muatRingkasanDashboardGuru() {
       .select('*', { count: 'exact', head: true })
       .eq('kelompok', kelasGuru);
 
-    // Aktivitas hari ini
-    const { count: jumlahAktivitas } = await supabaseClient
+    // Aktivitas hari ini - ambil semua lalu filter by tanggal di data JSONB
+    const { data: semuaAktivitas } = await supabaseClient
       .from('modul_ajar')
-      .select('*', { count: 'exact', head: true })
-      .eq('tanggal', today);
+      .select('id, data');
+    const aktivitasHariIni = (semuaAktivitas || []).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+      return d.tanggal === today && (d.kelompok === kelasGuru || !d.kelompok);
+    });
+    const jumlahAktivitas = aktivitasHariIni.length;
 
     // Total dokumentasi
     const { count: jumlahDokumentasi } = await supabaseClient
@@ -8442,14 +8455,15 @@ async function muatRingkasanDashboardGuru() {
 
     const kontainerAktivitas = document.getElementById('dg-aktivitas-hari-ini');
     if (kontainerAktivitas) {
-      if (!aktivitasList || aktivitasList.length === 0) {
+      if (aktivitasHariIni.length === 0) {
         kontainerAktivitas.innerHTML = `<div style="text-align:center;padding:24px;color:var(--gray-400);font-size:13px;">Belum ada aktivitas hari ini</div>`;
       } else {
-        kontainerAktivitas.innerHTML = aktivitasList.map((a, i) => {
-          const waktu = a.waktu_mulai && a.waktu_selesai ? `${a.waktu_mulai.slice(0,5)}–${a.waktu_selesai.slice(0,5)}` : '';
+        kontainerAktivitas.innerHTML = aktivitasHariIni.map((a, i) => {
+          const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+          const waktu = d.waktu_mulai && d.waktu_selesai ? `${d.waktu_mulai.slice(0,5)}–${d.waktu_selesai.slice(0,5)}` : '';
           return `<div class="activity-item" ${i > 0 ? 'style="margin-top:8px;"' : ''}>
             ${waktu ? `<div class="act-time-badge">${waktu}</div>` : ''}
-            <div class="act-info"><div class="act-name">${a.nama}</div><div class="act-cat">${a.aspek || ''}</div></div>
+            <div class="act-info"><div class="act-name">${d.nama || 'Aktivitas'}</div><div class="act-cat">${d.aspek || ''}</div></div>
           </div>`;
         }).join('');
       }
@@ -9853,13 +9867,17 @@ async function simpanAktivitasBaru() {
   showLoading();
   try {
     const { error } = await supabaseClient.from('modul_ajar').insert({
-      nama,
-      tanggal,
-      waktu_mulai: waktuMulai || null,
-      waktu_selesai: waktuSelesai || null,
-      aspek: kategori,
-      deskripsi: deskripsi || null,
-      peserta: peserta
+      data: {
+        nama,
+        tanggal,
+        waktu_mulai: waktuMulai || null,
+        waktu_selesai: waktuSelesai || null,
+        aspek: kategori,
+        deskripsi: deskripsi || null,
+        peserta: peserta,
+        kelompok: kelasGuru
+      },
+      status: 'aktif'
     });
     if (error) throw error;
 
