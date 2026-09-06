@@ -3664,16 +3664,13 @@
       <div style="padding:12px 16px;background:white;border-bottom:1px solid var(--gray-100);">
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:6px;">AKTIVITAS YANG DINILAI</div>
         <select id="pn-aktivitas" onchange="renderPenilaian()" style="width:100%;font-size:13px;font-weight:700;color:var(--gray-900);border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:10px 12px;background:white;outline:none;cursor:pointer;">
-          <option value="melipat">📄 Melipat Kertas · 08:00-09:00</option>
-          <option value="bernyanyi">🎤 Bernyanyi Bersama · 09:30-10:00</option>
-          <option value="mewarnai">🎨 Mewarnai Gambar · 10:30-11:00</option>
-          <option value="puzzle">🧩 Bermain Puzzle · 13:00-13:30</option>
+          <option value="">-- Pilih Aktivitas --</option>
         </select>
       </div>
       <!-- Pilih Aspek -->
-      <div style="padding:10px 0 10px 16px;background:white;border-bottom:1px solid var(--gray-100);overflow:hidden;">
+      <div style="padding:10px 0 10px 16px;background:white;border-bottom:1px solid var(--gray-100);">
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:6px;">ASPEK PENILAIAN</div>
-        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;ms-overflow-style:none;padding-left:0;padding-right:16px;">
+        <div class="aspek-scroll" style="display:flex;gap:8px;overflow-x:scroll;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:32px;">
           <button onclick="pilihAspek(this,'Motorik Halus')" class="aspek-btn active-aspek" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;background:var(--green);color:white;font-size:12px;font-weight:700;cursor:pointer;">Motorik Halus</button>
           <button onclick="pilihAspek(this,'Kreativitas')" class="aspek-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Kreativitas</button>
           <button onclick="pilihAspek(this,'Bahasa')" class="aspek-btn" style="flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--gray-200);color:var(--gray-500);background:white;font-size:12px;font-weight:700;cursor:pointer;">Bahasa</button>
@@ -7767,13 +7764,58 @@ function pilihAspek(btn, aspek) {
   renderPenilaian();
 }
 
-function initPenilaian() {
+async function initPenilaian() {
   try { nilaiMurid = JSON.parse(localStorage.getItem(NILAI_KEY) || '{}'); } catch(e) { nilaiMurid = {}; }
+
+  // Muat aktivitas dari Supabase
+  const select = document.getElementById('pn-aktivitas');
+  if (select) {
+    select.innerHTML = '<option value="">-- Pilih Aktivitas --</option>';
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabaseClient
+        .from('modul_ajar')
+        .select('id, nama, waktu_mulai, waktu_selesai, tanggal')
+        .order('tanggal', { ascending: false })
+        .order('waktu_mulai');
+      if (data && data.length > 0) {
+        data.forEach(a => {
+          const waktu = a.waktu_mulai && a.waktu_selesai
+            ? ` · ${a.waktu_mulai.slice(0,5)}–${a.waktu_selesai.slice(0,5)}` : '';
+          const opt = document.createElement('option');
+          opt.value = a.id;
+          opt.textContent = `📄 ${a.nama}${waktu}`;
+          select.appendChild(opt);
+        });
+        select.selectedIndex = 1; // pilih aktivitas pertama
+      }
+    } catch(e) {
+      console.error('Gagal muat aktivitas:', e);
+    }
+  }
+
+  // Reset scroll chip ke awal
+  const chipContainer = document.querySelector('#penilaian .aspek-scroll');
+  if (chipContainer) chipContainer.scrollLeft = 0;
+
+  // Aktifkan chip pertama
+  const chips = document.querySelectorAll('#penilaian .aspek-btn');
+  if (chips.length > 0) {
+    chips.forEach(c => {
+      c.style.background = 'white';
+      c.style.color = 'var(--gray-500)';
+      c.style.border = '1.5px solid var(--gray-200)';
+    });
+    chips[0].style.background = 'var(--green)';
+    chips[0].style.color = 'white';
+    chips[0].style.border = 'none';
+  }
+  aspekAktif = 'Motorik Halus';
   renderPenilaian();
 }
 
 function renderPenilaian() {
-  const list = getMuridList();
+  const list = getMuridAktif();
   const hadir = list.filter(m => statusAbsensi[m.nama] !== 'A' && statusAbsensi[m.nama] !== undefined || statusAbsensi[m.nama] === undefined);
   const container = document.getElementById('pn-list');
   if (!container) return;
