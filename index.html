@@ -4662,12 +4662,12 @@
           <div class="ks-hero-name">Kepala Sekolah</div>
           <div class="ks-hero-card">
             <div class="ks-hero-grid">
-              <div class="ks-hero-stat"><div class="ks-hero-val">10</div><div class="ks-hero-lbl">Jumlah Guru</div></div>
-              <div class="ks-hero-stat"><div class="ks-hero-val">120</div><div class="ks-hero-lbl">Jumlah Murid</div></div>
-              <div class="ks-hero-stat"><div class="ks-hero-val">85%</div><div class="ks-hero-lbl">Kehadiran Guru</div></div>
-              <div class="ks-hero-stat"><div class="ks-hero-val">88%</div><div class="ks-hero-lbl">Kehadiran Murid</div></div>
-              <div class="ks-hero-stat"><div class="ks-hero-val">23</div><div class="ks-hero-lbl">Aktivitas Bulan Ini</div></div>
-              <div class="ks-hero-stat"><div class="ks-hero-val">15</div><div class="ks-hero-lbl">Laporan Bulan Ini</div></div>
+              <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-guru">-</div><div class="ks-hero-lbl">Jumlah Guru</div></div>
+              <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-murid">-</div><div class="ks-hero-lbl">Jumlah Murid</div></div>
+              <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-kehadiran-guru">-</div><div class="ks-hero-lbl">Kehadiran Guru</div></div>
+              <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-kehadiran-murid">-</div><div class="ks-hero-lbl">Kehadiran Murid</div></div>
+              <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-aktivitas">-</div><div class="ks-hero-lbl">Aktivitas Bulan Ini</div></div>
+              <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-laporan">-</div><div class="ks-hero-lbl">Laporan Bulan Ini</div></div>
             </div>
           </div>
           <button class="ks-hero-btn" onclick="goTo('laporan-bulanan')">Lihat Laporan Lengkap</button>
@@ -4954,61 +4954,14 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Notifikasi</h2>
-      <button class="notif-btn" style="font-size:12px;width:auto;padding:0 8px;border-radius:6px;background:rgba(255,255,255,0.2);" onclick="showToast('Semua notifikasi ditandai sudah dibaca')">Tandai Baca</button>
+      <button class="notif-btn" style="font-size:12px;width:auto;padding:0 8px;border-radius:6px;background:rgba(255,255,255,0.2);" onclick="tandaiSemuaBaca()">Tandai Baca</button>
     </div>
     <div class="scroll-content">
-      <div class="notif-item unread" onclick="showToast('Lihat detail aktivitas baru')">
-        <div class="notif-icon" style="background:#E8F5E9;">📌</div>
-        <div class="notif-content">
-          <div class="notif-title">Aktivitas Baru Ditambahkan</div>
-          <div class="notif-desc">Guru menambahkan aktivitas baru untuk hari ini.</div>
-          <div class="notif-time">5 menit lalu</div>
+      <div id="notif-list">
+        <div style="text-align:center;padding:48px 16px;color:var(--gray-400);">
+          <div style="font-size:40px;margin-bottom:8px;">🔔</div>
+          <div style="font-size:14px;font-weight:600;">Belum ada notifikasi</div>
         </div>
-        <div class="unread-dot"></div>
-      </div>
-      <div class="notif-item unread" onclick="showToast('Lihat foto dokumentasi')">
-        <div class="notif-icon" style="background:#E3F2FD;">📷</div>
-        <div class="notif-content">
-          <div class="notif-title">Dokumentasi Baru</div>
-          <div class="notif-desc">Guru mengunggah foto dokumentasi kegiatan hari ini.</div>
-          <div class="notif-time">15 menit lalu</div>
-        </div>
-        <div class="unread-dot"></div>
-      </div>
-      <div class="notif-item" onclick="showToast('Buka pesan dari guru')">
-        <div class="notif-icon" style="background:#FFF8E1;">💬</div>
-        <div class="notif-content">
-          <div class="notif-title">Pesan dari Guru</div>
-          <div class="notif-desc">Guru mengirim pesan untuk Anda.</div>
-          <div class="notif-time">30 menit lalu</div>
-        </div>
-      </div>
-      <div class="notif-item" onclick="showToast('Persiapan rapor semester')">
-        <div class="notif-icon" style="background:#FFEBEE;">📋</div>
-        <div class="notif-content">
-          <div class="notif-title">Pengingat Rapor</div>
-          <div class="notif-desc">Rapor semester akan segera dibuat. Harap lengkapi penilaian.</div>
-          <div class="notif-time">1 jam lalu</div>
-        </div>
-      </div>
-      <div class="notif-item" onclick="showToast('Lihat pengumuman sekolah')">
-        <div class="notif-icon" style="background:#E8F5E9;">🏫</div>
-        <div class="notif-content">
-          <div class="notif-title">Pengumuman Sekolah</div>
-          <div class="notif-desc">Rapat koordinasi guru dijadwalkan Sabtu, 20 Juni 2026.</div>
-          <div class="notif-time">2 jam lalu</div>
-        </div>
-      </div>
-      <div class="notif-item" onclick="showToast('Lihat detail penilaian')">
-        <div class="notif-icon" style="background:#E8F5E9;">⭐</div>
-        <div class="notif-content">
-          <div class="notif-title">Penilaian Selesai</div>
-          <div class="notif-desc">Penilaian aktivitas "Bernyanyi Bersama" telah disimpan untuk 18 murid.</div>
-          <div class="notif-time">3 jam lalu</div>
-        </div>
-      </div>
-      <div style="padding:16px;text-align:center;">
-        <button style="background:none;border:1.5px solid var(--gray-300);border-radius:var(--radius-sm);padding:10px 24px;font-size:13px;font-weight:600;color:var(--gray-700);cursor:pointer;font-family:var(--font);" onclick="showToast('Memuat notifikasi lebih lama...')">Lihat Semua</button>
       </div>
     </div>
   </div>
@@ -6433,7 +6386,7 @@ function goTo(screenId) {
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
-    if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
+    if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
     if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
   }
 }
@@ -7344,6 +7297,61 @@ function simpanRapor() {
 let pendaftaranFilter = 'semua';
 let selectedPendaftaranId = null;
 
+// ===== DASHBOARD KEPALA SEKOLAH =====
+async function muatStatDashboardKepala() {
+  try {
+    const bulanIni = new Date().toISOString().slice(0, 7); // YYYY-MM
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? '-'; };
+
+    // Jumlah guru aktif
+    const { count: jmlGuru } = await supabaseClient
+      .from('guru').select('*', { count: 'exact', head: true })
+      .eq('status', 'aktif');
+    set('ks-stat-guru', jmlGuru ?? 0);
+
+    // Jumlah murid aktif
+    const { count: jmlMurid } = await supabaseClient
+      .from('murid').select('*', { count: 'exact', head: true })
+      .eq('status', 'aktif');
+    set('ks-stat-murid', jmlMurid ?? 0);
+
+    // Aktivitas bulan ini
+    const { data: modulBulanIni } = await supabaseClient
+      .from('modul_ajar').select('id, data');
+    const aktBulanIni = (modulBulanIni || []).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+      return (d.tanggal || '').startsWith(bulanIni);
+    });
+    set('ks-stat-aktivitas', aktBulanIni.length);
+
+    // Absensi bulan ini - hitung rata-rata kehadiran murid
+    const { data: absensiBulan } = await supabaseClient
+      .from('absensi').select('status')
+      .gte('tanggal', bulanIni + '-01');
+    if (absensiBulan && absensiBulan.length > 0) {
+      const hadir = absensiBulan.filter(a => a.status === 'H').length;
+      const pctMurid = Math.round((hadir / absensiBulan.length) * 100);
+      set('ks-stat-kehadiran-murid', pctMurid + '%');
+    } else {
+      set('ks-stat-kehadiran-murid', '-');
+    }
+    set('ks-stat-kehadiran-guru', '-');
+    set('ks-stat-laporan', aktBulanIni.length);
+
+  } catch (e) {
+    console.error('Gagal muat stat kepala:', e);
+  }
+}
+
+function tandaiSemuaBaca() {
+  document.querySelectorAll('#notif-list .notif-item.unread').forEach(el => {
+    el.classList.remove('unread');
+    const dot = el.querySelector('.unread-dot');
+    if (dot) dot.remove();
+  });
+  showToast('Semua notifikasi ditandai sudah dibaca ✅');
+}
+
 function initPendaftaranMasuk() {
   renderPendaftaranMasuk();
   updateBadgePendaftaran();
@@ -8249,7 +8257,6 @@ function hapusGuru() {
 // ===================================================================
 // ===== INFO SEKOLAH (Kepala Sekolah - benar-benar tersimpan) =====
 // ===================================================================
-const INFO_SEKOLAH_KEY = 'schoolid_info_sekolah';
 const INFO_SEKOLAH_DEFAULT = {
   nama: 'KB-TKIT Istiqomah Penumping',
   npsn: '',
@@ -8259,16 +8266,35 @@ const INFO_SEKOLAH_DEFAULT = {
   kepsek: '',
   tahunAjaran: '2026/2027'
 };
+let infoSekolahCache = null;
 
-function getInfoSekolah() {
+async function getInfoSekolah() {
+  if (infoSekolahCache) return infoSekolahCache;
   try {
-    const saved = JSON.parse(localStorage.getItem(INFO_SEKOLAH_KEY) || 'null');
-    return saved ? { ...INFO_SEKOLAH_DEFAULT, ...saved } : { ...INFO_SEKOLAH_DEFAULT };
-  } catch(e) { return { ...INFO_SEKOLAH_DEFAULT }; }
+    const { data } = await supabaseClient.from('info_sekolah').select('*').limit(1).maybeSingle();
+    if (data) {
+      infoSekolahCache = {
+        nama: data.nama || INFO_SEKOLAH_DEFAULT.nama,
+        npsn: data.npsn || '',
+        alamat: data.alamat || INFO_SEKOLAH_DEFAULT.alamat,
+        telp: data.telp || '',
+        email: data.email || '',
+        kepsek: data.kepsek || '',
+        tahunAjaran: data.tahun_ajaran || INFO_SEKOLAH_DEFAULT.tahunAjaran,
+        logo_url: data.logo_url || null
+      };
+    } else {
+      infoSekolahCache = { ...INFO_SEKOLAH_DEFAULT };
+    }
+  } catch(e) {
+    console.error('Gagal muat info sekolah:', e);
+    infoSekolahCache = { ...INFO_SEKOLAH_DEFAULT };
+  }
+  return infoSekolahCache;
 }
 
-function loadInfoSekolah() {
-  const d = getInfoSekolah();
+async function loadInfoSekolah() {
+  const d = await getInfoSekolah();
   document.getElementById('is-nama').value = d.nama;
   document.getElementById('is-npsn').value = d.npsn;
   document.getElementById('is-alamat').value = d.alamat;
@@ -8278,7 +8304,7 @@ function loadInfoSekolah() {
   document.getElementById('is-tahun-ajaran').value = d.tahunAjaran;
 }
 
-function simpanInfoSekolah() {
+async function simpanInfoSekolah() {
   const data = {
     nama: document.getElementById('is-nama').value.trim(),
     npsn: document.getElementById('is-npsn').value.trim(),
@@ -8286,11 +8312,26 @@ function simpanInfoSekolah() {
     telp: document.getElementById('is-telp').value.trim(),
     email: document.getElementById('is-email').value.trim(),
     kepsek: document.getElementById('is-kepsek').value.trim(),
-    tahunAjaran: document.getElementById('is-tahun-ajaran').value.trim()
+    tahun_ajaran: document.getElementById('is-tahun-ajaran').value.trim()
   };
-  localStorage.setItem(INFO_SEKOLAH_KEY, JSON.stringify(data));
-  showToast('Informasi sekolah berhasil disimpan! ✅');
-  setTimeout(goBack, 300);
+  showLoading();
+  try {
+    const { data: existing } = await supabaseClient.from('info_sekolah').select('id').limit(1).maybeSingle();
+    if (existing) {
+      const { error } = await supabaseClient.from('info_sekolah').update(data).eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabaseClient.from('info_sekolah').insert(data);
+      if (error) throw error;
+    }
+    infoSekolahCache = null; // reset cache
+    hideLoading();
+    showToast('Informasi sekolah berhasil disimpan! ✅');
+    setTimeout(goBack, 300);
+  } catch (e) {
+    hideLoading();
+    showToast('Gagal menyimpan: ' + e.message + ' ⚠️');
+  }
 }
 
 
@@ -8564,8 +8605,8 @@ function bukaInfoSekolahSesuaiPeran() {
   }
 }
 
-function loadInfoSekolahView() {
-  const d = getInfoSekolah();
+async function loadInfoSekolahView() {
+  const d = await getInfoSekolah();
   document.getElementById('isv-nama').textContent = d.nama;
   document.getElementById('isv-npsn').textContent = 'NPSN: ' + (d.npsn || '-');
   document.getElementById('isv-alamat').textContent = d.alamat || '-';
@@ -10530,7 +10571,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'laporan-harian') muatLaporanHarian();
     if (screenId === 'aktivitas') initAktivitasBaru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
-    if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); }
+    if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
     if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
   }
 }
