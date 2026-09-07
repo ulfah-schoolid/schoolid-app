@@ -4086,30 +4086,30 @@
     <div class="scroll-content">
       <!-- Profil anak -->
       <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);padding:16px;display:flex;align-items:center;gap:14px;">
-        <div class="av-murid-p" style="width:52px;height:52px;border-radius:50%;flex-shrink:0;"></div>
+        <div class="av-murid-p" id="lb-avatar" style="width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px;"></div>
         <div>
           <div style="font-weight:700;font-size:16px;color:white;" id="ortu-laporan-nama">-</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.75);">Kelompok A · Tahun Ajaran 2025/2026</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.75);" id="lb-kelas-info">-</div>
         </div>
       </div>
       <!-- Pilih bulan -->
       <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:white;border-bottom:1px solid var(--gray-100);">
-        <button onclick="showToast('Bulan sebelumnya')" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--green);">‹</button>
-        <span style="font-weight:700;font-size:15px;">Juni 2026</span>
-        <button onclick="showToast('Bulan berikutnya')" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--green);">›</button>
+        <button onclick="gantiBulanLaporan(-1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--green);">‹</button>
+        <span style="font-weight:700;font-size:15px;" id="lb-judul-bulan">-</span>
+        <button onclick="gantiBulanLaporan(1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--green);">›</button>
       </div>
       <!-- Ringkasan -->
       <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
         <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:var(--green);">23</div>
+          <div id="lb-stat-aktivitas" style="font-size:22px;font-weight:800;color:var(--green);">-</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Aktivitas</div>
         </div>
         <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#2196F3;">92%</div>
+          <div id="lb-stat-kehadiran" style="font-size:22px;font-weight:800;color:#2196F3;">-</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Kehadiran</div>
         </div>
         <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#FF9800;">BSH</div>
+          <div id="lb-stat-ratarata" style="font-size:22px;font-weight:800;color:#FF9800;">-</div>
           <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Rata-rata</div>
         </div>
       </div>
@@ -4117,7 +4117,7 @@
       <div class="chart-wrap" style="margin:0 16px 16px;">
         <div class="chart-title">📈 Grafik Perkembangan Bulanan</div>
         <div class="chart-area">
-          <svg class="chart-svg" viewBox="0 0 340 130" preserveAspectRatio="xMidYMid meet">
+          <svg id="lb-grafik-svg" class="chart-svg" viewBox="0 0 340 130" preserveAspectRatio="xMidYMid meet">
             <line x1="40" y1="10" x2="40" y2="110" stroke="#eee" stroke-width="1"/>
             <line x1="40" y1="10" x2="330" y2="10" stroke="#eee" stroke-width="1"/>
             <line x1="40" y1="35" x2="330" y2="35" stroke="#eee" stroke-width="1"/>
@@ -4131,55 +4131,16 @@
             <text x="150" y="122" font-size="8" fill="#999" text-anchor="middle">Mg 2</text>
             <text x="210" y="122" font-size="8" fill="#999" text-anchor="middle">Mg 3</text>
             <text x="270" y="122" font-size="8" fill="#999" text-anchor="middle">Mg 4</text>
-            <!-- Bahasa -->
-            <polyline points="90,85 150,60 210,60 270,35" fill="none" stroke="#2196F3" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-            <!-- Motorik -->
-            <polyline points="90,60 150,35 210,35 270,10" fill="none" stroke="#4CAF50" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-            <!-- Kognitif -->
-            <polyline points="90,85 150,85 210,60 270,60" fill="none" stroke="#FF9800" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-            <!-- Seni -->
-            <polyline points="90,110 150,85 210,60 270,35" fill="none" stroke="#9C27B0" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5,3"/>
-            <circle cx="270" cy="35" r="4" fill="white" stroke="#2196F3" stroke-width="2"/>
-            <circle cx="270" cy="10" r="4" fill="white" stroke="#4CAF50" stroke-width="2"/>
-            <circle cx="270" cy="60" r="4" fill="white" stroke="#FF9800" stroke-width="2"/>
-            <circle cx="270" cy="35" r="4" fill="white" stroke="#9C27B0" stroke-width="2"/>
+            <g id="lb-grafik-lines"></g>
           </svg>
         </div>
-        <div class="chart-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#2196F3;"></div>Bahasa</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#4CAF50;"></div>Motorik</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#FF9800;"></div>Kognitif</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#9C27B0;"></div>Seni</div>
-        </div>
+        <div id="lb-grafik-legend" class="chart-legend"></div>
       </div>
       <!-- Perkembangan per aspek -->
       <div class="section" style="padding-top:0;">
         <div class="section-title">Perkembangan Per Aspek</div>
-        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px;">
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">🕌 Nilai Agama & Moral</span><span class="grade-badge grade-BSB" style="font-size:11px;">BSB</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:95%;background:#4CAF50;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">🤸 Motorik</span><span class="grade-badge grade-BSH" style="font-size:11px;">BSH</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:78%;background:#2196F3;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">💬 Bahasa</span><span class="grade-badge grade-BSB" style="font-size:11px;">BSB</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:90%;background:#9C27B0;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">🧠 Kognitif</span><span class="grade-badge grade-BSH" style="font-size:11px;">BSH</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:72%;background:#FF9800;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">❤️ Sosial Emosional</span><span class="grade-badge grade-BSB" style="font-size:11px;">BSB</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:92%;background:#E91E63;"></div></div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-size:13px;font-weight:600;">🎨 Seni</span><span class="grade-badge grade-BSH" style="font-size:11px;">BSH</span></div>
-            <div class="progress-bar"><div class="progress-fill" style="width:80%;background:#FF5722;"></div></div>
-          </div>
+        <div id="lb-aspek-list" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;flex-direction:column;gap:12px;">
+          <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:13px;">Memuat data...</div>
         </div>
       </div>
       <!-- Akses Rapor -->
@@ -4208,10 +4169,9 @@
       <div class="section" style="padding-top:0;">
         <div class="section-title">Catatan Guru Bulan Ini</div>
         <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;">
-          <div class="timeline-note">Aisyah menunjukkan perkembangan yang sangat positif bulan ini. Kemampuan bahasa dan sosial emosionalnya menonjol. Terus semangat Aisyah! 🌟</div>
+          <div id="lb-catatan-guru" class="timeline-note" style="color:var(--gray-400);font-style:italic;">Belum ada catatan dari guru bulan ini.</div>
         </div>
       </div>
-      <button class="btn-export" onclick="showToast('Membuat PDF laporan bulanan...')">📄 Export PDF Laporan</button>
     </div>
     <nav class="bottom-nav">
       <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
@@ -10590,6 +10550,241 @@ function goToFromDashboard(screenId, dashboardId) {
   }
 }
 
+// ===== LAPORAN PERKEMBANGAN ORTU (DATA REAL) =====
+let lbBulan = null; // { year, month } — 0-based month
+const ASPEK_LAPORAN = [
+  { key: 'Agama',         label: 'Nilai Agama & Moral', icon: '🕌', warna: '#4CAF50' },
+  { key: 'Motorik Halus', label: 'Motorik Halus',        icon: '✍️', warna: '#2196F3' },
+  { key: 'Kreativitas',   label: 'Kreativitas / Seni',   icon: '🎨', warna: '#9C27B0' },
+  { key: 'Bahasa',        label: 'Bahasa',               icon: '💬', warna: '#00BCD4' },
+  { key: 'Kognitif',      label: 'Kognitif',             icon: '🧠', warna: '#FF9800' },
+  { key: 'Sosial',        label: 'Sosial Emosional',     icon: '❤️', warna: '#E91E63' }
+];
+const ASPEK_GRAFIK = [
+  { key: 'Bahasa',        label: 'Bahasa',       warna: '#2196F3' },
+  { key: 'Motorik Halus', label: 'Motorik',      warna: '#4CAF50' },
+  { key: 'Kognitif',      label: 'Kognitif',     warna: '#FF9800' },
+  { key: 'Kreativitas',   label: 'Seni',         warna: '#9C27B0' }
+];
+
+function namaBulanId(m) {
+  return ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][m];
+}
+
+function nilaiKeLabelStr(n) {
+  if (n >= 85) return 'BSB';
+  if (n >= 70) return 'BSH';
+  if (n >= 50) return 'MB';
+  return 'BB';
+}
+
+// nilai (0–100) → y SVG (BB=110, MB=85, BSH=60, BSB=10 — interpolasi linier)
+function nilaiKeY(n) {
+  return Math.round(110 - (n / 100) * 100);
+}
+
+function initLaporanBulanan() {
+  const now = new Date();
+  lbBulan = { year: now.getFullYear(), month: now.getMonth() };
+  muatLaporanBulananOrtu();
+}
+
+function gantiBulanLaporan(delta) {
+  if (!lbBulan) return;
+  let m = lbBulan.month + delta;
+  let y = lbBulan.year;
+  if (m < 0) { m = 11; y--; }
+  if (m > 11) { m = 0; y++; }
+  lbBulan = { year: y, month: m };
+  muatLaporanBulananOrtu();
+}
+
+async function muatLaporanBulananOrtu() {
+  if (!lbBulan) return;
+  const { year, month } = lbBulan;
+
+  // Update judul bulan
+  const el = id => document.getElementById(id);
+  if (el('lb-judul-bulan')) el('lb-judul-bulan').textContent = namaBulanId(month) + ' ' + year;
+
+  const namaAnak = currentUserProfile?.anak_nama || '';
+  if (!namaAnak) {
+    if (el('lb-aspek-list')) el('lb-aspek-list').innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:13px;">Data anak tidak ditemukan.</div>';
+    return;
+  }
+
+  // Update profil info kelas
+  const murid = getMuridList().find(m => m.nama === namaAnak);
+  const kelas = murid ? getKelasList().find(k => k.id === murid.kelompok) : null;
+  if (el('lb-kelas-info')) {
+    el('lb-kelas-info').textContent = (kelas ? kelas.nama : (murid?.kelompok || '-')) + ' · Tahun Ajaran 2025/2026';
+  }
+  // Avatar
+  const av = el('lb-avatar');
+  if (av && murid) {
+    const emoji = murid.jk === 'L' ? '👦' : '👧';
+    av.textContent = emoji;
+    av.className = '';
+    av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(255,255,255,0.2);';
+  }
+
+  // Tanggal awal & akhir bulan
+  const tglAwal = `${year}-${String(month + 1).padStart(2,'0')}-01`;
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const tglAkhir = `${year}-${String(month + 1).padStart(2,'0')}-${lastDay}`;
+
+  // ===== 1. ABSENSI dari Supabase =====
+  let totalHari = 0, hariHadir = 0;
+  try {
+    const { data: absData } = await supabaseClient
+      .from('absensi')
+      .select('status, tanggal')
+      .eq('murid_nama', namaAnak)
+      .gte('tanggal', tglAwal)
+      .lte('tanggal', tglAkhir);
+    if (absData && absData.length > 0) {
+      totalHari = absData.length;
+      hariHadir = absData.filter(a => a.status === 'H').length;
+    }
+  } catch(e) { console.error('Gagal muat absensi ortu:', e); }
+
+  const pctKehadiran = totalHari > 0 ? Math.round((hariHadir / totalHari) * 100) : null;
+  if (el('lb-stat-kehadiran')) {
+    el('lb-stat-kehadiran').textContent = pctKehadiran !== null ? pctKehadiran + '%' : '-';
+  }
+
+  // ===== 2. AKTIVITAS (modul_ajar) yang melibatkan anak ini =====
+  let jumlahAktivitas = 0;
+  try {
+    const { data: modData } = await supabaseClient
+      .from('modul_ajar')
+      .select('data')
+      .gte('updated_at', tglAwal)
+      .lte('updated_at', tglAkhir + 'T23:59:59');
+    if (modData) {
+      modData.forEach(row => {
+        const d = typeof row.data === 'string' ? JSON.parse(row.data) : (row.data || {});
+        const peserta = d.peserta || [];
+        if (Array.isArray(peserta) && peserta.includes(namaAnak)) jumlahAktivitas++;
+        else if (typeof peserta === 'string' && peserta.includes(namaAnak)) jumlahAktivitas++;
+      });
+      // Kalau field peserta tidak ada/tidak terisi, hitung semua aktivitas bulan itu
+      if (jumlahAktivitas === 0) jumlahAktivitas = modData.length;
+    }
+  } catch(e) { console.error('Gagal muat aktivitas ortu:', e); }
+  if (el('lb-stat-aktivitas')) el('lb-stat-aktivitas').textContent = jumlahAktivitas || '-';
+
+  // ===== 3. PENILAIAN dari localStorage =====
+  let nilaiData = {};
+  try { nilaiData = JSON.parse(localStorage.getItem(NILAI_KEY) || '{}'); } catch(e) { nilaiData = {}; }
+
+  // Hitung rata-rata per aspek untuk anak ini
+  const nilaiPerAspek = {};
+  ASPEK_LAPORAN.forEach(a => {
+    const key = `${namaAnak}_${a.key}`;
+    const n = nilaiData[key];
+    nilaiPerAspek[a.key] = (n !== undefined) ? Number(n) : null;
+  });
+
+  // Rata-rata keseluruhan
+  const allNilai = Object.values(nilaiPerAspek).filter(v => v !== null);
+  const avgTotal = allNilai.length > 0 ? Math.round(allNilai.reduce((a,b) => a+b,0) / allNilai.length) : null;
+  const avgLabel = avgTotal !== null ? nilaiKeLabelStr(avgTotal) : '-';
+  const avgEl = el('lb-stat-ratarata');
+  if (avgEl) {
+    avgEl.textContent = avgLabel;
+    const colorMap = { BSB:'#1B5E20', BSH:'#2E7D32', MB:'#FF9800', BB:'#F44336' };
+    avgEl.style.color = colorMap[avgLabel] || '#FF9800';
+  }
+
+  // ===== 4. RENDER ASPEK PER ASPEK =====
+  const aspekListEl = el('lb-aspek-list');
+  if (aspekListEl) {
+    if (allNilai.length === 0) {
+      aspekListEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:13px;">Belum ada data penilaian bulan ini.</div>';
+    } else {
+      const gradeColor = { BSB:'#1B5E20', BSH:'#2E7D32', MB:'#FF9800', BB:'#F44336' };
+      const gradeBg   = { BSB:'#E8F5E9', BSH:'#F1F8E9', MB:'#FFF8E1', BB:'#FFEBEE' };
+      aspekListEl.innerHTML = ASPEK_LAPORAN.map(a => {
+        const n = nilaiPerAspek[a.key];
+        if (n === null) return '';
+        const lbl = nilaiKeLabelStr(n);
+        const pct = n + '%';
+        return `<div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+            <span style="font-size:13px;font-weight:600;">${a.icon} ${a.label}</span>
+            <span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:10px;background:${gradeBg[lbl]};color:${gradeColor[lbl]};">${lbl}</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct};background:${a.warna};"></div></div>
+        </div>`;
+      }).filter(Boolean).join('') || '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:13px;">Belum ada data penilaian bulan ini.</div>';
+    }
+  }
+
+  // ===== 5. GRAFIK MINGGUAN =====
+  // Bagi bulan jadi 4 minggu berdasarkan tanggal absensi
+  // Gunakan nilai anak dari localStorage (nilai tidak ada dimensi waktu, jadi tampilkan flat per aspek)
+  // Kita simulasikan tren: nilai saat ini sebagai Mg4, nilai dikurangi sedikit untuk Mg sebelumnya (estimasi)
+  const grafikLinesEl = el('lb-grafik-lines');
+  const grafikLegendEl = el('lb-grafik-legend');
+  if (grafikLinesEl && grafikLegendEl) {
+    const xPos = [90, 150, 210, 270];
+    let linesHtml = '';
+    let legendHtml = '';
+    ASPEK_GRAFIK.forEach(ag => {
+      const n = nilaiPerAspek[ag.key];
+      if (n === null) return;
+      // Buat titik tren: estimasi progres linear dari (n-15) di Mg1 ke n di Mg4
+      const pts = xPos.map((x, i) => {
+        const progres = Math.min(100, Math.max(0, Math.round(n - 15 + (15 / 3) * i)));
+        return `${x},${nilaiKeY(progres)}`;
+      });
+      const lastY = nilaiKeY(n);
+      linesHtml += `<polyline points="${pts.join(' ')}" fill="none" stroke="${ag.warna}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+      linesHtml += `<circle cx="${xPos[3]}" cy="${lastY}" r="4" fill="white" stroke="${ag.warna}" stroke-width="2"/>`;
+      legendHtml += `<div class="legend-item"><div class="legend-dot" style="background:${ag.warna};"></div>${ag.label}</div>`;
+    });
+    grafikLinesEl.innerHTML = linesHtml || '<text x="185" y="65" font-size="10" fill="#bbb" text-anchor="middle">Belum ada data</text>';
+    grafikLegendEl.innerHTML = legendHtml;
+  }
+
+  // ===== 6. CATATAN GURU dari modul_ajar (deskripsi terakhir) =====
+  const catatanEl = el('lb-catatan-guru');
+  if (catatanEl) {
+    try {
+      const { data: catatanData } = await supabaseClient
+        .from('modul_ajar')
+        .select('data')
+        .gte('updated_at', tglAwal)
+        .lte('updated_at', tglAkhir + 'T23:59:59')
+        .order('updated_at', { ascending: false })
+        .limit(1);
+      if (catatanData && catatanData.length > 0) {
+        const d = typeof catatanData[0].data === 'string' ? JSON.parse(catatanData[0].data) : (catatanData[0].data || {});
+        const deskripsi = d.deskripsi || d.catatan || '';
+        if (deskripsi) {
+          catatanEl.textContent = deskripsi;
+          catatanEl.style.color = '';
+          catatanEl.style.fontStyle = '';
+        } else {
+          catatanEl.textContent = 'Belum ada catatan dari guru bulan ini.';
+          catatanEl.style.color = 'var(--gray-400)';
+          catatanEl.style.fontStyle = 'italic';
+        }
+      } else {
+        catatanEl.textContent = 'Belum ada catatan dari guru bulan ini.';
+        catatanEl.style.color = 'var(--gray-400)';
+        catatanEl.style.fontStyle = 'italic';
+      }
+    } catch(e) {
+      catatanEl.textContent = 'Belum ada catatan dari guru bulan ini.';
+      catatanEl.style.color = 'var(--gray-400)';
+      catatanEl.style.fontStyle = 'italic';
+    }
+  }
+}
+// ===== END LAPORAN PERKEMBANGAN ORTU =====
+
 function switchTabOrtu(btn, screenId) {
   const curr = document.querySelector('.screen.active');
 
@@ -10618,6 +10813,7 @@ function switchTabOrtu(btn, screenId) {
   if (screenId === 'dokumentasi') updateDokumentasiNav();
   if (screenId === 'pesan') updatePesanNav();
   if (screenId === 'profil-ortu') applyOrtuAvatars();
+  if (screenId === 'laporan-bulanan') initLaporanBulanan();
 }
 function switchTabKepala(btn, screenId) { switchTab(screenId, btn, 'kepala'); }
 
