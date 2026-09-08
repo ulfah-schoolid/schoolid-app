@@ -9935,7 +9935,9 @@ async function simpanAktivitasBaru() {
 
   showLoading();
   try {
+    const newId = crypto.randomUUID();
     const { error } = await supabaseClient.from('modul_ajar').insert({
+      id: newId,
       data: {
         nama,
         tanggal,
