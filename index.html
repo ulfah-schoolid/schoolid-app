@@ -3725,7 +3725,7 @@
         </div>
       </div>
       <div style="padding:0 16px 16px;">
-        <button onclick="simpanPenilaian()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Semua Penilaian</button>
+        <button onclick="simpanPenilaian()" class="btn-simpan-nilai" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Semua Penilaian</button>
       </div>
     </div>
   </div>
@@ -7710,10 +7710,11 @@ function toggleFaq(el) {
   }
 }
 
-// ===== PENILAIAN =====
-const NILAI_KEY = 'schoolid_nilai';
-let nilaiMurid = {};
+// ===== PENILAIAN (Supabase) =====
+// Tabel: penilaian (id, murid_nama, kelompok, aspek, nilai, tanggal, modul_ajar_id, created_at)
+let nilaiMurid = {}; // cache in-memory: key = "NamaMurid_Aspek", val = nilai angka
 let aspekAktif = 'Motorik Halus';
+let pnTanggalAktif = new Date().toISOString().split('T')[0]; // tanggal penilaian aktif
 
 function nilaiKeLabel(n) {
   if (n >= 85) return {label:'BSB', color:'#1B5E20', bg:'#E8F5E9'};
@@ -7736,14 +7737,14 @@ function pilihAspek(btn, aspek) {
 }
 
 async function initPenilaian() {
-  try { nilaiMurid = JSON.parse(localStorage.getItem(NILAI_KEY) || '{}'); } catch(e) { nilaiMurid = {}; }
+  // Set tanggal aktif ke hari ini
+  pnTanggalAktif = new Date().toISOString().split('T')[0];
 
   // Muat aktivitas dari Supabase
   const select = document.getElementById('pn-aktivitas');
   if (select) {
     select.innerHTML = '<option value="">-- Pilih Aktivitas --</option>';
     try {
-      const today = new Date().toISOString().split('T')[0];
       const { data: aktivitasData } = await supabaseClient
         .from('modul_ajar')
         .select('id, data')
@@ -7784,19 +7785,37 @@ async function initPenilaian() {
     chips[0].style.border = 'none';
   }
   aspekAktif = 'Motorik Halus';
+
+  // Muat nilai dari Supabase untuk tanggal hari ini
+  await muatNilaiDariSupabase(pnTanggalAktif);
   renderPenilaian();
+}
+
+async function muatNilaiDariSupabase(tanggal) {
+  nilaiMurid = {};
+  try {
+    const { data, error } = await supabaseClient
+      .from('penilaian')
+      .select('murid_nama, aspek, nilai')
+      .eq('tanggal', tanggal);
+    if (error) throw error;
+    if (data) {
+      data.forEach(row => {
+        nilaiMurid[`${row.murid_nama}_${row.aspek}`] = row.nilai;
+      });
+    }
+  } catch(e) {
+    console.error('Gagal muat nilai dari Supabase:', e);
+  }
 }
 
 function renderPenilaian() {
   const list = getMuridAktif();
-  const hadir = list.filter(m => statusAbsensi[m.nama] !== 'A' && statusAbsensi[m.nama] !== undefined || statusAbsensi[m.nama] === undefined);
   const container = document.getElementById('pn-list');
   if (!container) return;
   const warnaL = ['#BBDEFB,#90CAF9','#D1C4E9,#B39DDB','#B2EBF2,#80DEEA'];
   const warnaP = ['#FFE0B2,#FFCC80','#F8BBD0,#F48FB1','#C8E6C9,#A5D6A7'];
   container.innerHTML = list.map((m, i) => {
-    const w = m.jk === 'L' ? warnaL[i % warnaL.length] : warnaP[i % warnaP.length];
-    const avatar = m.avatar || (m.jk === 'L' ? '👦' : '👧');
     const key = `${m.nama}_${aspekAktif}`;
     const nilaiSaved = nilaiMurid[key];
     const nilaiVal = nilaiSaved !== undefined ? nilaiSaved : '';
@@ -7827,7 +7846,7 @@ function updateNilai(nama, val, input) {
   if (val !== '') {
     nilaiMurid[key] = n;
     input.value = n;
-    const idx = getMuridList().findIndex(m => m.nama === nama);
+    const idx = getMuridAktif().findIndex(m => m.nama === nama);
     const badge = document.getElementById('badge-' + idx);
     if (badge) {
       const info = nilaiKeLabel(n);
@@ -7837,7 +7856,7 @@ function updateNilai(nama, val, input) {
     }
   } else {
     delete nilaiMurid[key];
-    const idx = getMuridList().findIndex(m => m.nama === nama);
+    const idx = getMuridAktif().findIndex(m => m.nama === nama);
     const badge = document.getElementById('badge-' + idx);
     if (badge) { badge.style.background = '#F5F5F5'; badge.style.color = 'var(--gray-400)'; badge.textContent = '-'; }
   }
@@ -7854,7 +7873,7 @@ function applyDefaultNilai(val) {
     badge.textContent = info.label;
   }
   if (!val) return;
-  getMuridList().forEach(m => {
+  getMuridAktif().forEach(m => {
     nilaiMurid[`${m.nama}_${aspekAktif}`] = n;
   });
   renderPenilaian();
@@ -7862,7 +7881,7 @@ function applyDefaultNilai(val) {
 }
 
 function updateRingkasanPenilaian() {
-  const list = getMuridList();
+  const list = getMuridAktif();
   const nilai = list.map(m => nilaiMurid[`${m.nama}_${aspekAktif}`]).filter(v => v !== undefined);
   const rs = document.getElementById('pn-ringkasan');
   if (!rs || nilai.length === 0) { if(rs) rs.style.display = 'none'; return; }
@@ -7881,9 +7900,58 @@ function updateRingkasanPenilaian() {
   document.getElementById('rs-avg').style.color = avgInfo.color;
 }
 
-function simpanPenilaian() {
-  localStorage.setItem(NILAI_KEY, JSON.stringify(nilaiMurid));
-  showToast('Penilaian berhasil disimpan! ✅');
+async function simpanPenilaian() {
+  const btn = document.querySelector('#penilaian .btn-simpan-nilai');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Menyimpan...'; }
+
+  const modulId = document.getElementById('pn-aktivitas')?.value || null;
+  const muridList = getMuridAktif();
+
+  // Siapkan semua aspek yang ada nilainya untuk hari ini
+  const aspekList = ['Motorik Halus','Kreativitas','Bahasa','Kognitif','Sosial','Agama'];
+  const rows = [];
+  muridList.forEach(m => {
+    const kelompok = m.kelompok || '';
+    aspekList.forEach(aspek => {
+      const key = `${m.nama}_${aspek}`;
+      if (nilaiMurid[key] !== undefined) {
+        rows.push({
+          murid_nama: m.nama,
+          kelompok,
+          aspek,
+          nilai: nilaiMurid[key],
+          tanggal: pnTanggalAktif,
+          modul_ajar_id: modulId || null
+        });
+      }
+    });
+  });
+
+  if (rows.length === 0) {
+    showToast('Belum ada nilai yang diisi ⚠️');
+    if (btn) { btn.disabled = false; btn.innerHTML = '💾 Simpan Semua Penilaian'; }
+    return;
+  }
+
+  try {
+    // Hapus data lama hari ini dulu (upsert manual agar tidak duplikat)
+    await supabaseClient
+      .from('penilaian')
+      .delete()
+      .eq('tanggal', pnTanggalAktif);
+
+    const { error } = await supabaseClient
+      .from('penilaian')
+      .insert(rows);
+
+    if (error) throw error;
+    showToast('Penilaian berhasil disimpan! ✅');
+  } catch(e) {
+    console.error('Gagal simpan penilaian:', e);
+    showToast('Gagal simpan: ' + (e.message || 'coba lagi') + ' ⚠️');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '💾 Simpan Semua Penilaian'; }
+  }
 }
 
 // ===== KELOLA MURID (localStorage) =====
@@ -10674,17 +10742,31 @@ async function muatLaporanBulananOrtu() {
   } catch(e) { console.error('Gagal muat aktivitas ortu:', e); }
   if (el('lb-stat-aktivitas')) el('lb-stat-aktivitas').textContent = jumlahAktivitas || '-';
 
-  // ===== 3. PENILAIAN dari localStorage =====
-  let nilaiData = {};
-  try { nilaiData = JSON.parse(localStorage.getItem(NILAI_KEY) || '{}'); } catch(e) { nilaiData = {}; }
-
-  // Hitung rata-rata per aspek untuk anak ini
+  // ===== 3. PENILAIAN dari Supabase =====
   const nilaiPerAspek = {};
-  ASPEK_LAPORAN.forEach(a => {
-    const key = `${namaAnak}_${a.key}`;
-    const n = nilaiData[key];
-    nilaiPerAspek[a.key] = (n !== undefined) ? Number(n) : null;
-  });
+  ASPEK_LAPORAN.forEach(a => { nilaiPerAspek[a.key] = null; });
+  try {
+    const { data: nilaiRows } = await supabaseClient
+      .from('penilaian')
+      .select('aspek, nilai')
+      .eq('murid_nama', namaAnak)
+      .gte('tanggal', tglAwal)
+      .lte('tanggal', tglAkhir);
+    if (nilaiRows && nilaiRows.length > 0) {
+      // Rata-rata per aspek selama bulan itu
+      const aspekTally = {};
+      nilaiRows.forEach(row => {
+        if (!aspekTally[row.aspek]) aspekTally[row.aspek] = [];
+        aspekTally[row.aspek].push(row.nilai);
+      });
+      ASPEK_LAPORAN.forEach(a => {
+        const vals = aspekTally[a.key];
+        if (vals && vals.length > 0) {
+          nilaiPerAspek[a.key] = Math.round(vals.reduce((s,v) => s+v, 0) / vals.length);
+        }
+      });
+    }
+  } catch(e) { console.error('Gagal muat penilaian ortu:', e); }
 
   // Rata-rata keseluruhan
   const allNilai = Object.values(nilaiPerAspek).filter(v => v !== null);
