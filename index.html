@@ -4531,7 +4531,7 @@
       <nav class="ks-sidebar">
         <div class="ks-sidebar-logo av-kepsek"></div>
         <button class="ks-side-item active" onclick="switchSidebarKepala(this,'dashboard-kepala')">🏠</button>
-        <button class="ks-side-item" onclick="switchSidebarKepala(this,'laporan-bulanan')">📊</button>
+        <button class="ks-side-item" onclick="switchSidebarKepala(this,'kepala-arsip');renderArsipKepala()">📊</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'kepala-arsip')">📘</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'notifikasi')">🔔</button>
         <button class="ks-side-item" onclick="switchSidebarKepala(this,'pengaturan')">⚙️</button>
@@ -4541,7 +4541,7 @@
         <div class="ks-hero">
           <div class="ks-hero-title">Dashboard Kepala Sekolah</div>
           <div class="ks-hero-greet">Selamat datang,</div>
-          <div class="ks-hero-name">Kepala Sekolah</div>
+          <div class="ks-hero-name" id="ks-nama-kepala">Kepala Sekolah</div>
           <div class="ks-hero-card">
             <div class="ks-hero-grid">
               <div class="ks-hero-stat"><div class="ks-hero-val" id="ks-stat-guru">-</div><div class="ks-hero-lbl">Jumlah Guru</div></div>
@@ -7158,6 +7158,10 @@ async function muatStatDashboardKepala() {
     const bulanIni = new Date().toISOString().slice(0, 7); // YYYY-MM
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? '-'; };
 
+    // Nama kepala dari profil
+    const namaKepala = currentUserProfile?.nama || 'Kepala Sekolah';
+    set('ks-nama-kepala', namaKepala);
+
     // Jumlah guru aktif
     const { count: jmlGuru } = await supabaseClient
       .from('guru').select('*', { count: 'exact', head: true })
@@ -7190,8 +7194,24 @@ async function muatStatDashboardKepala() {
     } else {
       set('ks-stat-kehadiran-murid', '-');
     }
-    set('ks-stat-kehadiran-guru', '-');
-    set('ks-stat-laporan', aktBulanIni.length);
+    // Kehadiran guru bulan ini
+    try {
+      const { data: absGuru } = await supabaseClient
+        .from('absensi_guru').select('status')
+        .gte('tanggal', bulanIni + '-01');
+      if (absGuru && absGuru.length > 0) {
+        const hadirGuru = absGuru.filter(a => a.status === 'H').length;
+        set('ks-stat-kehadiran-guru', Math.round((hadirGuru/absGuru.length)*100) + '%');
+      } else { set('ks-stat-kehadiran-guru', '-'); }
+    } catch(e) { set('ks-stat-kehadiran-guru', '-'); }
+
+    // Laporan bulan ini = modul + asesmen yang sudah dikirim/disetujui
+    try {
+      const { count: jmlLaporan } = await supabaseClient
+        .from('modul_ajar').select('*', { count: 'exact', head: true })
+        .in('status', ['dikirim','disetujui']);
+      set('ks-stat-laporan', jmlLaporan ?? 0);
+    } catch(e) { set('ks-stat-laporan', aktBulanIni.length); }
 
   } catch (e) {
     console.error('Gagal muat stat kepala:', e);
