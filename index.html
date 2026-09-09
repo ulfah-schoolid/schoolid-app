@@ -7120,75 +7120,137 @@ function toggleEditRapor() {
   setRaporMode(!raporEditMode);
 }
 
-function loadRaporData(periode) {
+async function loadRaporData(periode) {
+  const namaAnak = currentUserProfile?.anak_nama || document.getElementById('r-nama')?.textContent || '';
+  if (!namaAnak || namaAnak === '-') return;
+
+  const setVal = (id, val) => { const el = document.getElementById(id); if(el && val !== undefined && val !== null) el.value = val; };
+  const setView = (id, val) => {
+    const vEl = document.getElementById(id+'-view');
+    const eEl = document.getElementById(id);
+    if (vEl) vEl.textContent = val || '-';
+    if (eEl) eEl.value = val || '';
+  };
+
   try {
-    const all = JSON.parse(localStorage.getItem(RAPOR_KEY) || '{}');
-    const data = all[periode];
-    if (!data) return;
+    // Ambil data rapor dari Supabase
+    const { data: raporData } = await supabaseClient
+      .from('rapor_digital')
+      .select('*')
+      .eq('murid_nama', namaAnak)
+      .eq('periode', periode)
+      .maybeSingle();
 
-    // Narasi
-    const setVal = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
-    setVal('r-agama-narasi', data.agama_narasi);
-    setVal('r-jatidiri-narasi', data.jatidiri_narasi);
-    setVal('r-literasi-narasi', data.literasi_narasi);
-    setVal('r-pancasila-narasi', data.pancasila_narasi);
-    setVal('r-pesan-guru', data.pesan_guru);
-    setVal('r-refleksi-ortu', data.refleksi_ortu);
-    setVal('r-iqro-jilid', data.iqro_jilid);
-    setVal('r-iqro-hal', data.iqro_hal);
-    setVal('r-tinggi', data.tinggi);
-    setVal('r-berat', data.berat);
-    setVal('r-hadir-sakit', data.hadir_sakit);
-    setVal('r-hadir-izin', data.hadir_izin);
-    setVal('r-hadir-alpa', data.hadir_alpa);
-    setVal('r-hadir-total', data.hadir_total);
-
-    // Radio buttons
-    if (data.radio) {
-      Object.entries(data.radio).forEach(([name, val]) => {
-        const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
-        if (radio) radio.checked = true;
-      });
+    if (raporData && raporData.data) {
+      const d = typeof raporData.data === 'string' ? JSON.parse(raporData.data) : raporData.data;
+      setVal('r-agama-narasi', d.agama_narasi);
+      setVal('r-jatidiri-narasi', d.jatidiri_narasi);
+      setVal('r-literasi-narasi', d.literasi_narasi);
+      setVal('r-pancasila-narasi', d.pancasila_narasi);
+      setVal('r-pesan-guru', d.pesan_guru);
+      setVal('r-refleksi-ortu', d.refleksi_ortu);
+      setVal('r-iqro-jilid', d.iqro_jilid);
+      setVal('r-iqro-hal', d.iqro_hal);
+      setVal('r-tinggi', d.tinggi);
+      setVal('r-berat', d.berat);
+      setVal('r-hadir-sakit', d.hadir_sakit);
+      setVal('r-hadir-izin', d.hadir_izin);
+      setVal('r-hadir-alpa', d.hadir_alpa);
+      setVal('r-hadir-total', d.hadir_total);
+      if (d.radio) {
+        Object.entries(d.radio).forEach(([name, val]) => {
+          const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
+          if (radio) radio.checked = true;
+        });
+      }
+    } else {
+      // Auto-isi data absensi dari tabel absensi
+      try {
+        const periodeRange = {
+          tengah1: ['2025-07-01','2025-09-30'],
+          semester1: ['2025-10-01','2025-12-31'],
+          tengah2: ['2026-01-01','2026-03-31'],
+          semester2: ['2026-04-01','2026-06-30']
+        };
+        const range = periodeRange[periode];
+        if (range && namaAnak) {
+          const { data: absRows } = await supabaseClient
+            .from('absensi').select('status')
+            .eq('murid_nama', namaAnak)
+            .gte('tanggal', range[0]).lte('tanggal', range[1]);
+          if (absRows && absRows.length > 0) {
+            const sakit = absRows.filter(a => a.status === 'S').length;
+            const izin  = absRows.filter(a => a.status === 'I').length;
+            const alpa  = absRows.filter(a => a.status === 'A').length;
+            const total = absRows.length;
+            setVal('r-hadir-sakit', sakit);
+            setVal('r-hadir-izin', izin);
+            setVal('r-hadir-alpa', alpa);
+            setVal('r-hadir-total', total);
+          }
+        }
+      } catch(e2) {}
     }
-  } catch(e) {}
+  } catch(e) { console.error('Gagal muat rapor:', e); }
 }
 
-function simpanRapor() {
+async function simpanRapor() {
+  const namaAnak = currentUserProfile?.anak_nama || document.getElementById('r-nama')?.textContent || '';
+  if (!namaAnak || namaAnak === '-') { showToast('Data anak tidak ditemukan ⚠️'); return; }
+
+  const radioData = {};
+  document.querySelectorAll('#detail-rapor input[type=radio]:checked').forEach(r => {
+    radioData[r.name] = r.value;
+  });
+  const getVal = (id) => document.getElementById(id)?.value || '';
+
+  const dataRapor = {
+    agama_narasi: getVal('r-agama-narasi'),
+    jatidiri_narasi: getVal('r-jatidiri-narasi'),
+    literasi_narasi: getVal('r-literasi-narasi'),
+    pancasila_narasi: getVal('r-pancasila-narasi'),
+    pesan_guru: getVal('r-pesan-guru'),
+    refleksi_ortu: getVal('r-refleksi-ortu'),
+    iqro_jilid: getVal('r-iqro-jilid'),
+    iqro_hal: getVal('r-iqro-hal'),
+    tinggi: getVal('r-tinggi'),
+    berat: getVal('r-berat'),
+    hadir_sakit: getVal('r-hadir-sakit'),
+    hadir_izin: getVal('r-hadir-izin'),
+    hadir_alpa: getVal('r-hadir-alpa'),
+    hadir_total: getVal('r-hadir-total'),
+    radio: radioData,
+    tgl_simpan: new Date().toLocaleDateString('id-ID')
+  };
+
+  showLoading();
   try {
-    const all = JSON.parse(localStorage.getItem(RAPOR_KEY) || '{}');
+    // Cek apakah sudah ada data untuk murid + periode ini
+    const { data: existing } = await supabaseClient
+      .from('rapor_digital')
+      .select('id')
+      .eq('murid_nama', namaAnak)
+      .eq('periode', raporPeriodeAktif)
+      .maybeSingle();
 
-    // Kumpulkan semua radio button
-    const radioData = {};
-    document.querySelectorAll('#detail-rapor input[type=radio]:checked').forEach(r => {
-      radioData[r.name] = r.value;
-    });
-
-    const getVal = (id) => document.getElementById(id)?.value || '';
-
-    all[raporPeriodeAktif] = {
-      agama_narasi: getVal('r-agama-narasi'),
-      jatidiri_narasi: getVal('r-jatidiri-narasi'),
-      literasi_narasi: getVal('r-literasi-narasi'),
-      pancasila_narasi: getVal('r-pancasila-narasi'),
-      pesan_guru: getVal('r-pesan-guru'),
-      refleksi_ortu: getVal('r-refleksi-ortu'),
-      iqro_jilid: getVal('r-iqro-jilid'),
-      iqro_hal: getVal('r-iqro-hal'),
-      tinggi: getVal('r-tinggi'),
-      berat: getVal('r-berat'),
-      hadir_sakit: getVal('r-hadir-sakit'),
-      hadir_izin: getVal('r-hadir-izin'),
-      hadir_alpa: getVal('r-hadir-alpa'),
-      hadir_total: getVal('r-hadir-total'),
-      radio: radioData,
-      tgl_simpan: new Date().toLocaleDateString('id-ID')
-    };
-
-    localStorage.setItem(RAPOR_KEY, JSON.stringify(all));
+    if (existing) {
+      const { error } = await supabaseClient
+        .from('rapor_digital')
+        .update({ data: dataRapor, updated_at: new Date().toISOString() })
+        .eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabaseClient
+        .from('rapor_digital')
+        .insert({ murid_nama: namaAnak, periode: raporPeriodeAktif, data: dataRapor });
+      if (error) throw error;
+    }
+    hideLoading();
     showToast('Rapor berhasil disimpan! ✅');
     setRaporMode(false);
   } catch(e) {
-    showToast('Gagal menyimpan rapor ⚠️');
+    hideLoading();
+    showToast('Gagal menyimpan rapor: ' + (e.message || '') + ' ⚠️');
   }
 }
 
