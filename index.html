@@ -10603,22 +10603,42 @@ async function muatProfilOrtu() {
   if (!p) return;
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
   set('po-nama', p.nama || p.name || '-');
+  // Ambil email dari session Supabase Auth
   const emailEl = document.getElementById('po-email');
-  if (emailEl) emailEl.textContent = 'Orang Tua · ' + (p.email || '-');
-  set('po-hp', '📱 ' + (p.hp || p.phone || '-'));
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const emailAuth = session?.user?.email || '';
+    if (emailEl) emailEl.textContent = 'Orang Tua' + (emailAuth ? ' · ' + emailAuth : '');
+  } catch(e) { if (emailEl) emailEl.textContent = 'Orang Tua'; }
+  // HP — sembunyikan bila kosong
+  const hpEl = document.getElementById('po-hp');
+  if (hpEl) {
+    const hp = p.hp || p.phone || p.no_hp || '';
+    hpEl.style.display = hp ? '' : 'none';
+    if (hp) hpEl.textContent = '📱 ' + hp;
+  }
   set('ortu-anak-pm-nama', p.anak_nama || '');
-  // Ambil data murid dan kelas langsung dari Supabase (muridCache mungkin kosong saat ortu login)
+  // Ambil kelas dari kelas_id di profiles, atau dari tabel murid
   let kelasNama = '-';
   try {
-    const { data: muridData } = await supabaseClient.from('murid').select('kelompok').eq('nama', p.anak_nama || '').maybeSingle();
-    if (muridData && muridData.kelompok) {
-      const { data: kelasData } = await supabaseClient.from('kelas').select('nama').eq('id', muridData.kelompok).maybeSingle();
-      kelasNama = kelasData?.nama || muridData.kelompok;
+    // Coba kelas_id di profiles dulu
+    if (p.kelas_id) {
+      const { data: kelasData } = await supabaseClient.from('kelas').select('nama').eq('id', p.kelas_id).maybeSingle();
+      if (kelasData?.nama) kelasNama = kelasData.nama;
+    }
+    // Fallback: cari lewat tabel murid
+    if (kelasNama === '-' && p.anak_nama) {
+      const { data: muridData } = await supabaseClient.from('murid').select('kelompok').eq('nama', p.anak_nama).maybeSingle();
+      if (muridData?.kelompok) {
+        const { data: kelasData2 } = await supabaseClient.from('kelas').select('nama').eq('id', muridData.kelompok).maybeSingle();
+        kelasNama = kelasData2?.nama || muridData.kelompok;
+      }
     }
   } catch(e) { console.error('Gagal muat kelas ortu:', e); }
   const kelasEl = document.getElementById('po-kelas-info');
   if (kelasEl) kelasEl.textContent = (kelasNama !== '-' ? kelasNama : '-') + ' · KB-TKIT Istiqomah';
-  set('po-stat-kelompok', kelasNama.replace('Kelompok ','').replace('Kelas ','') || '-');
+  const kelassingkat = kelasNama.replace('Kelompok ','').replace('Kelas ','');
+  set('po-stat-kelompok', kelassingkat || '-');
   const now = new Date();
   const bulanIni = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   const tglAwal = bulanIni+'-01';
