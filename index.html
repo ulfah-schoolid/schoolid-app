@@ -3898,94 +3898,16 @@
       </div>
     </div>
     <div style="padding:10px 16px;flex-shrink:0;">
-      <select style="width:100%;font-size:13px;font-weight:700;color:var(--gray-900);border:1.5px solid var(--gray-300);border-radius:20px;padding:8px 14px;background:white;cursor:pointer;outline:none;text-align:center;">
-        <option>16 Juni 2026</option>
-        <option>15 Juni 2026</option>
-        <option>14 Juni 2026</option>
-      </select>
+      <input type="date" id="tl-tanggal" style="width:100%;font-size:13px;font-weight:700;color:var(--gray-900);border:1.5px solid var(--gray-300);border-radius:20px;padding:8px 14px;background:white;cursor:pointer;outline:none;text-align:center;" onchange="muatTimelineOrtu(this.value)">
     </div>
     <div class="scroll-content">
-      <div class="tl2-list">
-        <div class="tl2-item">
-          <div class="tl2-line">
-            <div class="tl2-dot"></div>
-            <div class="tl2-bar"></div>
-          </div>
-          <div class="tl2-content">
-            <div class="tl2-time">08:00 - 09:00</div>
-            <div class="tl2-row">
-              <div class="tl2-main">
-                <div class="tl2-title">Melipat Kertas</div>
-                <div class="tl2-chips">
-                  <span class="tl2-chip-cat">Motorik Halus</span>
-                  <span class="grade-badge grade-BSH">BSH</span>
-                </div>
-              </div>
-              <div class="tl2-thumb">📄</div>
-            </div>
-          </div>
-        </div>
-        <div class="tl2-item">
-          <div class="tl2-line">
-            <div class="tl2-dot"></div>
-            <div class="tl2-bar"></div>
-          </div>
-          <div class="tl2-content">
-            <div class="tl2-time">09:30 - 10:00</div>
-            <div class="tl2-row">
-              <div class="tl2-main">
-                <div class="tl2-title">Bernyanyi Bersama</div>
-                <div class="tl2-chips">
-                  <span class="tl2-chip-cat">Bahasa</span>
-                  <span class="grade-badge grade-BSB">BSB</span>
-                </div>
-              </div>
-              <div class="tl2-thumb" style="background:linear-gradient(135deg,#a8d5a2,#6db66a);">🎤</div>
-            </div>
-          </div>
-        </div>
-        <div class="tl2-item">
-          <div class="tl2-line">
-            <div class="tl2-dot"></div>
-            <div class="tl2-bar"></div>
-          </div>
-          <div class="tl2-content">
-            <div class="tl2-time">10:30 - 11:00</div>
-            <div class="tl2-row">
-              <div class="tl2-main">
-                <div class="tl2-title">Mewarnai Gambar</div>
-                <div class="tl2-chips">
-                  <span class="tl2-chip-cat">Seni</span>
-                  <span class="grade-badge grade-BSH">BSH</span>
-                </div>
-              </div>
-              <div class="tl2-thumb" style="background:linear-gradient(135deg,#FFE0B2,#FFCC80);">🎨</div>
-            </div>
-          </div>
-        </div>
-        <div class="tl2-item">
-          <div class="tl2-line">
-            <div class="tl2-dot"></div>
-          </div>
-          <div class="tl2-content">
-            <div class="tl2-time">13:00 - 13:30</div>
-            <div class="tl2-row">
-              <div class="tl2-main">
-                <div class="tl2-title">Bermain Puzzle</div>
-                <div class="tl2-chips">
-                  <span class="tl2-chip-cat">Kognitif</span>
-                  <span class="grade-badge grade-BSH">BSH</span>
-                </div>
-              </div>
-              <div class="tl2-thumb" style="background:linear-gradient(135deg,#D1C4E9,#B39DDB);">🧩</div>
-            </div>
-          </div>
-        </div>
+      <div class="tl2-list" id="tl-list">
+        <div style="text-align:center;padding:40px 16px;color:var(--gray-400);font-size:13px;">Memuat aktivitas...</div>
       </div>
       <div class="section" style="padding-top:0;">
         <div class="section-title">Catatan Guru Hari Ini</div>
         <div style="background:white;border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);">
-          <div class="timeline-note">Ananda Aisyah mengikuti semua kegiatan dengan sangat baik dan antusias hari ini. Suaranya merdu saat bernyanyi dan pilihan warnanya sangat kreatif. 😊</div>
+          <div id="tl-catatan-guru" class="timeline-note" style="color:var(--gray-400);font-style:italic;">Belum ada catatan dari guru hari ini.</div>
         </div>
       </div>
     </div>
@@ -4933,38 +4855,11 @@
       <h2>Pesan</h2>
     </div>
     <div class="scroll-content">
-      <div class="chat-list">
-        <div class="chat-item" onclick="showToast('Fitur chat segera hadir!')">
-          <div class="chat-avatar av-guru"></div>
-          <div class="chat-info">
-            <div class="chat-name">Wali Kelas</div>
-            <div class="chat-preview">Terima kasih atas informasinya 😊</div>
-          </div>
-          <div class="chat-time">10:30</div>
-        </div>
-        <div class="chat-item" onclick="showToast('Membuka chat Bu Siti')">
-          <div class="chat-avatar" style="background:linear-gradient(135deg,#9C27B0,#CE93D8);font-size:14px;">BS</div>
-          <div class="chat-info">
-            <div class="chat-name">Bu Siti</div>
-            <div class="chat-preview">Baik, sampai jumpa besok</div>
-          </div>
-          <div class="chat-time">Kemarin</div>
-        </div>
-        <div class="chat-item" onclick="showToast('Membuka pengumuman sekolah')">
-          <div class="chat-avatar" style="background:linear-gradient(135deg,var(--green),#81C784);font-size:22px;">🏫</div>
-          <div class="chat-info">
-            <div class="chat-name">Pengumuman Sekolah</div>
-            <div class="chat-preview">Rapat koordinasi Sabtu 20 Juni...</div>
-          </div>
-          <div class="chat-time">2 hari lalu</div>
-        </div>
-        <div class="chat-item" onclick="showToast('Membuka chat Pak Andi')">
-          <div class="chat-avatar" style="background:linear-gradient(135deg,#FF9800,#FFCC80);font-size:14px;">PA</div>
-          <div class="chat-info">
-            <div class="chat-name">Pak Andi</div>
-            <div class="chat-preview">Terima kasih, rapor sudah diterima</div>
-          </div>
-          <div class="chat-time">3 hari lalu</div>
+      <div class="chat-list" id="pesan-list">
+        <div style="text-align:center;padding:60px 16px;color:var(--gray-400);">
+          <div style="font-size:40px;margin-bottom:12px;">💬</div>
+          <div style="font-size:14px;font-weight:600;">Belum ada pesan</div>
+          <div style="font-size:12px;margin-top:4px;">Fitur pesan antara ortu dan guru akan segera hadir</div>
         </div>
       </div>
     </div>
@@ -5220,10 +5115,10 @@
           <div id="ortu-avatar-display" class="av-ortu" style="width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);"></div>
           <button onclick="bukaAvatarPicker('ortu')" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:12px;cursor:pointer;">✏️</button>
         </div>
-        <div style="font-weight:700;font-size:17px;color:white;">Ibu Sari Dewi</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:3px;">Orang Tua · sari.dewi@email.com</div>
+        <div id="po-nama" style="font-weight:700;font-size:17px;color:white;">-</div>
+        <div id="po-email" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:3px;">Orang Tua · -</div>
         <div style="margin-top:10px;display:flex;justify-content:center;gap:8px;">
-          <span style="background:rgba(255,255,255,0.2);color:white;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;">📱 0812-3456-7890</span>
+          <span id="po-hp" style="background:rgba(255,255,255,0.2);color:white;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;">📱 -</span>
         </div>
       </div>
       <!-- Kartu Info Anak -->
@@ -5236,17 +5131,17 @@
           </div>
           <div style="flex:1;">
             <div style="font-weight:700;font-size:15px;" id="ortu-anak-pm-nama">-</div>
-            <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Kelompok A · TK SchoolID</div>
+            <div id="po-kelas-info" style="font-size:12px;color:var(--gray-500);margin-top:2px;">- · KB-TKIT Istiqomah</div>
             <div style="display:flex;gap:6px;margin-top:5px;">
-              <span style="background:#E8F5E9;color:var(--green);font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">BSH ⭐</span>
-              <span style="background:#E3F2FD;color:#1565C0;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">Hadir 92%</span>
+              <span id="po-badge-nilai" style="background:#E8F5E9;color:var(--green);font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">- ⭐</span>
+              <span id="po-badge-hadir" style="background:#E3F2FD;color:#1565C0;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;">Hadir -</span>
             </div>
           </div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-100);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
-          <div><div style="font-size:18px;font-weight:800;color:var(--green);">23</div><div style="font-size:10px;color:var(--gray-500);">Aktivitas</div></div>
-          <div><div style="font-size:18px;font-weight:800;color:#FF9800;">BSH</div><div style="font-size:10px;color:var(--gray-500);">Rata-rata</div></div>
-          <div><div style="font-size:18px;font-weight:800;color:#2196F3;">A</div><div style="font-size:10px;color:var(--gray-500);">Kelompok</div></div>
+          <div><div id="po-stat-aktivitas" style="font-size:18px;font-weight:800;color:var(--green);">-</div><div style="font-size:10px;color:var(--gray-500);">Aktivitas</div></div>
+          <div><div id="po-stat-ratarata" style="font-size:18px;font-weight:800;color:#FF9800;">-</div><div style="font-size:10px;color:var(--gray-500);">Rata-rata</div></div>
+          <div><div id="po-stat-kelompok" style="font-size:18px;font-weight:800;color:#2196F3;">-</div><div style="font-size:10px;color:var(--gray-500);">Kelompok</div></div>
         </div>
       </div>
       <!-- Menu -->
@@ -10517,7 +10412,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
     }
     goTo('dashboard-guru');
   }
-  else if (profile.role === 'ortu') goTo('timeline-ortu');
+  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(()=>{ initTimelineOrtu(); muatProfilOrtu(); }, 300); }
   else if (profile.role === 'kepala') goTo('dashboard-kepala');
 }
 
@@ -10619,6 +10514,135 @@ function goToFromDashboard(screenId, dashboardId) {
     if (scrollable) scrollable.scrollTop = 0;
   }
 }
+
+// ===== TIMELINE ORTU (DATA REAL) =====
+const ASPEK_EMOJI = {
+  'Motorik Halus':'✍️','Kreativitas':'🎨','Bahasa':'💬',
+  'Kognitif':'🧠','Sosial':'❤️','Agama':'🕌','Seni':'🎨',
+  'Motorik Kasar':'🤸','default':'📄'
+};
+const ASPEK_WARNA = {
+  'Motorik Halus':'#BBDEFB,#90CAF9','Kreativitas':'#FFE0B2,#FFCC80',
+  'Bahasa':'#E1BEE7,#CE93D8','Kognitif':'#D1C4E9,#B39DDB',
+  'Sosial':'#F8BBD0,#F48FB1','Agama':'#C8E6C9,#A5D6A7',
+  'Seni':'#FFE0B2,#FFCC80','default':'#E8F5E9,#A5D6A7'
+};
+
+async function initTimelineOrtu() {
+  const today = new Date().toISOString().split('T')[0];
+  const tlInput = document.getElementById('tl-tanggal');
+  if (tlInput) tlInput.value = today;
+  await muatTimelineOrtu(today);
+}
+
+async function muatTimelineOrtu(tanggal) {
+  if (!tanggal) return;
+  const namaAnak = currentUserProfile?.anak_nama || '';
+  const tlList = document.getElementById('tl-list');
+  const catatanEl = document.getElementById('tl-catatan-guru');
+  if (!tlList) return;
+  tlList.innerHTML = '<div style="text-align:center;padding:40px 16px;color:var(--gray-400);font-size:13px;">Memuat...</div>';
+  try {
+    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('id, data').order('updated_at', { ascending: true });
+    const aktHariIni = (aktivitas || []).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+      const tglAkt = d.tanggal || '';
+      const peserta = d.peserta || [];
+      const ikut = !namaAnak || (Array.isArray(peserta) ? peserta.includes(namaAnak) : String(peserta).includes(namaAnak));
+      return tglAkt === tanggal && ikut;
+    });
+    if (aktHariIni.length === 0) {
+      tlList.innerHTML = '<div style="text-align:center;padding:40px 16px;color:var(--gray-400);font-size:13px;">Tidak ada aktivitas hari ini</div>';
+      if (catatanEl) { catatanEl.textContent = 'Belum ada catatan dari guru hari ini.'; catatanEl.style.color = 'var(--gray-400)'; catatanEl.style.fontStyle = 'italic'; }
+      return;
+    }
+    let nilaiHariIni = {};
+    if (namaAnak) {
+      const { data: nilaiRows } = await supabaseClient.from('penilaian').select('aspek, nilai, modul_ajar_id').eq('murid_nama', namaAnak).eq('tanggal', tanggal);
+      (nilaiRows || []).forEach(r => {
+        nilaiHariIni[r.modul_ajar_id] = nilaiHariIni[r.modul_ajar_id] || {};
+        nilaiHariIni[r.modul_ajar_id][r.aspek] = r.nilai;
+      });
+    }
+    tlList.innerHTML = aktHariIni.map((a, idx) => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
+      const nama = d.nama || d.judul || 'Aktivitas';
+      const aspek = d.aspek || 'default';
+      const mulai = d.waktu_mulai ? d.waktu_mulai.slice(0,5) : '';
+      const selesai = d.waktu_selesai ? d.waktu_selesai.slice(0,5) : '';
+      const waktu = mulai ? (selesai ? mulai+' - '+selesai : mulai) : '';
+      const emoji = ASPEK_EMOJI[aspek] || ASPEK_EMOJI['default'];
+      const warna = ASPEK_WARNA[aspek] || ASPEK_WARNA['default'];
+      const isLast = idx === aktHariIni.length - 1;
+      const nilaiAkt = nilaiHariIni[a.id];
+      let badgeHtml = '';
+      if (nilaiAkt) {
+        const aspekNilai = Object.entries(nilaiAkt);
+        if (aspekNilai.length > 0) {
+          const avgNilai = Math.round(aspekNilai.reduce((s,[,v]) => s+v, 0) / aspekNilai.length);
+          const info = nilaiKeLabel(avgNilai);
+          badgeHtml = '<span style="background:'+info.bg+';color:'+info.color+';font-size:10px;font-weight:800;padding:2px 7px;border-radius:10px;">'+info.label+'</span>';
+        }
+      }
+      return '<div class="tl2-item"><div class="tl2-line"><div class="tl2-dot"></div>'+(isLast?'':'<div class="tl2-bar"></div>')+'</div><div class="tl2-content">'+(waktu?'<div class="tl2-time">'+waktu+'</div>':'')+'<div class="tl2-row"><div class="tl2-main"><div class="tl2-title">'+nama+'</div><div class="tl2-chips"><span class="tl2-chip-cat">'+(aspek!=='default'?aspek:'')+'</span>'+badgeHtml+'</div></div><div class="tl2-thumb" style="background:linear-gradient(135deg,'+warna+');">'+emoji+'</div></div></div></div>';
+    }).join('');
+    const catatanList = aktHariIni.map(a => { const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {}); return d.deskripsi || d.catatan || ''; }).filter(Boolean);
+    if (catatanEl) {
+      if (catatanList.length > 0) { catatanEl.textContent = catatanList[catatanList.length-1]; catatanEl.style.color = ''; catatanEl.style.fontStyle = ''; }
+      else { catatanEl.textContent = 'Belum ada catatan dari guru hari ini.'; catatanEl.style.color = 'var(--gray-400)'; catatanEl.style.fontStyle = 'italic'; }
+    }
+  } catch(e) {
+    console.error('Gagal muat timeline ortu:', e);
+    tlList.innerHTML = '<div style="text-align:center;padding:40px 16px;color:var(--gray-400);font-size:13px;">Gagal memuat data</div>';
+  }
+}
+
+// ===== PROFIL ORTU (DATA REAL) =====
+async function muatProfilOrtu() {
+  const p = currentUserProfile;
+  if (!p) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
+  set('po-nama', p.nama || p.name || '-');
+  const emailEl = document.getElementById('po-email');
+  if (emailEl) emailEl.textContent = 'Orang Tua · ' + (p.email || '-');
+  set('po-hp', '📱 ' + (p.hp || p.phone || '-'));
+  set('ortu-anak-pm-nama', p.anak_nama || '');
+  const murid = getMuridList().find(m => m.nama === (p.anak_nama||''));
+  const kelas = murid ? getKelasList().find(k => k.id === murid.kelompok) : null;
+  const kelasNama = kelas ? kelas.nama : (murid?.kelompok || '-');
+  const kelasEl = document.getElementById('po-kelas-info');
+  if (kelasEl) kelasEl.textContent = kelasNama + ' · KB-TKIT Istiqomah';
+  set('po-stat-kelompok', kelasNama.replace('Kelompok ','').replace('Kelas ','') || '-');
+  const now = new Date();
+  const bulanIni = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const tglAwal = bulanIni+'-01';
+  const lastDay = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const tglAkhir = bulanIni+'-'+lastDay;
+  try {
+    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('id, data');
+    const aktBulan = (aktivitas||[]).filter(a => { const d = typeof a.data==='string'?JSON.parse(a.data):(a.data||{}); return (d.tanggal||'').startsWith(bulanIni); });
+    set('po-stat-aktivitas', aktBulan.length||'0');
+  } catch(e) { set('po-stat-aktivitas','-'); }
+  try {
+    const [{ data: nilaiRows },{ data: absData }] = await Promise.all([
+      supabaseClient.from('penilaian').select('nilai').eq('murid_nama', p.anak_nama||'').gte('tanggal',tglAwal).lte('tanggal',tglAkhir),
+      supabaseClient.from('absensi').select('status').eq('murid_nama', p.anak_nama||'').gte('tanggal',tglAwal).lte('tanggal',tglAkhir)
+    ]);
+    if (nilaiRows && nilaiRows.length > 0) {
+      const avg = Math.round(nilaiRows.reduce((s,r)=>s+r.nilai,0)/nilaiRows.length);
+      const info = nilaiKeLabel(avg);
+      set('po-stat-ratarata', info.label);
+      const rataEl = document.getElementById('po-stat-ratarata'); if(rataEl) rataEl.style.color = info.color;
+      const badgeEl = document.getElementById('po-badge-nilai'); if(badgeEl){ badgeEl.textContent=info.label+' ⭐'; badgeEl.style.background=info.bg; badgeEl.style.color=info.color; }
+    } else { set('po-stat-ratarata','-'); }
+    if (absData && absData.length > 0) {
+      const hadir = absData.filter(a=>a.status==='H').length;
+      const pct = Math.round((hadir/absData.length)*100);
+      const hadirEl = document.getElementById('po-badge-hadir'); if(hadirEl) hadirEl.textContent='Hadir '+pct+'%';
+    }
+  } catch(e) { console.error('Gagal muat profil ortu stats:',e); }
+}
+// ===== END PROFIL ORTU =====
 
 // ===== LAPORAN PERKEMBANGAN ORTU (DATA REAL) =====
 let lbBulan = null; // { year, month } — 0-based month
@@ -10896,8 +10920,9 @@ function switchTabOrtu(btn, screenId) {
 
   if (screenId === 'dokumentasi') updateDokumentasiNav();
   if (screenId === 'pesan') updatePesanNav();
-  if (screenId === 'profil-ortu') applyOrtuAvatars();
+  if (screenId === 'profil-ortu') { applyOrtuAvatars(); muatProfilOrtu(); }
   if (screenId === 'laporan-bulanan') initLaporanBulanan();
+  if (screenId === 'timeline-ortu') initTimelineOrtu();
 }
 function switchTabKepala(btn, screenId) { switchTab(screenId, btn, 'kepala'); }
 
