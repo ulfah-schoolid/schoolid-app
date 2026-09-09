@@ -4613,12 +4613,12 @@
           <div class="section">
             <div class="section-title">Laporan Sekolah</div>
             <div style="display:flex;flex-direction:column;gap:8px;">
-              <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="goTo('laporan-bulanan')">
+              <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="bukaLaporanKepala()">
                 <div class="quick-btn-icon" style="background:#E8F5E9;">📊</div>
                 <div style="flex:1;text-align:left;margin-left:4px;"><div style="font-weight:700;font-size:13px;">Laporan Bulanan</div><div style="font-size:11px;color:var(--gray-500);">Lihat perkembangan bulan ini</div></div>
                 <span style="color:var(--gray-300);">›</span>
               </div>
-              <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="goTo('rapor')">
+              <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="bukaRaporKepala()">
                 <div class="quick-btn-icon" style="background:#FFF8E1;">📋</div>
                 <div style="flex:1;text-align:left;margin-left:4px;"><div style="font-weight:700;font-size:13px;">Rapor Murid</div><div style="font-size:11px;color:var(--gray-500);">Generate rapor semester</div></div>
                 <span style="color:var(--gray-300);">›</span>
@@ -4751,6 +4751,52 @@
     </div>
     <div class="scroll-content">
       <div id="akd-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== LAPORAN BULANAN KEPALA SEKOLAH ===== -->
+  <div id="laporan-kepala" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <h2>Laporan Bulanan</h2>
+    </div>
+    <div class="scroll-content">
+      <!-- Pilih bulan -->
+      <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;background:white;border-bottom:1px solid var(--gray-100);">
+        <button onclick="gantiLaporanKepala(-1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--green);">‹</button>
+        <span style="font-weight:700;font-size:15px;" id="lk-judul-bulan">-</span>
+        <button onclick="gantiLaporanKepala(1)" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--green);">›</button>
+      </div>
+      <!-- Stat ringkasan -->
+      <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
+          <div id="lk-stat-murid" style="font-size:22px;font-weight:800;color:var(--green);">-</div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Murid Aktif</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
+          <div id="lk-stat-aktivitas" style="font-size:22px;font-weight:800;color:#2196F3;">-</div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Aktivitas</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;text-align:center;">
+          <div id="lk-stat-kehadiran" style="font-size:22px;font-weight:800;color:#FF9800;">-</div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Kehadiran</div>
+        </div>
+      </div>
+      <!-- Perkembangan per kelas -->
+      <div class="section" style="padding-top:0;">
+        <div class="section-title">Rata-rata Perkembangan Per Kelas</div>
+        <div id="lk-kelas-list" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="text-align:center;padding:30px;color:var(--gray-400);font-size:13px;">Memuat data...</div>
+        </div>
+      </div>
+      <!-- Aktivitas terbaru -->
+      <div class="section" style="padding-top:0;">
+        <div class="section-title">Aktivitas Terbaru</div>
+        <div id="lk-aktivitas-list" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div style="text-align:center;padding:30px;color:var(--gray-400);font-size:13px;">Memuat data...</div>
+        </div>
+      </div>
       <div style="height:16px;"></div>
     </div>
   </div>
@@ -10534,6 +10580,79 @@ function goToFromDashboard(screenId, dashboardId) {
     if (scrollable) scrollable.scrollTop = 0;
   }
 }
+
+// ===== LAPORAN BULANAN KEPALA =====
+let lkBulan = null;
+
+function bukaLaporanKepala() {
+  goTo('laporan-kepala');
+  if (!lkBulan) { const now = new Date(); lkBulan = { year: now.getFullYear(), month: now.getMonth() }; }
+  muatLaporanKepala();
+}
+
+function bukaRaporKepala() {
+  goTo('kepala-arsip');
+  setTimeout(() => pilihTabArsip('rapor'), 200);
+}
+
+function gantiLaporanKepala(delta) {
+  if (!lkBulan) return;
+  let m = lkBulan.month + delta, y = lkBulan.year;
+  if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; }
+  lkBulan = { year: y, month: m };
+  muatLaporanKepala();
+}
+
+async function muatLaporanKepala() {
+  if (!lkBulan) return;
+  const { year, month } = lkBulan;
+  const judulEl = document.getElementById('lk-judul-bulan');
+  if (judulEl) judulEl.textContent = namaBulanId(month) + ' ' + year;
+  const tglAwal = year+'-'+String(month+1).padStart(2,'0')+'-01';
+  const lastDay = new Date(year, month+1, 0).getDate();
+  const tglAkhir = year+'-'+String(month+1).padStart(2,'0')+'-'+lastDay;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? '-'; };
+  try {
+    const { count: jmlMurid } = await supabaseClient.from('murid').select('*', { count:'exact', head:true }).eq('status','aktif');
+    set('lk-stat-murid', jmlMurid ?? '-');
+
+    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('id, data');
+    const bulanStr = year+'-'+String(month+1).padStart(2,'0');
+    const aktBulan = (aktivitas||[]).filter(a => { const d = typeof a.data==='string'?JSON.parse(a.data):(a.data||{}); return (d.tanggal||'').startsWith(bulanStr); });
+    set('lk-stat-aktivitas', aktBulan.length);
+
+    const { data: absData } = await supabaseClient.from('absensi').select('status').gte('tanggal',tglAwal).lte('tanggal',tglAkhir);
+    if (absData && absData.length > 0) { const hadir = absData.filter(a => a.status === 'H').length; set('lk-stat-kehadiran', Math.round((hadir/absData.length)*100)+'%'); }
+    else { set('lk-stat-kehadiran', '-'); }
+
+    const [{ data: kelasList }, { data: nilaiData }] = await Promise.all([
+      supabaseClient.from('kelas').select('id, nama'),
+      supabaseClient.from('penilaian').select('nilai, kelompok').gte('tanggal',tglAwal).lte('tanggal',tglAkhir)
+    ]);
+    const kelasListEl = document.getElementById('lk-kelas-list');
+    if (kelasListEl && kelasList) {
+      if (!nilaiData || nilaiData.length === 0) {
+        kelasListEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);font-size:13px;">Belum ada data penilaian bulan ini</div>';
+      } else {
+        kelasListEl.innerHTML = kelasList.map(k => {
+          const nk = (nilaiData||[]).filter(n => n.kelompok === k.id || n.kelompok === k.nama);
+          if (!nk.length) return '';
+          const avg = Math.round(nk.reduce((s,n)=>s+n.nilai,0)/nk.length);
+          const info = nilaiKeLabel(avg);
+          return '<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;"><div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;">🏫 '+k.nama+'</span><span style="font-size:11px;font-weight:800;padding:3px 8px;border-radius:10px;background:'+info.bg+';color:'+info.color+';">'+info.label+'</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+avg+'%;background:'+info.color+';"></div></div><div style="font-size:11px;color:var(--gray-500);margin-top:4px;">'+nk.length+' data penilaian</div></div>';
+        }).filter(Boolean).join('') || '<div style="text-align:center;padding:30px;color:var(--gray-400);font-size:13px;">Belum ada data bulan ini</div>';
+      }
+    }
+
+    const aktEl = document.getElementById('lk-aktivitas-list');
+    if (aktEl) {
+      const aktTerbaru = aktBulan.slice(-5).reverse();
+      if (!aktTerbaru.length) { aktEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);font-size:13px;">Belum ada aktivitas bulan ini</div>'; }
+      else { aktEl.innerHTML = aktTerbaru.map((a,idx) => { const d = typeof a.data==='string'?JSON.parse(a.data):(a.data||{}); const isLast = idx===aktTerbaru.length-1; return '<div style="padding:12px 14px;'+(isLast?'':'border-bottom:1px solid var(--gray-100);')+'display:flex;align-items:center;gap:12px;"><div style="width:38px;height:38px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📌</div><div style="flex:1;"><div style="font-weight:700;font-size:13px;">'+(d.nama||d.judul||'Aktivitas')+'</div><div style="font-size:11px;color:var(--gray-500);margin-top:2px;">'+(d.aspek||'-')+' · '+(d.tanggal||'')+'</div></div></div>'; }).join(''); }
+    }
+  } catch(e) { console.error('Gagal muat laporan kepala:', e); }
+}
+// ===== END LAPORAN BULANAN KEPALA =====
 
 // ===== TIMELINE ORTU (DATA REAL) =====
 const ASPEK_EMOJI = {
