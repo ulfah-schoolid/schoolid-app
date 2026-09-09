@@ -5618,41 +5618,40 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
       <h2>Informasi Sekolah</h2>
+      <button id="is-edit-btn" onclick="toggleEditInfoSekolah()" style="margin-left:auto;border:none;background:none;color:var(--green);font-size:13px;font-weight:700;cursor:pointer;padding:6px 10px;">✏️ Edit</button>
     </div>
+    <!-- Input file tersembunyi untuk logo -->
+    <input type="file" id="is-logo-input" accept="image/*" style="display:none;" onchange="previewLogoSekolah(this)">
     <div class="form-body">
-      <div style="text-align:center;padding:16px 0 8px;">
-        <div style="width:80px;height:80px;border-radius:16px;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 8px;">🏫</div>
-        <div style="font-size:13px;color:var(--green);font-weight:600;cursor:pointer;">✏️ Ganti Logo Sekolah</div>
+      <!-- Logo sekolah -->
+      <div style="text-align:center;padding:16px 0 8px;" onclick="document.getElementById('is-logo-input').click()">
+        <div id="is-logo-wrap" style="width:80px;height:80px;border-radius:16px;background:linear-gradient(135deg,#E8F5E9,#C8E6C9);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 8px;overflow:hidden;">🏫</div>
+        <div id="is-logo-hint" style="font-size:13px;color:var(--green);font-weight:600;cursor:pointer;display:none;">📷 Ganti Logo Sekolah</div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Nama Sekolah</label>
-        <input type="text" id="is-nama" class="form-input" value="KB-TKIT Istiqomah Penumping">
+      <!-- Mode view -->
+      <div id="is-view-mode">
+        <div class="form-group"><label class="form-label">Nama Sekolah</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);" id="is-view-nama">-</div></div>
+        <div class="form-group"><label class="form-label">NPSN</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);" id="is-view-npsn">-</div></div>
+        <div class="form-group"><label class="form-label">Alamat</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);min-height:60px;" id="is-view-alamat">-</div></div>
+        <div class="form-group"><label class="form-label">Nomor Telepon</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);" id="is-view-telp">-</div></div>
+        <div class="form-group"><label class="form-label">Email Sekolah</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);" id="is-view-email">-</div></div>
+        <div class="form-group"><label class="form-label">Kepala Sekolah</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);" id="is-view-kepsek">-</div></div>
+        <div class="form-group"><label class="form-label">Tahun Ajaran Aktif</label><div class="form-input" style="background:#f9f9f9;color:var(--gray-700);" id="is-view-tahun">-</div></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">NPSN</label>
-        <input type="text" id="is-npsn" class="form-input" value="">
+      <!-- Mode edit -->
+      <div id="is-edit-mode" style="display:none;">
+        <div class="form-group"><label class="form-label">Nama Sekolah</label><input type="text" id="is-nama" class="form-input"></div>
+        <div class="form-group"><label class="form-label">NPSN</label><input type="text" id="is-npsn" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Alamat</label><textarea id="is-alamat" class="form-textarea"></textarea></div>
+        <div class="form-group"><label class="form-label">Nomor Telepon</label><input type="tel" id="is-telp" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Email Sekolah</label><input type="email" id="is-email" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Kepala Sekolah</label><input type="text" id="is-kepsek" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Tahun Ajaran Aktif</label><input type="text" id="is-tahun-ajaran" class="form-input"></div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <button onclick="toggleEditInfoSekolah()" style="flex:1;padding:13px;background:white;border:1.5px solid var(--gray-300);border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;color:var(--gray-600);">Batal</button>
+          <button class="btn-save" onclick="simpanInfoSekolah()" style="flex:2;margin:0;">💾 Simpan</button>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Alamat</label>
-        <textarea id="is-alamat" class="form-textarea">Penumping, Surakarta</textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Nomor Telepon</label>
-        <input type="tel" id="is-telp" class="form-input" value="">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Email Sekolah</label>
-        <input type="email" id="is-email" class="form-input" value="">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Kepala Sekolah</label>
-        <input type="text" id="is-kepsek" class="form-input" value="">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Tahun Ajaran Aktif</label>
-        <input type="text" id="is-tahun-ajaran" class="form-input" value="2026/2027">
-      </div>
-      <button class="btn-save" onclick="simpanInfoSekolah()">💾 Simpan</button>
     </div>
   </div>
 
@@ -7204,9 +7203,18 @@ async function muatStatDashboardKepala() {
     const bulanIni = new Date().toISOString().slice(0, 7); // YYYY-MM
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? '-'; };
 
-    // Nama kepala dari profil
-    const namaKepala = currentUserProfile?.nama || 'Kepala Sekolah';
-    set('ks-nama-kepala', namaKepala);
+    // Nama kepala dari profil, fallback dari tabel guru
+    let namaKepala = currentUserProfile?.nama || '';
+    if (!namaKepala) {
+      try {
+        const { data: guruData } = await supabaseClient
+          .from('guru').select('nama')
+          .eq('user_id', currentUserProfile?.id || '')
+          .maybeSingle();
+        namaKepala = guruData?.nama || '';
+      } catch(e) {}
+    }
+    set('ks-nama-kepala', namaKepala || 'Kepala Sekolah');
 
     // Jumlah guru aktif
     const { count: jmlGuru } = await supabaseClient
@@ -8284,17 +8292,78 @@ async function getInfoSekolah() {
 
 async function loadInfoSekolah() {
   const d = await getInfoSekolah();
-  document.getElementById('is-nama').value = d.nama;
-  document.getElementById('is-npsn').value = d.npsn;
-  document.getElementById('is-alamat').value = d.alamat;
-  document.getElementById('is-telp').value = d.telp;
-  document.getElementById('is-email').value = d.email;
-  document.getElementById('is-kepsek').value = d.kepsek;
-  document.getElementById('is-tahun-ajaran').value = d.tahunAjaran;
+  // Isi view mode
+  const sv = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
+  sv('is-view-nama', d.nama);
+  sv('is-view-npsn', d.npsn);
+  sv('is-view-alamat', d.alamat);
+  sv('is-view-telp', d.telp);
+  sv('is-view-email', d.email);
+  sv('is-view-kepsek', d.kepsek);
+  sv('is-view-tahun', d.tahunAjaran);
+  // Isi edit mode
+  const si = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  si('is-nama', d.nama);
+  si('is-npsn', d.npsn);
+  si('is-alamat', d.alamat);
+  si('is-telp', d.telp);
+  si('is-email', d.email);
+  si('is-kepsek', d.kepsek);
+  si('is-tahun-ajaran', d.tahunAjaran);
+  // Logo
+  const logoWrap = document.getElementById('is-logo-wrap');
+  if (logoWrap && d.logo_url) {
+    logoWrap.innerHTML = '<img src="'+d.logo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">';
+  }
+  // Default view mode
+  const viewMode = document.getElementById('is-view-mode');
+  const editMode = document.getElementById('is-edit-mode');
+  const editBtn = document.getElementById('is-edit-btn');
+  const logoHint = document.getElementById('is-logo-hint');
+  if (viewMode) viewMode.style.display = '';
+  if (editMode) editMode.style.display = 'none';
+  if (editBtn) editBtn.textContent = '✏️ Edit';
+  if (logoHint) logoHint.style.display = 'none';
+}
+
+function toggleEditInfoSekolah() {
+  const viewMode = document.getElementById('is-view-mode');
+  const editMode = document.getElementById('is-edit-mode');
+  const editBtn = document.getElementById('is-edit-btn');
+  const logoHint = document.getElementById('is-logo-hint');
+  const isEditing = editMode && editMode.style.display !== 'none';
+  if (isEditing) {
+    // Kembali ke view mode
+    if (viewMode) viewMode.style.display = '';
+    if (editMode) editMode.style.display = 'none';
+    if (editBtn) editBtn.textContent = '✏️ Edit';
+    if (logoHint) logoHint.style.display = 'none';
+  } else {
+    // Masuk edit mode
+    if (viewMode) viewMode.style.display = 'none';
+    if (editMode) editMode.style.display = '';
+    if (editBtn) editBtn.textContent = '';
+    if (logoHint) logoHint.style.display = '';
+  }
+}
+
+let isLogoBase64 = null;
+function previewLogoSekolah(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (file.size > 2 * 1024 * 1024) { showToast('Ukuran logo maksimal 2MB ⚠️'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    isLogoBase64 = e.target.result;
+    const logoWrap = document.getElementById('is-logo-wrap');
+    if (logoWrap) logoWrap.innerHTML = '<img src="'+isLogoBase64+'" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">';
+    showToast('Logo dipilih, klik Simpan untuk menyimpan');
+  };
+  reader.readAsDataURL(file);
 }
 
 async function simpanInfoSekolah() {
-  const data = {
+  const dataToSave = {
     nama: document.getElementById('is-nama').value.trim(),
     npsn: document.getElementById('is-npsn').value.trim(),
     alamat: document.getElementById('is-alamat').value.trim(),
@@ -8303,20 +8372,31 @@ async function simpanInfoSekolah() {
     kepsek: document.getElementById('is-kepsek').value.trim(),
     tahun_ajaran: document.getElementById('is-tahun-ajaran').value.trim()
   };
+  if (isLogoBase64) dataToSave.logo_url = isLogoBase64;
   showLoading();
   try {
     const { data: existing } = await supabaseClient.from('info_sekolah').select('id').limit(1).maybeSingle();
     if (existing) {
-      const { error } = await supabaseClient.from('info_sekolah').update(data).eq('id', existing.id);
+      const { error } = await supabaseClient.from('info_sekolah').update(dataToSave).eq('id', existing.id);
       if (error) throw error;
     } else {
-      const { error } = await supabaseClient.from('info_sekolah').insert(data);
+      const { error } = await supabaseClient.from('info_sekolah').insert(dataToSave);
       if (error) throw error;
     }
-    infoSekolahCache = null; // reset cache
+    infoSekolahCache = null;
+    isLogoBase64 = null;
+    // Update nama kepala di dashboard
+    const ksNamaEl = document.getElementById('ks-nama-kepala');
+    if (ksNamaEl && dataToSave.kepsek) ksNamaEl.textContent = dataToSave.kepsek;
+    // Update profiles juga
+    if (dataToSave.kepsek && currentUserProfile?.id) {
+      await supabaseClient.from('profiles').update({ nama: dataToSave.kepsek }).eq('id', currentUserProfile.id);
+      if (currentUserProfile) currentUserProfile.nama = dataToSave.kepsek;
+    }
     hideLoading();
     showToast('Informasi sekolah berhasil disimpan! ✅');
-    setTimeout(goBack, 300);
+    // Reload view mode
+    await loadInfoSekolah();
   } catch (e) {
     hideLoading();
     showToast('Gagal menyimpan: ' + e.message + ' ⚠️');
@@ -10479,7 +10559,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
     goTo('dashboard-guru');
   }
   else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(()=>{ initTimelineOrtu(); muatProfilOrtu(); }, 300); }
-  else if (profile.role === 'kepala') goTo('dashboard-kepala');
+  else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => muatStatDashboardKepala(), 300); }
 }
 
 async function cekSesiAktif() {
