@@ -10637,7 +10637,9 @@ async function muatProfilOrtu() {
   } catch(e) { console.error('Gagal muat kelas ortu:', e); }
   const kelasEl = document.getElementById('po-kelas-info');
   if (kelasEl) kelasEl.textContent = (kelasNama !== '-' ? kelasNama : '-') + ' · KB-TKIT Istiqomah';
-  const kelassingkat = kelasNama.replace('Kelompok ','').replace('Kelas ','');
+  // Ambil singkatan kelas dari dalam kurung, atau 2 kata pertama
+  const matchKurung = kelasNama.match(/\(([^)]+)\)/);
+  const kelassingkat = matchKurung ? matchKurung[1] : kelasNama.replace('Kelompok ','').replace('Kelas ','').split(' ')[0];
   set('po-stat-kelompok', kelassingkat || '-');
   const now = new Date();
   const bulanIni = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
