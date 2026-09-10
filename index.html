@@ -4589,14 +4589,24 @@
             </div>
           </div>
           <div class="section">
-            <div class="section-title">Komunikasi ke Guru</div>
-            <div onclick="goToFromDashboard('pengumuman-guru-kepala','dashboard-kepala');renderRiwayatPengumuman()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
-              <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#EF6C00,#FF9800);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📢</div>
-              <div style="flex:1;">
-                <div style="font-weight:700;font-size:14px;">Kirim Pengumuman ke Guru</div>
-                <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Pesan satu arah ke semua guru</div>
+            <div class="section-title">Kehadiran & Komunikasi Guru</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div onclick="bukaAbsensiGuru()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+                <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#0288D1,#29B6F6);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📋</div>
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:14px;">Absensi Guru</div>
+                  <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Catat kehadiran guru hari ini</div>
+                </div>
+                <span class="chevron">›</span>
               </div>
-              <span class="chevron">›</span>
+              <div onclick="goToFromDashboard('pengumuman-guru-kepala','dashboard-kepala');renderRiwayatPengumuman()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+                <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#EF6C00,#FF9800);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">📢</div>
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:14px;">Kirim Pengumuman ke Guru</div>
+                  <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Pesan satu arah ke semua guru</div>
+                </div>
+                <span class="chevron">›</span>
+              </div>
             </div>
           </div>
           <div class="section">
@@ -4752,6 +4762,28 @@
     <div class="scroll-content">
       <div id="akd-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
       <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===== ABSENSI GURU (KEPALA) ===== -->
+  <div id="absensi-guru-kepala" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">‹</button>
+      <h2>Absensi Guru</h2>
+    </div>
+    <div class="scroll-content">
+      <div style="padding:12px 16px;background:white;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;">
+        <input type="date" id="ag-tanggal" style="flex:1;font-size:13px;font-weight:700;color:var(--gray-900);border:1.5px solid var(--gray-300);border-radius:20px;padding:8px 14px;background:white;cursor:pointer;outline:none;" onchange="muatAbsensiGuru(this.value)">
+      </div>
+      <div class="section">
+        <div class="section-title">Daftar Guru</div>
+        <div id="ag-list" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="text-align:center;padding:30px;color:var(--gray-400);">Memuat...</div>
+        </div>
+      </div>
+      <div style="padding:0 16px 16px;">
+        <button onclick="simpanAbsensiGuru()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Absensi Guru</button>
+      </div>
     </div>
   </div>
 
@@ -10750,6 +10782,114 @@ function goToFromDashboard(screenId, dashboardId) {
     if (scrollable) scrollable.scrollTop = 0;
   }
 }
+
+// ===== ABSENSI GURU (KEPALA) =====
+let statusAbsensiGuru = {};
+
+function bukaAbsensiGuru() {
+  goTo('absensi-guru-kepala');
+  const today = new Date().toISOString().split('T')[0];
+  const inp = document.getElementById('ag-tanggal');
+  if (inp) inp.value = today;
+  muatAbsensiGuru(today);
+}
+
+async function muatAbsensiGuru(tanggal) {
+  if (!tanggal) return;
+  statusAbsensiGuru = {};
+  const listEl = document.getElementById('ag-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Memuat...</div>';
+
+  // Ambil daftar guru dari cache atau Supabase
+  let guruList = getMuridList ? [] : [];
+  try {
+    const { data: guruData } = await supabaseClient.from('guru').select('nama, id').eq('status','aktif');
+    guruList = guruData || [];
+  } catch(e) { guruList = []; }
+
+  if (guruList.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Belum ada data guru</div>';
+    return;
+  }
+
+  // Ambil status absensi hari itu dari Supabase
+  try {
+    const { data: absData } = await supabaseClient
+      .from('absensi_guru').select('guru_nama, status')
+      .eq('tanggal', tanggal);
+    (absData || []).forEach(r => { statusAbsensiGuru[r.guru_nama] = r.status; });
+  } catch(e) {}
+
+  // Default H untuk yang belum ada
+  guruList.forEach(g => { if (!statusAbsensiGuru[g.nama]) statusAbsensiGuru[g.nama] = 'H'; });
+
+  renderAbsensiGuru(guruList);
+}
+
+function renderAbsensiGuru(guruList) {
+  const listEl = document.getElementById('ag-list');
+  if (!listEl) return;
+  const statusOpts = [
+    { val:'H', label:'H', color:'#1B5E20', bg:'#E8F5E9' },
+    { val:'S', label:'S', color:'#1565C0', bg:'#E3F2FD' },
+    { val:'I', label:'I', color:'#E65100', bg:'#FFF8E1' },
+    { val:'A', label:'A', color:'#B71C1C', bg:'#FFEBEE' }
+  ];
+  listEl.innerHTML = guruList.map(g => {
+    const st = statusAbsensiGuru[g.nama] || 'H';
+    return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;display:flex;align-items:center;gap:10px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#E8F5E9,#A5D6A7);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👩‍🏫</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:var(--gray-900);">${g.nama}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        ${statusOpts.map(o => `<button onclick="setStatusAbsensiGuru('${g.nama}','${o.val}',this)" style="width:32px;height:32px;border-radius:8px;border:2px solid ${st===o.val?o.color:'#eee'};background:${st===o.val?o.bg:'white'};color:${st===o.val?o.color:'var(--gray-400)'};font-size:12px;font-weight:800;cursor:pointer;" data-guru="${g.nama}" data-val="${o.val}">${o.label}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setStatusAbsensiGuru(nama, status, btn) {
+  statusAbsensiGuru[nama] = status;
+  // Update visual semua tombol baris ini
+  const statusOpts = { H:{color:'#1B5E20',bg:'#E8F5E9'}, S:{color:'#1565C0',bg:'#E3F2FD'}, I:{color:'#E65100',bg:'#FFF8E1'}, A:{color:'#B71C1C',bg:'#FFEBEE'} };
+  const row = btn.closest('div[style*="border-radius"]');
+  if (row) {
+    row.querySelectorAll('button[data-guru]').forEach(b => {
+      const val = b.getAttribute('data-val');
+      const isActive = val === status;
+      const opt = statusOpts[val] || {};
+      b.style.border = `2px solid ${isActive ? opt.color : '#eee'}`;
+      b.style.background = isActive ? opt.bg : 'white';
+      b.style.color = isActive ? opt.color : 'var(--gray-400)';
+    });
+  }
+}
+
+async function simpanAbsensiGuru() {
+  const tanggal = document.getElementById('ag-tanggal')?.value;
+  if (!tanggal) { showToast('Pilih tanggal dulu ⚠️'); return; }
+  const rows = Object.entries(statusAbsensiGuru).map(([nama, status]) => ({
+    guru_nama: nama, tanggal, status
+  }));
+  if (rows.length === 0) { showToast('Belum ada data guru ⚠️'); return; }
+  showLoading();
+  try {
+    await supabaseClient.from('absensi_guru').delete().eq('tanggal', tanggal);
+    const { error } = await supabaseClient.from('absensi_guru').insert(rows);
+    if (error) throw error;
+    hideLoading();
+    showToast('Absensi guru berhasil disimpan! ✅');
+    // Refresh stat card
+    muatStatDashboardKepala();
+    setTimeout(goBack, 300);
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal simpan: ' + (e.message||'') + ' ⚠️');
+  }
+}
+// ===== END ABSENSI GURU =====
 
 // ===== LAPORAN BULANAN KEPALA =====
 let lkBulan = null;
