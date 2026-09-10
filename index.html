@@ -7133,16 +7133,27 @@ async function loadRaporData(periode) {
   };
 
   try {
-    // Ambil data rapor dari Supabase
-    const { data: raporData } = await supabaseClient
-      .from('rapor_digital')
+    // Ambil dari rapor_murid (disimpan guru) ATAU rapor_digital (disimpan ortu)
+    let raporRow = null;
+    const { data: raporMurid } = await supabaseClient
+      .from('rapor_murid')
       .select('*')
       .eq('murid_nama', namaAnak)
       .eq('periode', periode)
       .maybeSingle();
+    if (raporMurid) { raporRow = raporMurid; }
+    else {
+      const { data: raporDigital } = await supabaseClient
+        .from('rapor_digital')
+        .select('*')
+        .eq('murid_nama', namaAnak)
+        .eq('periode', periode)
+        .maybeSingle();
+      if (raporDigital) raporRow = raporDigital;
+    }
 
-    if (raporData && raporData.data) {
-      const d = typeof raporData.data === 'string' ? JSON.parse(raporData.data) : raporData.data;
+    if (raporRow && raporRow.data) {
+      const d = typeof raporRow.data === 'string' ? JSON.parse(raporRow.data) : raporRow.data;
       setVal('r-agama-narasi', d.agama_narasi);
       setVal('r-jatidiri-narasi', d.jatidiri_narasi);
       setVal('r-literasi-narasi', d.literasi_narasi);
