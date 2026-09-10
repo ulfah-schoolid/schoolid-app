@@ -7067,7 +7067,7 @@ const RAPOR_KEY = 'schoolid_rapor';
 let raporEditMode = false;
 let raporPeriodeAktif = '';
 
-function bukaRaporPeriode(periode) {
+async function bukaRaporPeriode(periode) {
   raporPeriodeAktif = periode;
   const judulMap = {
     tengah1: 'Lap. Tengah Smt 1',
@@ -7084,7 +7084,7 @@ function bukaRaporPeriode(periode) {
   document.getElementById('r-tgl-rapor').textContent = tglMap[periode] || '';
 
   // Load data tersimpan
-  loadRaporData(periode);
+  await loadRaporData(periode);
 
   // Default mode view (orang tua) atau edit (guru)
   // Cek apakah user adalah guru
