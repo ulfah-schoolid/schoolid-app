@@ -10801,10 +10801,10 @@ async function muatAbsensiGuru(tanggal) {
   if (!listEl) return;
   listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Memuat...</div>';
 
-  // Ambil daftar guru dari cache atau Supabase
-  let guruList = getMuridList ? [] : [];
+  // Ambil daftar guru dari Supabase
+  let guruList = [];
   try {
-    const { data: guruData } = await supabaseClient.from('guru').select('nama, id').eq('status','aktif');
+    const { data: guruData } = await supabaseClient.from('guru').select('nama, id');
     guruList = guruData || [];
   } catch(e) { guruList = []; }
 
