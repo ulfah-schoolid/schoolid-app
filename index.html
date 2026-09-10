@@ -7083,6 +7083,15 @@ async function bukaRaporPeriode(periode) {
   document.getElementById('r-sem-label').textContent = semMap[periode] || 'I';
   document.getElementById('r-tgl-rapor').textContent = tglMap[periode] || '';
 
+  // Pastikan nama anak sudah terisi di r-nama sebelum load data
+  const namaAnakNow = currentUserProfile?.anak_nama || '';
+  if (namaAnakNow) {
+    const rNamaEl = document.getElementById('r-nama');
+    if (rNamaEl && (!rNamaEl.textContent || rNamaEl.textContent === '-')) {
+      rNamaEl.textContent = namaAnakNow;
+    }
+  }
+
   // Load data tersimpan
   await loadRaporData(periode);
 
@@ -7121,8 +7130,16 @@ function toggleEditRapor() {
 }
 
 async function loadRaporData(periode) {
-  const namaAnak = currentUserProfile?.anak_nama || document.getElementById('r-nama')?.textContent || '';
-  if (!namaAnak || namaAnak === '-') return;
+  // Coba dari berbagai sumber nama anak
+  const namaAnak = currentUserProfile?.anak_nama 
+    || document.getElementById('r-nama')?.textContent 
+    || document.getElementById('ortu-rapor-nama')?.textContent 
+    || '';
+  if (!namaAnak || namaAnak === '-' || namaAnak === '') {
+    console.warn('loadRaporData: nama anak kosong, skip load');
+    return;
+  }
+  console.log('loadRaporData: nama=', namaAnak, 'periode=', periode);
 
   const setVal = (id, val) => { const el = document.getElementById(id); if(el && val !== undefined && val !== null) el.value = val; };
   const setView = (id, val) => {
