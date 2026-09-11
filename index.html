@@ -10801,12 +10801,26 @@ async function muatAbsensiGuru(tanggal) {
   if (!listEl) return;
   listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Memuat...</div>';
 
-  // Ambil daftar guru dari Supabase
+  // Ambil daftar guru dari cache atau Supabase
   let guruList = [];
   try {
-    const { data: guruData } = await supabaseClient.from('guru').select('nama, id');
-    guruList = guruData || [];
-  } catch(e) { guruList = []; }
+    // Coba dari muridCache dulu (guru tersimpan sebagai cache)
+    const cached = getMuridList ? null : null;
+    const { data: guruData, error: guruError } = await supabaseClient
+      .from('guru').select('*');
+    if (guruError) throw guruError;
+    if (guruData && guruData.length > 0) {
+      // Handle berbagai format kolom
+      guruList = guruData.map(g => ({
+        nama: g.nama || (g.data && (typeof g.data === 'string' ? JSON.parse(g.data) : g.data).nama) || '-',
+        id: g.id
+      })).filter(g => g.nama && g.nama !== '-');
+    }
+  } catch(e) {
+    console.error('Gagal muat guru:', e);
+    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:red;font-size:12px;">Error: ' + (e.message||'gagal load') + '</div>';
+    return;
+  }
 
   if (guruList.length === 0) {
     listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Belum ada data guru</div>';
