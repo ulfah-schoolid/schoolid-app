@@ -6343,7 +6343,7 @@ function goBack() {
       'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view'];
 
     const kepalaScreens = ['laporan-kepala','kalender-kepala','pendaftaran-masuk',
-      'detail-pendaftaran','pengaturan-kepala'];
+      'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala'];
 
     if (sharedScreens.includes(id)) {
       if (currentRole === 'ortu') prev = 'timeline-ortu';
@@ -10787,7 +10787,7 @@ function goToFromDashboard(screenId, dashboardId) {
 let statusAbsensiGuru = {};
 
 function bukaAbsensiGuru() {
-  goTo('absensi-guru-kepala');
+  goToFromDashboard('absensi-guru-kepala', 'dashboard-kepala');
   const today = new Date().toISOString().split('T')[0];
   const inp = document.getElementById('ag-tanggal');
   if (inp) inp.value = today;
