@@ -4777,7 +4777,7 @@
       </div>
       <div class="section">
         <div class="section-title">Daftar Guru</div>
-        <div id="ag-list" style="display:flex;flex-direction:column;gap:8px;">
+        <div id="agk-list" style="display:flex;flex-direction:column;gap:8px;">
           <div style="text-align:center;padding:30px;color:var(--gray-400);">Memuat...</div>
         </div>
       </div>
@@ -10797,7 +10797,7 @@ function bukaAbsensiGuru() {
 async function muatAbsensiGuru(tanggal) {
   if (!tanggal) return;
   statusAbsensiGuru = {};
-  const listEl = document.getElementById('ag-list');
+  const listEl = document.getElementById('agk-list');
   if (!listEl) return;
   listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Memuat...</div>';
 
@@ -10806,13 +10806,13 @@ async function muatAbsensiGuru(tanggal) {
   const { data: guruData, error: guruError } = await supabaseClient
     .from('guru').select('id, nama, status');
   if (guruError) {
-    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:red;font-size:12px;">Error: ' + guruError.message + '</div>';
+    document.getElementById('agk-list').innerHTML = '<div style="text-align:center;padding:30px;color:red;font-size:12px;">Error: ' + guruError.message + '</div>';
     return;
   }
   guruList = (guruData || []).filter(g => g.nama);
 
   if (guruList.length === 0) {
-    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Belum ada data guru</div>';
+    document.getElementById('agk-list').innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray-400);">Belum ada data guru</div>';
     return;
   }
 
@@ -10831,7 +10831,7 @@ async function muatAbsensiGuru(tanggal) {
 }
 
 function renderAbsensiGuru(guruList) {
-  const listEl = document.getElementById('ag-list');
+  const listEl = document.getElementById('agk-list');
   if (!listEl) return;
   const statusOpts = [
     { val:'H', label:'H', color:'#1B5E20', bg:'#E8F5E9' },
