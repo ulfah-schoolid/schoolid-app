@@ -5533,7 +5533,7 @@
     <div class="top-bar"><button class="back-btn" onclick="goBack()">‹</button><h2>Profil Guru</h2></div>
     <div class="scroll-content">
       <div style="padding:12px 16px;background:linear-gradient(135deg,#1B5E20,#2E7D32);">
-        <div style="font-size:13px;color:rgba(255,255,255,0.8);">TK SchoolID Indonesia</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);" id="ortu-profil-guru-nama-sekolah">KB-TKIT Istiqomah</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;" id="ortu-profil-guru-ta">Tahun Ajaran 2026/2027</div>
       </div>
       <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
@@ -8414,14 +8414,16 @@ async function getInfoSekolah() {
 
 function updateTahunAjaranLabels() {
   const ta = infoSekolahCache?.tahunAjaran || '2026/2027';
-  const ids = [
+  const nama = infoSekolahCache?.nama || 'KB-TKIT Istiqomah';
+  const items = [
     { id: 'rapor-siswa-ta-label', text: 'Penumping Surakarta · TA ' + ta },
     { id: 'rapor-digital-ta-label', text: 'Penumping Surakarta · TA ' + ta },
     { id: 'ortu-rapor-ta', text: 'Tahun Ajaran ' + ta },
     { id: 'ortu-rapor-list-ta', text: 'Tahun Ajaran ' + ta },
     { id: 'ortu-profil-guru-ta', text: 'Tahun Ajaran ' + ta },
+    { id: 'ortu-profil-guru-nama-sekolah', text: nama },
   ];
-  ids.forEach(({ id, text }) => { const el = document.getElementById(id); if (el) el.textContent = text; });
+  items.forEach(({ id, text }) => { const e = document.getElementById(id); if (e) e.textContent = text; });
 }
 
 async function loadInfoSekolah() {
@@ -10695,7 +10697,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
   }
   else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(()=>{ initTimelineOrtu(); muatProfilOrtu(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => muatStatDashboardKepala(), 300); }
-  // Update semua label tahun ajaran dari info_sekolah
+  // Selalu update label tahun ajaran dari info_sekolah setelah login
   getInfoSekolah().then(() => updateTahunAjaranLabels());
 }
 
