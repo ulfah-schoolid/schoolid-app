@@ -5542,6 +5542,38 @@
       </div>
   </div>
 
+  <!-- ===== DETAIL GURU DINAMIS ===== -->
+  <div id="ortu-detail-guru" class="screen">
+    <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
+      <button class="back-btn" style="color:white;" onclick="goBack()">&#x2039;</button>
+      <h2 style="color:white;">Profil Guru</h2>
+    </div>
+    <div class="scroll-content">
+      <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);padding:20px 16px 32px;text-align:center;">
+        <div id="ortu-detail-guru-avatar" style="width:80px;height:80px;border-radius:50%;border:3px solid rgba(255,255,255,0.4);margin:0 auto 12px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:36px;overflow:hidden;"></div>
+        <div style="font-weight:800;font-size:18px;color:white;" id="ortu-detail-guru-nama">-</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);margin-top:4px;" id="ortu-detail-guru-jabatan">-</div>
+      </div>
+      <div style="margin:-16px 16px 0;background:white;border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:16px;position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,1fr);text-align:center;gap:8px;">
+        <div><div style="font-size:18px;font-weight:800;color:var(--green);" id="ortu-detail-guru-tahun">-</div><div style="font-size:10px;color:var(--gray-500);">Th Bergabung</div></div>
+        <div><div style="font-size:18px;font-weight:800;color:#FF9800;" id="ortu-detail-guru-kelas">-</div><div style="font-size:10px;color:var(--gray-500);">Kelas</div></div>
+      </div>
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px;margin-top:8px;">
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:12px;">INFORMASI GURU</div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+            <div style="display:flex;gap:12px;"><span style="color:var(--gray-500);width:110px;flex-shrink:0;">&#x1F4C5; Bergabung</span><span style="font-weight:600;" id="ortu-detail-guru-bergabung">-</span></div>
+            <div style="display:flex;gap:12px;"><span style="color:var(--gray-500);width:110px;flex-shrink:0;">&#x1F3EB; Mengajar</span><span style="font-weight:600;" id="ortu-detail-guru-mengajar">-</span></div>
+            <div style="display:flex;gap:12px;"><span style="color:var(--gray-500);width:110px;flex-shrink:0;">&#x1F4DE; Kontak</span><span style="font-weight:600;" id="ortu-detail-guru-hp">-</span></div>
+          </div>
+        </div>
+        <div style="background:#FFF8E1;border-radius:var(--radius);padding:12px 14px;font-size:12px;color:#F57F17;">
+          &#x2139;&#xFE0F; Untuk menghubungi guru, gunakan fitur Pesan di menu utama.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== DETAIL GURU 1 ===== -->
   <div id="ortu-detail-guru-1" class="screen">
     <div class="top-bar" style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-bottom:none;">
@@ -6313,7 +6345,7 @@ function goBack() {
 
     const ortuScreens = ['laporan-bulanan','rapor','detail-rapor','notifikasi','ortu-info-pribadi',
       'ortu-data-anak','ortu-ubah-hp','ortu-notifikasi','ortu-ubah-password','ortu-profil-guru',
-      'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view'];
+      'ortu-detail-guru','ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view'];
 
     const kepalaScreens = ['laporan-kepala','kalender-kepala','pendaftaran-masuk',
       'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala'];
@@ -10752,7 +10784,7 @@ function goToFromDashboard(screenId, dashboardId) {
     const scrollable = to.querySelector('.scroll-content');
     if (scrollable) scrollable.scrollTop = 0;
   }
-  if (screenId === 'ortu-profil-guru') muatDaftarGuruOrtu();
+  if (screenId === 'ortu-profil-guru' && typeof muatDaftarGuruOrtu === 'function') muatDaftarGuruOrtu();
 }
 
 // ===== ABSENSI GURU (KEPALA) =====
