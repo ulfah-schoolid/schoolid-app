@@ -10733,7 +10733,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'dokumentasi') updateDokumentasiNav();
     if (screenId === 'pesan') updatePesanNav();
     if (screenId === 'profil-user') updateProfilUserView();
-    if (screenId === 'info-pribadi' && currentRole === 'guru') isiFormProfilGuru();
+    if (screenId === 'info-pribadi' && (currentRole === 'guru' || currentRole === 'kepala')) isiFormProfilGuru();
     if (screenId === 'laporan-harian') muatLaporanHarian();
     if (screenId === 'aktivitas') initAktivitasBaru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
