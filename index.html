@@ -6079,12 +6079,24 @@
     </div>
     <div class="form-body">
       <input type="hidden" id="fm-id">
+
+      <!-- Foto Profil Murid -->
+      <div class="form-group" style="text-align:center;">
+        <label class="form-label" style="text-align:left;display:block;">Foto Profil Murid</label>
+        <div style="position:relative;width:80px;height:80px;margin:0 auto 8px;">
+          <div id="fm-foto-preview" style="width:80px;height:80px;border-radius:50%;background:#E8F5E9;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;background-size:cover;background-position:center;"></div>
+          <label for="fm-foto-input" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;">✏️</label>
+          <input type="file" id="fm-foto-input" accept="image/*" style="display:none;" onchange="previewFotoMurid(this)">
+        </div>
+        <div style="font-size:11px;color:var(--gray-400);">Tap ✏️ untuk ganti foto (maks 2MB)</div>
+      </div>
+
       <div class="form-group">
         <label class="form-label">Nama Lengkap *</label>
         <input type="text" id="fm-nama" class="form-input" placeholder="cth: Nama Lengkap Murid">
       </div>
       <div class="form-group">
-        <label class="form-label">Pilih Avatar</label>
+        <label class="form-label">Pilih Avatar (jika tidak ada foto)</label>
         <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;">
           <!-- Avatar laki -->
           <div onclick="pilihAvatar(this,'👦')" class="avatar-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#BBDEFB,#90CAF9);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👦</div>
@@ -9810,10 +9822,34 @@ function hitungUmur(tgl) {
   return `${tahun} Th ${bulan} Bln`;
 }
 
+function previewFotoMurid(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (!file.type.startsWith('image/')) { showToast('File harus berupa gambar ⚠️'); input.value=''; return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('Ukuran foto maksimal 2MB ⚠️'); input.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const prev = document.getElementById('fm-foto-preview');
+    if (prev) {
+      prev.style.backgroundImage = 'url(' + e.target.result + ')';
+      prev.style.backgroundSize = 'cover';
+      prev.style.backgroundPosition = 'center';
+      prev.textContent = '';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 function bukaFormTambahMurid() {
   editMuridId = null; selectedJK = '';
   document.getElementById('form-murid-judul').textContent = 'Tambah Murid';
   ['fm-nama','fm-tgl','fm-ortu','fm-hp','fm-catatan','fm-avatar'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  // Reset foto preview
+  const prev = document.getElementById('fm-foto-preview');
+  if (prev) { prev.style.backgroundImage=''; prev.textContent='📷'; }
+  const inp = document.getElementById('fm-foto-input');
+  if (inp) inp.value = '';
+  window._fmFotoUrl = null;
   isiDropdownKelas('fm-kelompok');
   document.getElementById('fm-kelompok').value = 'A';
   document.getElementById('btn-hapus-murid').style.display = 'none';
@@ -9853,6 +9889,26 @@ function bukaEditMurid(id) {
   }
   resetPilihJK(); pilihJK(m.jk);
   setTimeout(() => resetAvatarGrid(m.avatar || ''), 100);
+  // Load foto murid dari Supabase
+  window._fmFotoUrl = null;
+  const prev = document.getElementById('fm-foto-preview');
+  const inp = document.getElementById('fm-foto-input');
+  if (inp) inp.value = '';
+  if (prev) {
+    prev.style.backgroundImage = '';
+    prev.textContent = '📷';
+    if (m.id) {
+      supabaseClient.from('murid').select('foto_url').eq('id', m.id).maybeSingle().then(({ data }) => {
+        if (data?.foto_url) {
+          prev.style.backgroundImage = 'url(' + data.foto_url + ')';
+          prev.style.backgroundSize = 'cover';
+          prev.style.backgroundPosition = 'center';
+          prev.textContent = '';
+          window._fmFotoUrl = data.foto_url;
+        }
+      });
+    }
+  }
   goToFromDashboard('form-murid', 'kelola-murid');
 }
 
@@ -9909,26 +9965,53 @@ function resetPilihJK() {
   });
 }
 
-function simpanMurid() {
+async function simpanMurid() {
   const nama = document.getElementById('fm-nama').value.trim();
   if (!nama) { showToast('Nama murid wajib diisi! ⚠️'); return; }
   if (!selectedJK) { showToast('Pilih jenis kelamin! ⚠️'); return; }
   const avatarPilihan = document.getElementById('fm-avatar').value || (selectedJK === 'L' ? '👦' : '👧');
   const kelompokPilihan = document.getElementById('fm-kelompok').value || 'A';
+
+  // Upload foto jika ada file baru
+  let fotoUrl = window._fmFotoUrl || null;
+  const fotoInput = document.getElementById('fm-foto-input');
+  if (fotoInput && fotoInput.files && fotoInput.files[0]) {
+    showLoading();
+    try {
+      const file = fotoInput.files[0];
+      const muridId = editMuridId || Date.now().toString();
+      const ext = file.name.split('.').pop();
+      const path = 'murid-foto/' + muridId + '.' + ext;
+      const { error: upErr } = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(path);
+      fotoUrl = urlData.publicUrl;
+    } catch(e) {
+      hideLoading();
+      showToast('Gagal upload foto: ' + (e.message||e) + ' ⚠️');
+      return;
+    }
+    hideLoading();
+  }
+
   const list = getMuridList();
   if (editMuridId) {
     const idx = list.findIndex(m => m.id === editMuridId);
     if (idx !== -1) list[idx] = {...list[idx], nama, jk: selectedJK,
-      avatar: avatarPilihan,
+      avatar: avatarPilihan, foto_url: fotoUrl,
       kelompok: kelompokPilihan,
       tgl: document.getElementById('fm-tgl').value,
       ortu: document.getElementById('fm-ortu').value.trim(),
       hp: document.getElementById('fm-hp').value.trim(),
       catatan: document.getElementById('fm-catatan').value.trim()};
+    // Update foto_url ke Supabase jika ada foto baru
+    if (fotoUrl) {
+      await supabaseClient.from('murid').update({ foto_url: fotoUrl }).eq('id', editMuridId);
+    }
     showToast('Data murid diperbarui! ✅');
   } else {
     list.push({id: Date.now().toString(), nama, jk: selectedJK,
-      avatar: avatarPilihan,
+      avatar: avatarPilihan, foto_url: fotoUrl,
       kelompok: kelompokPilihan,
       tgl: document.getElementById('fm-tgl').value,
       ortu: document.getElementById('fm-ortu').value.trim(),
