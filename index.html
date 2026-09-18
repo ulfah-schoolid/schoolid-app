@@ -11319,15 +11319,33 @@ async function muatLaporanBulananOrtu() {
   const murid = getMuridList().find(m => m.nama === namaAnak);
   const kelas = murid ? getKelasList().find(k => k.id === murid.kelompok) : null;
   if (el('lb-kelas-info')) {
-    el('lb-kelas-info').textContent = (kelas ? kelas.nama : (murid?.kelompok || '-')) + ' · Tahun Ajaran 2025/2026';
+    const ta = (infoSekolahCache && infoSekolahCache.tahunAjaran) ? infoSekolahCache.tahunAjaran : '2026/2027';
+    el('lb-kelas-info').textContent = (kelas ? kelas.nama : (murid?.kelompok || '-')) + ' · Tahun Ajaran ' + ta;
   }
-  // Avatar
+  // Avatar - prioritaskan foto dari Supabase
   const av = el('lb-avatar');
   if (av && murid) {
-    const emoji = murid.jk === 'L' ? '👦' : '👧';
-    av.textContent = emoji;
-    av.className = '';
-    av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(255,255,255,0.2);';
+    if (murid.foto_url) {
+      av.className = '';
+      av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;background-image:url(' + murid.foto_url + ');background-size:cover;background-position:center;';
+      av.textContent = '';
+    } else {
+      // Coba load dari Supabase langsung
+      supabaseClient.from('murid').select('foto_url').eq('nama', namaAnak).maybeSingle().then(({ data }) => {
+        if (data?.foto_url) {
+          av.className = '';
+          av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;background-image:url(' + data.foto_url + ');background-size:cover;background-position:center;';
+          av.textContent = '';
+          // Update cache lokal
+          if (murid) murid.foto_url = data.foto_url;
+        } else {
+          const emoji = murid.jk === 'L' ? '👦' : '👧';
+          av.textContent = emoji;
+          av.className = '';
+          av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(255,255,255,0.2);';
+        }
+      });
+    }
   }
 
   // Tanggal awal & akhir bulan
