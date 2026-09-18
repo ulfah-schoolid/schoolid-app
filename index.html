@@ -11407,6 +11407,29 @@ function updateProfilUserView() {
     avatar.classList.add('av-kepsek');
     name.textContent = 'Kepala Sekolah';
     sub.textContent = 'KB - TKIT Istiqomah Penumping';
+    // Load foto kepala dari tabel guru
+    if (currentUserProfile?.id) {
+      supabaseClient.from('guru')
+        .select('nama, foto_url')
+        .eq('user_id', currentUserProfile.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!data) return;
+          if (data.nama) name.textContent = data.nama;
+          if (data.foto_url) {
+            avatar.style.backgroundImage = `url(${data.foto_url})`;
+            avatar.style.backgroundSize = 'cover';
+            avatar.style.backgroundPosition = 'center';
+            avatar.textContent = '';
+            // Update juga foto di dashboard
+            document.querySelectorAll('.av-kepsek').forEach(el => {
+              el.style.backgroundImage = `url(${data.foto_url})`;
+              el.style.backgroundSize = 'cover';
+              el.style.backgroundPosition = 'center';
+            });
+          }
+        });
+    }
   } else if (currentRole === 'ortu') {
     avatar.classList.add('av-ortu');
     name.textContent = 'Wali Murid';
@@ -11536,6 +11559,13 @@ async function uploadFotoGuru(input) {
 
     hideLoading();
     showToast('Foto profil berhasil diperbarui ✅');
+    // Update foto di halaman Profil juga
+    const puAvatar = document.getElementById('pu-avatar');
+    if (puAvatar) {
+      puAvatar.style.backgroundImage = `url(${fotoUrl})`;
+      puAvatar.style.backgroundSize = 'cover';
+      puAvatar.style.backgroundPosition = 'center';
+    }
   } catch (e) {
     hideLoading();
     showToast('Gagal upload foto: ' + e.message + ' ⚠️');
