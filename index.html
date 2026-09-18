@@ -10755,6 +10755,7 @@ function goToFromDashboard(screenId, dashboardId) {
     if (scrollable) scrollable.scrollTop = 0;
   }
   if (screenId === 'ortu-profil-guru' && typeof muatDaftarGuruOrtu === 'function') { setTimeout(muatDaftarGuruOrtu, 50); }
+  if (screenId === 'info-pribadi' && typeof isiFormProfilGuru === 'function') { setTimeout(isiFormProfilGuru, 50); }
 }
 
 // ===== ABSENSI GURU (KEPALA) =====
@@ -11503,18 +11504,19 @@ async function isiFormProfilGuru() {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
   set('ip-nama-guru', data.nama);
   set('ip-nip-guru', data.nip || '');
-  set('ip-email-guru', data.email || '');
+  set('ip-email-guru', currentUserProfile.email || data.email || '');
   set('ip-hp-guru', data.no_hp || '');
   set('ip-jabatan-guru', data.jabatan || '');
   set('ip-tanggal-guru', data.tanggal_bergabung || '');
 
-  // Tampilkan foto jika ada
+  // Tampilkan foto
   if (data.foto_url) {
     const fotoEl = document.getElementById('ip-foto-guru');
     if (fotoEl) {
       fotoEl.style.backgroundImage = `url(${data.foto_url})`;
       fotoEl.style.backgroundSize = 'cover';
       fotoEl.style.backgroundPosition = 'center';
+      fotoEl.textContent = '';
     }
   }
 }
