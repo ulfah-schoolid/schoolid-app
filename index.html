@@ -8623,13 +8623,14 @@ async function muatRingkasanDashboardGuru() {
       .select('*', { count: 'exact', head: true })
       .eq('kelompok', kelasGuru);
 
-    // Aktivitas hari ini - ambil semua lalu filter by tanggal di data JSONB
+    // Aktivitas hari ini - filter via JSONB data->tanggal
     const { data: semuaAktivitas } = await supabaseClient
       .from('modul_ajar')
-      .select('id, data');
+      .select('id, data')
+      .filter('data->>tanggal', 'eq', today);
     const aktivitasHariIni = (semuaAktivitas || []).filter(a => {
       const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
-      return d.tanggal === today && (d.kelompok === kelasGuru || !d.kelompok);
+      return !d.kelompok || d.kelompok === kelasGuru || kelasGuru === '' || kelasGuru === null;
     });
     const jumlahAktivitas = aktivitasHariIni.length;
 
@@ -8653,12 +8654,8 @@ async function muatRingkasanDashboardGuru() {
     set('dg-stat-dokumentasi', jumlahDokumentasi ?? 0);
     set('dg-stat-penilaian', jumlahPenilaian ?? 0);
 
-    // Muat aktivitas hari ini
-    const { data: aktivitasList } = await supabaseClient
-      .from('modul_ajar')
-      .select('nama, aspek, waktu_mulai, waktu_selesai')
-      .eq('tanggal', today)
-      .order('waktu_mulai');
+    // Muat aktivitas hari ini untuk tampilan card
+    const aktivitasList = aktivitasHariIni;
 
     const kontainerAktivitas = document.getElementById('dg-aktivitas-hari-ini');
     if (kontainerAktivitas) {
