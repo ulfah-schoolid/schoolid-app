@@ -5192,7 +5192,8 @@
       <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);padding:16px 16px 32px;text-align:center;">
         <div style="position:relative;width:72px;height:72px;margin:0 auto 10px;">
           <div id="ortu-avatar-display" class="av-ortu" style="width:72px;height:72px;border-radius:50%;border:3px solid rgba(255,255,255,0.5);"></div>
-          <button onclick="bukaAvatarPicker('ortu')" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:12px;cursor:pointer;">✏️</button>
+          <label for="input-foto-ortu" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✏️</label>
+          <input type="file" id="input-foto-ortu" accept="image/*" style="display:none;" onchange="uploadFotoOrtu(this)">
         </div>
         <div id="po-nama" style="font-weight:700;font-size:17px;color:white;">-</div>
         <div id="po-email" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:3px;">Orang Tua · -</div>
@@ -5206,7 +5207,6 @@
         <div style="display:flex;align-items:center;gap:14px;">
           <div style="position:relative;width:52px;height:52px;flex-shrink:0;">
             <div id="ortu-anak-avatar-display" class="av-murid-p" style="width:52px;height:52px;border-radius:50%;"></div>
-            <button onclick="bukaAvatarPicker('anak')" style="position:absolute;bottom:-3px;right:-3px;width:20px;height:20px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:9px;cursor:pointer;padding:0;">✏️</button>
           </div>
           <div style="flex:1;">
             <div style="font-weight:700;font-size:15px;" id="ortu-anak-pm-nama">-</div>
@@ -5368,7 +5368,6 @@
       <div style="text-align:center;padding:12px 0;">
         <div style="position:relative;width:72px;height:72px;margin:0 auto 8px;">
           <div id="anak-avatar-display" class="av-murid-p" style="width:72px;height:72px;border-radius:50%;"></div>
-          <button onclick="bukaAvatarPicker('anak')" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;font-size:12px;cursor:pointer;">✏️</button>
         </div>
       </div>
       <div class="form-group">
@@ -8517,15 +8516,37 @@ function applyOrtuAvatars() {
   const ortuEl = document.getElementById('ortu-avatar-display');
   const anakEl1 = document.getElementById('ortu-anak-avatar-display');
   const anakEl2 = document.getElementById('anak-avatar-display');
-  if (ortuEl) {
+  if (ortuEl && !ortuEl.style.backgroundImage) {
     if (a.ortu) { ortuEl.classList.remove('av-ortu'); ortuEl.style.fontSize = '36px'; ortuEl.style.display = 'flex'; ortuEl.style.alignItems = 'center'; ortuEl.style.justifyContent = 'center'; ortuEl.textContent = a.ortu; }
     else { ortuEl.classList.add('av-ortu'); ortuEl.textContent = ''; }
   }
-  [anakEl1, anakEl2].forEach(el => {
-    if (!el) return;
-    if (a.anak) { el.classList.remove('av-murid-p', 'av-murid-l'); el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.justifyContent = 'center'; el.textContent = a.anak; }
-    else { el.classList.add('av-murid-p'); el.textContent = ''; }
-  });
+  // Load foto murid dari Supabase
+  const anakNama = currentUserProfile?.anak_nama;
+  if (anakNama) {
+    supabaseClient.from('murid').select('foto_url').eq('nama', anakNama).maybeSingle().then(({ data }) => {
+      if (data?.foto_url) {
+        [anakEl1, anakEl2].forEach(el => {
+          if (!el) return;
+          el.style.backgroundImage = 'url(' + data.foto_url + ')';
+          el.style.backgroundSize = 'cover';
+          el.style.backgroundPosition = 'center';
+          el.textContent = '';
+        });
+      } else {
+        [anakEl1, anakEl2].forEach(el => {
+          if (!el) return;
+          if (a.anak) { el.classList.remove('av-murid-p', 'av-murid-l'); el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.justifyContent = 'center'; el.textContent = a.anak; }
+          else { el.classList.add('av-murid-p'); el.textContent = ''; }
+        });
+      }
+    });
+  } else {
+    [anakEl1, anakEl2].forEach(el => {
+      if (!el) return;
+      if (a.anak) { el.classList.remove('av-murid-p', 'av-murid-l'); el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.justifyContent = 'center'; el.textContent = a.anak; }
+      else { el.classList.add('av-murid-p'); el.textContent = ''; }
+    });
+  }
   terapkanNamaAnakOrtu();
 }
 
@@ -8623,14 +8644,13 @@ async function muatRingkasanDashboardGuru() {
       .select('*', { count: 'exact', head: true })
       .eq('kelompok', kelasGuru);
 
-    // Aktivitas hari ini - filter via JSONB data->tanggal
+    // Aktivitas hari ini - ambil semua lalu filter by tanggal di data JSONB
     const { data: semuaAktivitas } = await supabaseClient
       .from('modul_ajar')
-      .select('id, data')
-      .filter('data->>tanggal', 'eq', today);
+      .select('id, data');
     const aktivitasHariIni = (semuaAktivitas || []).filter(a => {
       const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
-      return !d.kelompok || d.kelompok === kelasGuru || kelasGuru === '' || kelasGuru === null;
+      return d.tanggal === today && (d.kelompok === kelasGuru || !d.kelompok);
     });
     const jumlahAktivitas = aktivitasHariIni.length;
 
@@ -8654,8 +8674,12 @@ async function muatRingkasanDashboardGuru() {
     set('dg-stat-dokumentasi', jumlahDokumentasi ?? 0);
     set('dg-stat-penilaian', jumlahPenilaian ?? 0);
 
-    // Muat aktivitas hari ini untuk tampilan card
-    const aktivitasList = aktivitasHariIni;
+    // Muat aktivitas hari ini
+    const { data: aktivitasList } = await supabaseClient
+      .from('modul_ajar')
+      .select('nama, aspek, waktu_mulai, waktu_selesai')
+      .eq('tanggal', today)
+      .order('waktu_mulai');
 
     const kontainerAktivitas = document.getElementById('dg-aktivitas-hari-ini');
     if (kontainerAktivitas) {
@@ -8723,6 +8747,37 @@ function bukaAvatarPicker(target) {
 function closeAvatarPicker() {
   document.getElementById('modalAvatarPicker').classList.remove('show');
   avatarPickerTarget = null;
+}
+
+async function uploadFotoOrtu(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  if (!file.type.startsWith('image/')) { showToast('File harus berupa gambar ⚠️'); return; }
+  if (file.size > 2 * 1024 * 1024) { showToast('Ukuran foto maksimal 2MB ⚠️'); return; }
+  showLoading();
+  try {
+    const userId = currentUserProfile.id;
+    const ext = file.name.split('.').pop();
+    const path = 'ortu-foto/' + userId + '.' + ext;
+    const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(path);
+    const fotoUrl = urlData.publicUrl;
+    // Simpan ke tabel profiles atau buat kolom foto_url di profiles
+    await supabaseClient.from('profiles').update({ foto_url: fotoUrl }).eq('id', userId);
+    // Update tampilan avatar
+    const avEl = document.getElementById('ortu-avatar-display');
+    if (avEl) {
+      avEl.style.backgroundImage = 'url(' + fotoUrl + ')';
+      avEl.style.backgroundSize = 'cover';
+      avEl.style.backgroundPosition = 'center';
+    }
+    hideLoading();
+    showToast('Foto profil berhasil diperbarui ✅');
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal upload foto: ' + (e.message || e) + ' ⚠️');
+  }
 }
 
 function pilihAvatarPicker(el, emoji) {
@@ -11027,6 +11082,19 @@ async function muatProfilOrtu() {
   if (!p) return;
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
   set('po-nama', p.nama || p.name || '-');
+
+  // Load foto ortu dari profiles.foto_url
+  try {
+    const { data: profData } = await supabaseClient.from('profiles').select('foto_url').eq('id', p.id).maybeSingle();
+    if (profData?.foto_url) {
+      const avEl = document.getElementById('ortu-avatar-display');
+      if (avEl) {
+        avEl.style.backgroundImage = 'url(' + profData.foto_url + ')';
+        avEl.style.backgroundSize = 'cover';
+        avEl.style.backgroundPosition = 'center';
+      }
+    }
+  } catch(e) { console.error('Gagal load foto ortu:', e); }
   // Ambil email dari session Supabase Auth
   const emailEl = document.getElementById('po-email');
   try {
