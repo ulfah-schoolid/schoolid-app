@@ -5269,7 +5269,7 @@
         <!-- Data Diri -->
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);padding:4px 0;">DATA DIRI</div>
         <div class="menu-list" style="margin:0;">
-          <div class="menu-item" onclick="goToFromDashboard('ortu-info-pribadi','profil-ortu')">
+          <div class="menu-item" onclick="goToFromDashboard('ortu-info-pribadi','profil-ortu');muatDataOrtu()">
             <div class="menu-item-icon" style="background:#E8F5E9;">👨‍👩‍👧</div>
             <div class="menu-item-text"><div class="menu-item-label">Data Orang Tua</div><div style="font-size:11px;color:var(--gray-400);">Suami, istri & alamat tinggal</div></div>
             <span class="menu-chevron">›</span>
@@ -5350,55 +5350,55 @@
       <div style="background:#E8F5E9;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#1B5E20;font-weight:600;margin-bottom:4px;">👨 Data Suami / Ayah</div>
       <div class="form-group">
         <label class="form-label">Nama Lengkap Ayah</label>
-        <input type="text" class="form-input" value="Bapak Hari Santoso">
+        <input type="text" class="form-input" id="odo-nama-ayah" placeholder="Nama lengkap ayah">
       </div>
       <div class="form-group">
         <label class="form-label">Tempat Lahir Ayah</label>
-        <input type="text" class="form-input" value="Jakarta">
+        <input type="text" class="form-input" id="odo-tempat-ayah" placeholder="Kota tempat lahir">
       </div>
       <div class="form-group">
         <label class="form-label">Tanggal Lahir Ayah</label>
-        <input type="date" class="form-input" value="1985-05-15">
+        <input type="date" class="form-input" id="odo-tgl-ayah">
       </div>
       <div class="form-group">
         <label class="form-label">Pekerjaan Ayah</label>
-        <input type="text" class="form-input" value="Wiraswasta">
+        <input type="text" class="form-input" id="odo-kerja-ayah" placeholder="Pekerjaan ayah">
       </div>
       <div class="form-group">
         <label class="form-label">Nomor HP Ayah</label>
-        <input type="tel" class="form-input" value="0811-2345-6789">
+        <input type="tel" class="form-input" id="odo-hp-ayah" placeholder="08xxxxxxxxxx">
       </div>
       <div style="background:#FCE4EC;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#C2185B;font-weight:600;margin:4px 0;">👩 Data Istri / Ibu</div>
       <div class="form-group">
         <label class="form-label">Nama Lengkap Ibu</label>
-        <input type="text" class="form-input" value="Ibu Sari Dewi">
+        <input type="text" class="form-input" id="odo-nama-ibu" placeholder="Nama lengkap ibu">
       </div>
       <div class="form-group">
         <label class="form-label">Tempat Lahir Ibu</label>
-        <input type="text" class="form-input" value="Bandung">
+        <input type="text" class="form-input" id="odo-tempat-ibu" placeholder="Kota tempat lahir">
       </div>
       <div class="form-group">
         <label class="form-label">Tanggal Lahir Ibu</label>
-        <input type="date" class="form-input" value="1988-03-22">
+        <input type="date" class="form-input" id="odo-tgl-ibu">
       </div>
       <div class="form-group">
         <label class="form-label">Pekerjaan Ibu</label>
-        <input type="text" class="form-input" value="Ibu Rumah Tangga">
+        <input type="text" class="form-input" id="odo-kerja-ibu" placeholder="Pekerjaan ibu">
       </div>
       <div class="form-group">
         <label class="form-label">Nomor HP Ibu</label>
-        <input type="tel" class="form-input" value="0812-3456-7890">
+        <input type="tel" class="form-input" id="odo-hp-ibu" placeholder="08xxxxxxxxxx">
       </div>
       <div style="background:#E3F2FD;border-radius:var(--radius);padding:10px 14px;font-size:13px;color:#1565C0;font-weight:600;margin:4px 0;">🏠 Alamat Tinggal</div>
       <div class="form-group">
         <label class="form-label">Alamat Lengkap</label>
-        <textarea class="form-textarea">Jl. Melati No. 5, RT 03/RW 02, Kel. Cempaka, Kec. Mampang, Jakarta Selatan</textarea>
+        <textarea class="form-textarea" id="odo-alamat" placeholder="Alamat lengkap tempat tinggal"></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">Kode Pos</label>
-        <input type="text" class="form-input" value="12345">
+        <input type="text" class="form-input" id="odo-kodepos" placeholder="Kode pos">
       </div>
-      <button class="btn-save" onclick="saveAndBack('Data orang tua berhasil disimpan! ✅')">💾 Simpan Data</button>
+      <button class="btn-save" onclick="simpanDataOrtu()"><i class="ti ti-device-floppy" aria-hidden="true"></i> Simpan Data</button>
     </div>
   </div>
 
@@ -11150,15 +11150,70 @@ async function muatTimelineOrtu(tanggal) {
 }
 
 // ===== PROFIL ORTU (DATA REAL) =====
+async function muatDataOrtu() {
+  if (!currentUserProfile?.id) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  try {
+    const { data } = await supabaseClient.from('profiles')
+      .select('nama_ayah, tempat_lahir_ayah, tanggal_lahir_ayah, pekerjaan_ayah, hp_ayah, nama_ibu, tempat_lahir_ibu, tanggal_lahir_ibu, pekerjaan_ibu, hp_ibu, alamat, kode_pos')
+      .eq('id', currentUserProfile.id).maybeSingle();
+    if (!data) return;
+    set('odo-nama-ayah', data.nama_ayah);
+    set('odo-tempat-ayah', data.tempat_lahir_ayah);
+    set('odo-tgl-ayah', data.tanggal_lahir_ayah);
+    set('odo-kerja-ayah', data.pekerjaan_ayah);
+    set('odo-hp-ayah', data.hp_ayah);
+    set('odo-nama-ibu', data.nama_ibu);
+    set('odo-tempat-ibu', data.tempat_lahir_ibu);
+    set('odo-tgl-ibu', data.tanggal_lahir_ibu);
+    set('odo-kerja-ibu', data.pekerjaan_ibu);
+    set('odo-hp-ibu', data.hp_ibu);
+    set('odo-alamat', data.alamat);
+    set('odo-kodepos', data.kode_pos);
+  } catch(e) { console.error('Gagal load data ortu:', e); }
+}
+
+async function simpanDataOrtu() {
+  if (!currentUserProfile?.id) { showToast('Sesi tidak ditemukan ⚠️'); return; }
+  const val = (id) => document.getElementById(id)?.value?.trim() || null;
+  showLoading();
+  try {
+    const { error } = await supabaseClient.from('profiles').update({
+      nama_ayah: val('odo-nama-ayah'),
+      tempat_lahir_ayah: val('odo-tempat-ayah'),
+      tanggal_lahir_ayah: val('odo-tgl-ayah'),
+      pekerjaan_ayah: val('odo-kerja-ayah'),
+      hp_ayah: val('odo-hp-ayah'),
+      nama_ibu: val('odo-nama-ibu'),
+      tempat_lahir_ibu: val('odo-tempat-ibu'),
+      tanggal_lahir_ibu: val('odo-tgl-ibu'),
+      pekerjaan_ibu: val('odo-kerja-ibu'),
+      hp_ibu: val('odo-hp-ibu'),
+      alamat: val('odo-alamat'),
+      kode_pos: val('odo-kodepos'),
+    }).eq('id', currentUserProfile.id);
+    if (error) throw error;
+    hideLoading();
+    showToast('Data orang tua berhasil disimpan! ✅');
+    // Update header Profil Saya langsung
+    const namaHeader = val('odo-nama-ayah') || val('odo-nama-ibu');
+    if (namaHeader) { const el = document.getElementById('po-nama'); if (el) el.textContent = namaHeader; }
+    goBack();
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal simpan: ' + (e.message || e) + ' ⚠️');
+  }
+}
+
 async function muatProfilOrtu() {
   const p = currentUserProfile;
   if (!p) return;
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '-'; };
   set('po-nama', p.nama || p.name || '-');
 
-  // Load foto ortu dari profiles.foto_url
+  // Load foto ortu + nama ayah/ibu dari profiles
   try {
-    const { data: profData } = await supabaseClient.from('profiles').select('foto_url').eq('id', p.id).maybeSingle();
+    const { data: profData } = await supabaseClient.from('profiles').select('foto_url, nama_ayah, nama_ibu').eq('id', p.id).maybeSingle();
     if (profData?.foto_url) {
       const avEl = document.getElementById('ortu-avatar-display');
       if (avEl) {
@@ -11167,6 +11222,9 @@ async function muatProfilOrtu() {
         avEl.style.backgroundPosition = 'center';
       }
     }
+    // Header pakai nama ayah/ibu (siapapun yang login) jika sudah diisi
+    const namaHeader = profData?.nama_ayah || profData?.nama_ibu;
+    if (namaHeader) set('po-nama', namaHeader);
   } catch(e) { console.error('Gagal load foto ortu:', e); }
   // Ambil email dari session Supabase Auth
   const emailEl = document.getElementById('po-email');
