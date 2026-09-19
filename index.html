@@ -7,6 +7,7 @@
 <title>SchoolID Indonesia</title>
 <meta name="description" content="Asisten Digital Sekolah Indonesia">
 <meta name="theme-color" content="#2E7D32">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
   :root {
     --green: #2E7D32;
@@ -203,6 +204,7 @@
     transition: border-color 0.2s;
   }
   .input-wrap input:focus { border-color: var(--green); background: white; }
+  .input-icon i.ti { font-size: 16px; }
   .input-icon {
     position: absolute;
     left: 14px;
@@ -468,6 +470,7 @@
   }
   .peran-bottom-nav .pnav-item.active { color: var(--green); }
   .peran-bottom-nav .pnav-item .pnav-icon { font-size: 18px; }
+  .peran-bottom-nav .pnav-item i.ti.pnav-icon { font-size: 20px; display: block; }
 
 
   /* ===== STATUS BAR (putih, untuk halaman detail dengan top-bar putih) ===== */
@@ -567,6 +570,8 @@
   .nav-item.active .nav-label { color: var(--green); font-weight: 700; }
   .nav-item:active { background: var(--green-bg); }
   .nav-icon { font-size: 22px; color: var(--gray-500); }
+  .nav-item i.ti { font-size: 24px; color: var(--gray-500); display: block; }
+  .nav-item.active i.ti { color: var(--green); }
   .nav-label { font-size: 10px; color: var(--gray-500); font-family: var(--font); }
 
   /* ===== CARDS ===== */
@@ -709,6 +714,7 @@
     transition: transform 0.15s;
   }
   .quick-btn:active { transform: scale(0.96); }
+  .quick-btn-icon i.ti { font-size: 22px; }
   .quick-btn-icon {
     width: 44px; height: 44px;
     border-radius: 12px;
@@ -923,7 +929,9 @@
     padding: 8px 2px;
     font-family: var(--font);
   }
-  .pm-menu-icon {
+  .pm-menu-icon { display:flex; align-items:center; justify-content:center; }
+  .pm-menu-icon i.ti { font-size: 20px; }
+  .pm-menu-icon-ORIG {
     width: 46px; height: 46px;
     border-radius: 12px;
     display: flex;
@@ -1498,7 +1506,9 @@
     border-bottom: 1px solid var(--gray-100);
   }
   .menu-item:active { background: var(--gray-50); }
-  .menu-item-icon {
+  .menu-item-icon { display:flex; align-items:center; justify-content:center; }
+  .menu-item-icon i.ti { font-size: 22px; }
+  .menu-item-icon-orig {
     width: 36px; height: 36px;
     border-radius: 10px;
     display: flex;
@@ -1782,7 +1792,7 @@
       <div class="input-group">
         <label>Nama Lengkap Orang Tua</label>
         <div class="input-wrap">
-          <span class="input-icon">👤</span>
+          <span class="input-icon"><i class="ti ti-user" aria-hidden="true"></i></span>
           <input type="text" id="reg-nama" placeholder="cth: Ibu Siti Aminah">
         </div>
       </div>
@@ -1790,7 +1800,7 @@
       <div class="input-group">
         <label>Nama Lengkap Anak</label>
         <div class="input-wrap">
-          <span class="input-icon">👧</span>
+          <span class="input-icon"><i class="ti ti-user" aria-hidden="true"></i></span>
           <input type="text" id="reg-anak" placeholder="cth: Ahmad Fauzan">
         </div>
       </div>
@@ -1798,7 +1808,7 @@
       <div class="input-group">
         <label>Email</label>
         <div class="input-wrap">
-          <span class="input-icon">✉️</span>
+          <span class="input-icon"><i class="ti ti-mail" aria-hidden="true"></i></span>
           <input type="email" id="reg-email" placeholder="contoh@email.com">
         </div>
       </div>
@@ -1806,7 +1816,7 @@
       <div class="input-group">
         <label>Password</label>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="reg-password" placeholder="Minimal 6 karakter">
           <button class="eye-toggle" onclick="togglePassById('reg-password')">👁</button>
         </div>
@@ -1815,7 +1825,7 @@
       <div class="input-group">
         <label>Konfirmasi Password</label>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="reg-password2" placeholder="Ulangi password">
           <button class="eye-toggle" onclick="togglePassById('reg-password2')">👁</button>
         </div>
@@ -1846,7 +1856,7 @@
       <div class="input-group">
         <label>Nama Lengkap</label>
         <div class="input-wrap">
-          <span class="input-icon">👤</span>
+          <span class="input-icon"><i class="ti ti-user" aria-hidden="true"></i></span>
           <input type="text" id="guru-reg-nama" placeholder="cth: Ustadzah Fatimah">
         </div>
       </div>
@@ -1854,7 +1864,7 @@
       <div class="input-group">
         <label>Email</label>
         <div class="input-wrap">
-          <span class="input-icon">✉️</span>
+          <span class="input-icon"><i class="ti ti-mail" aria-hidden="true"></i></span>
           <input type="email" id="guru-reg-email" placeholder="contoh@email.com">
         </div>
       </div>
@@ -1862,7 +1872,7 @@
       <div class="input-group">
         <label>Password</label>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="guru-reg-password" placeholder="Minimal 6 karakter">
           <button class="eye-toggle" onclick="togglePassById('guru-reg-password')">👁</button>
         </div>
@@ -1871,7 +1881,7 @@
       <div class="input-group">
         <label>Konfirmasi Password</label>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="guru-reg-password2" placeholder="Ulangi password">
           <button class="eye-toggle" onclick="togglePassById('guru-reg-password2')">👁</button>
         </div>
@@ -2370,10 +2380,10 @@
       </div>
     </div>
     <div class="peran-bottom-nav">
-      <button class="pnav-item active" onclick="void(0)"><span class="pnav-icon">🏠</span>Beranda</button>
-      <button class="pnav-item" onclick="goToFromDashboard('info-sekolah-view','peran');loadInfoSekolahView()"><span class="pnav-icon">ℹ️</span>Informasi</button>
-      <button class="pnav-item" onclick="goToFromDashboard('bantuan','peran')"><span class="pnav-icon">🎧</span>Bantuan</button>
-      <button class="pnav-item" onclick="showToast('Silakan pilih peran terlebih dahulu')"><span class="pnav-icon">👤</span>Akun</button>
+      <button class="pnav-item active" onclick="void(0)"><i class="ti ti-home-2 pnav-icon" aria-hidden="true"></i>Beranda</button>
+      <button class="pnav-item" onclick="goToFromDashboard('info-sekolah-view','peran');loadInfoSekolahView()"><i class="ti ti-info-circle pnav-icon" aria-hidden="true"></i>Informasi</button>
+      <button class="pnav-item" onclick="goToFromDashboard('bantuan','peran')"><i class="ti ti-headset pnav-icon" aria-hidden="true"></i>Bantuan</button>
+      <button class="pnav-item" onclick="showToast('Silakan pilih peran terlebih dahulu')"><i class="ti ti-user-circle pnav-icon" aria-hidden="true"></i>Akun</button>
     </div>
   </div>
 
@@ -2413,39 +2423,39 @@
         <div class="section-title">Menu Cepat</div>
         <div class="quick-grid">
           <button class="quick-btn" onclick="goToFromDashboard('absensi','dashboard-guru');initScreenIfNeeded('absensi')">
-            <div class="quick-btn-icon" style="background:#42A5F5;color:white;">📋</div>
+            <div class="quick-btn-icon" style="background:#42A5F5;color:white;"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
             <span>Absensi</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('aktivitas','dashboard-guru');initScreenIfNeeded('aktivitas')">
-            <div class="quick-btn-icon" style="background:var(--green);color:white;">➕</div>
+            <div class="quick-btn-icon" style="background:var(--green);color:white;"><i class="ti ti-circle-plus" aria-hidden="true"></i></div>
             <span>Aktivitas Baru</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('penilaian','dashboard-guru');initPenilaian()">
-            <div class="quick-btn-icon" style="background:#FF7043;color:white;">📝</div>
+            <div class="quick-btn-icon" style="background:#FF7043;color:white;"><i class="ti ti-file-text" aria-hidden="true"></i></div>
             <span>Penilaian Cepat</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('guru-rapor-siswa','dashboard-guru')">
-            <div class="quick-btn-icon" style="background:#8BC34A;color:white;">📊</div>
+            <div class="quick-btn-icon" style="background:#8BC34A;color:white;"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
             <span>Rapor Siswa</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('dokumentasi','dashboard-guru')">
-            <div class="quick-btn-icon" style="background:#7E57C2;color:white;">📷</div>
+            <div class="quick-btn-icon" style="background:#7E57C2;color:white;"><i class="ti ti-camera" aria-hidden="true"></i></div>
             <span>Dokumentasi</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('laporan-harian','dashboard-guru')">
-            <div class="quick-btn-icon" style="background:#42A5F5;color:white;">📋</div>
+            <div class="quick-btn-icon" style="background:#42A5F5;color:white;"><i class="ti ti-file-analytics" aria-hidden="true"></i></div>
             <span>Laporan Harian</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('guru-modul-list','dashboard-guru');renderGuruModulList()">
-            <div class="quick-btn-icon" style="background:#5E35B1;color:white;">📘</div>
+            <div class="quick-btn-icon" style="background:#5E35B1;color:white;"><i class="ti ti-book-2" aria-hidden="true"></i></div>
             <span>Modul Pembelajaran</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('guru-asesmen-list','dashboard-guru');renderGuruAsesmenList()">
-            <div class="quick-btn-icon" style="background:#00897B;color:white;">🗒️</div>
+            <div class="quick-btn-icon" style="background:#00897B;color:white;"><i class="ti ti-notes" aria-hidden="true"></i></div>
             <span>Lembar Asesmen</span>
           </button>
           <button class="quick-btn" style="position:relative;" onclick="goToFromDashboard('pengumuman-guru-terima','dashboard-guru');renderPengumumanGuruTerima()">
-            <div class="quick-btn-icon" style="background:#EF6C00;color:white;">📢</div>
+            <div class="quick-btn-icon" style="background:#EF6C00;color:white;"><i class="ti ti-speakerphone" aria-hidden="true"></i></div>
             <span>Pengumuman</span>
             <div id="badge-pengumuman-guru" style="display:none;position:absolute;top:4px;right:14px;background:#F44336;color:white;font-size:10px;font-weight:800;padding:2px 6px;border-radius:10px;">0</div>
           </button>
@@ -2465,11 +2475,11 @@
       </div>
     </div>
     <nav class="bottom-nav" id="bottomNav-guru">
-      <button class="nav-item active" onclick="switchTab('dashboard-guru', this, 'guru')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><span class="nav-icon">📌</span><span class="nav-label">Aktivitas</span></button>
-      <button class="nav-item" onclick="switchTab('daftar-murid-guru', this, 'guru');renderDaftarMuridGuru()"><span class="nav-icon">👦</span><span class="nav-label">Murid</span></button>
-      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item active" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
+      <button class="nav-item" onclick="switchTab('daftar-murid-guru', this, 'guru');renderDaftarMuridGuru()"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Murid</span></button>
+      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -2506,11 +2516,11 @@
       <div style="height:16px;"></div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><span class="nav-icon">📌</span><span class="nav-label">Aktivitas</span></button>
-      <button class="nav-item active" onclick="switchTab('daftar-murid-guru', this, 'guru');renderDaftarMuridGuru()"><span class="nav-icon">👦</span><span class="nav-label">Murid</span></button>
-      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
+      <button class="nav-item active" onclick="switchTab('daftar-murid-guru', this, 'guru');renderDaftarMuridGuru()"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Murid</span></button>
+      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -2731,7 +2741,7 @@
       <!-- Daftar murid -->
       <div id="daftar-absensi" style="padding:0 16px;display:flex;flex-direction:column;gap:8px;"></div>
       <div style="padding:16px;">
-        <button onclick="simpanAbsensi()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Absensi</button>
+        <button onclick="simpanAbsensi()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;"><i class="ti ti-device-floppy" aria-hidden="true"></i> Simpan Absensi</button>
       </div>
     </div>
   </div>
@@ -3747,19 +3757,19 @@
       </div>
       <div class="pm-menu-grid">
         <button class="pm-menu-btn active" onclick="switchProfileTab(this,'tab-riwayat')">
-          <div class="pm-menu-icon" style="background:#E8F5E9;color:var(--green-dark);">🕐</div>
+          <div class="pm-menu-icon" style="background:#E8F5E9;color:var(--green-dark);"><i class="ti ti-clock" aria-hidden="true"></i></div>
           <span>Riwayat</span>
         </button>
         <button class="pm-menu-btn" onclick="switchProfileTab(this,'tab-penilaian')">
-          <div class="pm-menu-icon" style="background:#E3F2FD;color:#1565C0;">📝</div>
+          <div class="pm-menu-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-pencil" aria-hidden="true"></i></div>
           <span>Penilaian</span>
         </button>
         <button class="pm-menu-btn" onclick="switchProfileTab(this,'tab-dokumentasi')">
-          <div class="pm-menu-icon" style="background:#F3E5F5;color:#7B1FA2;">📷</div>
+          <div class="pm-menu-icon" style="background:#F3E5F5;color:#7B1FA2;"><i class="ti ti-camera" aria-hidden="true"></i></div>
           <span>Dokumentasi</span>
         </button>
         <button class="pm-menu-btn" onclick="switchProfileTab(this,'tab-grafik')">
-          <div class="pm-menu-icon" style="background:#FFF3E0;color:#E65100;">📊</div>
+          <div class="pm-menu-icon" style="background:#FFF3E0;color:#E65100;"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
           <span>Grafik</span>
         </button>
       </div>
@@ -3881,11 +3891,11 @@
       </div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><span class="nav-icon">📌</span><span class="nav-label">Aktivitas</span></button>
-      <button class="nav-item active" onclick="switchTab('profil-murid', this, 'guru')"><span class="nav-icon">👦</span><span class="nav-label">Murid</span></button>
-      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
+      <button class="nav-item active" onclick="switchTab('profil-murid', this, 'guru')"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Murid</span></button>
+      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -3913,11 +3923,11 @@
       </div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-item active" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><span class="nav-icon">📷</span><span class="nav-label">Foto</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><span class="nav-icon">💬</span><span class="nav-label">Pesan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -3950,18 +3960,18 @@
       </div>
     </div>
     <nav class="bottom-nav" id="dokNavGuru">
-      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><span class="nav-icon">📌</span><span class="nav-label">Aktivitas</span></button>
-      <button class="nav-item" onclick="switchTab('profil-murid', this, 'guru')"><span class="nav-icon">👦</span><span class="nav-label">Murid</span></button>
-      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
+      <button class="nav-item" onclick="switchTab('profil-murid', this, 'guru')"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Murid</span></button>
+      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
     <nav class="bottom-nav" id="dokNavOrtu" style="display:none;">
-      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item active" onclick="switchTabOrtu(this,'dokumentasi')"><span class="nav-icon">📷</span><span class="nav-label">Foto</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><span class="nav-icon">💬</span><span class="nav-label">Pesan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -4097,11 +4107,11 @@
       </div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><span class="nav-icon">📷</span><span class="nav-label">Foto</span></button>
-      <button class="nav-item active" onclick="switchTabOrtu(this,'laporan-bulanan')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><span class="nav-icon">💬</span><span class="nav-label">Pesan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -4168,11 +4178,11 @@
       <div style="height:8px;"></div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><span class="nav-icon">📷</span><span class="nav-label">Foto</span></button>
-      <button class="nav-item active" onclick="switchTabOrtu(this,'laporan-bulanan')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><span class="nav-icon">💬</span><span class="nav-label">Pesan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -4625,17 +4635,17 @@
             <div class="section-title">Laporan Sekolah</div>
             <div style="display:flex;flex-direction:column;gap:8px;">
               <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="bukaLaporanKepala()">
-                <div class="quick-btn-icon" style="background:#E8F5E9;">📊</div>
+                <div class="quick-btn-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-chart-bar" aria-hidden="true"></i></div>
                 <div style="flex:1;text-align:left;margin-left:4px;"><div style="font-weight:700;font-size:13px;">Laporan Bulanan</div><div style="font-size:11px;color:var(--gray-500);">Lihat perkembangan bulan ini</div></div>
                 <span style="color:var(--gray-300);">›</span>
               </div>
               <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="bukaRaporKepala()">
-                <div class="quick-btn-icon" style="background:#FFF8E1;">📋</div>
+                <div class="quick-btn-icon" style="background:#FFF8E1;color:#F57F17;"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
                 <div style="flex:1;text-align:left;margin-left:4px;"><div style="font-weight:700;font-size:13px;">Rapor Murid</div><div style="font-size:11px;color:var(--gray-500);">Generate rapor semester</div></div>
                 <span style="color:var(--gray-300);">›</span>
               </div>
               <div class="quick-btn" style="flex-direction:row;align-items:center;padding:14px;" onclick="goTo('pengaturan')">
-                <div class="quick-btn-icon" style="background:#E3F2FD;">⚙️</div>
+                <div class="quick-btn-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-settings" aria-hidden="true"></i></div>
                 <div style="flex:1;text-align:left;margin-left:4px;"><div style="font-weight:700;font-size:13px;">Pengaturan Sekolah</div><div style="font-size:11px;color:var(--gray-500);">Kelola data sekolah</div></div>
                 <span style="color:var(--gray-300);">›</span>
               </div>
@@ -4783,7 +4793,7 @@
         </div>
       </div>
       <div style="padding:0 16px 16px;">
-        <button onclick="simpanAbsensiGuru()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;">💾 Simpan Absensi Guru</button>
+        <button onclick="simpanAbsensiGuru()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--green),var(--green-light));color:white;border:none;border-radius:var(--radius);font-size:15px;font-weight:700;cursor:pointer;"><i class="ti ti-device-floppy" aria-hidden="true"></i> Simpan Absensi Guru</button>
       </div>
     </div>
   </div>
@@ -4943,18 +4953,18 @@
       </div>
     </div>
     <nav class="bottom-nav" id="pesanNavGuru">
-      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><span class="nav-icon">📌</span><span class="nav-label">Aktivitas</span></button>
-      <button class="nav-item" onclick="switchTab('profil-murid', this, 'guru')"><span class="nav-icon">👦</span><span class="nav-label">Murid</span></button>
-      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
+      <button class="nav-item" onclick="switchTab('profil-murid', this, 'guru')"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Murid</span></button>
+      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
     <nav class="bottom-nav" id="pesanNavOrtu" style="display:none;">
-      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><span class="nav-icon">📷</span><span class="nav-label">Foto</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item active" onclick="switchTabOrtu(this,'pesan')"><span class="nav-icon">💬</span><span class="nav-label">Pesan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -4974,32 +4984,32 @@
       </div>
       <div class="menu-list">
         <div class="menu-item" onclick="goToFromDashboard('info-pribadi','profil-user')">
-          <div class="menu-item-icon" style="background:#E8F5E9;">👤</div>
+          <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
           <div class="menu-item-text"><div class="menu-item-label">Informasi Pribadi</div></div>
           <span class="menu-chevron">›</span>
         </div>
         <div class="menu-item" onclick="goToFromDashboard('pengaturan','profil-user');updatePengaturanView()">
-          <div class="menu-item-icon" style="background:#E3F2FD;">⚙️</div>
+          <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-settings" aria-hidden="true"></i></div>
           <div class="menu-item-text"><div class="menu-item-label">Pengaturan Akun</div></div>
           <span class="menu-chevron">›</span>
         </div>
         <div class="menu-item" onclick="goToFromDashboard('ubah-password','profil-user')">
-          <div class="menu-item-icon" style="background:#FFF8E1;">🔒</div>
+          <div class="menu-item-icon" style="background:#FFF8E1;color:#F57F17;"><i class="ti ti-lock" aria-hidden="true"></i></div>
           <div class="menu-item-text"><div class="menu-item-label">Ubah Password</div></div>
           <span class="menu-chevron">›</span>
         </div>
         <div class="menu-item" onclick="goToFromDashboard('bantuan','profil-user')">
-          <div class="menu-item-icon" style="background:#E3F2FD;">❓</div>
+          <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
           <div class="menu-item-text"><div class="menu-item-label">Bantuan</div></div>
           <span class="menu-chevron">›</span>
         </div>
         <div class="menu-item" onclick="goToFromDashboard('tentang-app','profil-user')">
-          <div class="menu-item-icon" style="background:#E8F5E9;">ℹ️</div>
+          <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
           <div class="menu-item-text"><div class="menu-item-label">Tentang SchoolID</div></div>
           <span class="menu-chevron">›</span>
         </div>
         <div class="menu-item danger" onclick="confirmLogout()">
-          <div class="menu-item-icon">🚪</div>
+          <div class="menu-item-icon"style="background:#FFEBEE;color:#C62828;"><i class="ti ti-logout" aria-hidden="true"></i></div>
           <div class="menu-item-text"><div class="menu-item-label">Keluar</div></div>
         </div>
       </div>
@@ -5229,12 +5239,12 @@
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);padding:4px 0;">DATA DIRI</div>
         <div class="menu-list" style="margin:0;">
           <div class="menu-item" onclick="goToFromDashboard('ortu-info-pribadi','profil-ortu')">
-            <div class="menu-item-icon" style="background:#E8F5E9;">👨‍👩‍👧</div>
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-users" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Data Orang Tua</div><div style="font-size:11px;color:var(--gray-400);">Suami, istri & alamat tinggal</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('ortu-data-anak','profil-ortu');applyOrtuAvatars()">
-            <div class="menu-item-icon" style="background:#F3E5F5;">👧</div>
+            <div class="menu-item-icon" style="background:#F3E5F5;color:#7B1FA2;"><i class="ti ti-girl" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Data Anak</div><div style="font-size:11px;color:var(--gray-400);">Profil lengkap anak</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -5243,17 +5253,17 @@
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);padding:4px 0;margin-top:4px;">AKUN & KEAMANAN</div>
         <div class="menu-list" style="margin:0;">
           <div class="menu-item" onclick="goToFromDashboard('ortu-ubah-hp','profil-ortu')">
-            <div class="menu-item-icon" style="background:#E3F2FD;">📱</div>
+            <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-device-mobile" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Ubah Nomor HP</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('ortu-notifikasi','profil-ortu')">
-            <div class="menu-item-icon" style="background:#FFF8E1;">🔔</div>
+            <div class="menu-item-icon" style="background:#FFF8E1;color:#F57F17;"><i class="ti ti-bell" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Notifikasi</div><div style="font-size:11px;color:var(--gray-400);">Laporan realtime & pengumuman</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('ortu-ubah-password','profil-ortu')">
-            <div class="menu-item-icon" style="background:#FCE4EC;">🔒</div>
+            <div class="menu-item-icon" style="background:#FCE4EC;color:#C62828;"><i class="ti ti-lock" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Ubah Password</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -5262,12 +5272,12 @@
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);padding:4px 0;margin-top:4px;">INFORMASI SEKOLAH</div>
         <div class="menu-list" style="margin:0;">
           <div class="menu-item" onclick="goToFromDashboard('ortu-profil-guru','profil-ortu')">
-            <div class="menu-item-icon" style="background:#E8F5E9;">👩‍🏫</div>
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-school" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Profil Guru</div><div style="font-size:11px;color:var(--gray-400);">Lihat semua guru di sekolah</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('info-sekolah-view','profil-ortu');loadInfoSekolahView()">
-            <div class="menu-item-icon" style="background:#E3F2FD;">🏫</div>
+            <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-building-school" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Informasi Sekolah</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -5276,17 +5286,17 @@
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);padding:4px 0;margin-top:4px;">LAINNYA</div>
         <div class="menu-list" style="margin:0;">
           <div class="menu-item" onclick="goToFromDashboard('bantuan','profil-ortu')">
-            <div class="menu-item-icon" style="background:#E3F2FD;">❓</div>
+            <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Bantuan</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('tentang-app','profil-ortu')">
-            <div class="menu-item-icon" style="background:#E8F5E9;">ℹ️</div>
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Tentang SchoolID</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item danger" onclick="confirmLogout()">
-            <div class="menu-item-icon">🚪</div>
+            <div class="menu-item-icon"style="background:#FFEBEE;color:#C62828;"><i class="ti ti-logout" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Keluar</div></div>
           </div>
         </div>
@@ -5294,11 +5304,11 @@
       <div style="height:16px;"></div>
     </div>
     <nav class="bottom-nav">
-      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><span class="nav-icon">📷</span><span class="nav-label">Foto</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><span class="nav-icon">📊</span><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><span class="nav-icon">💬</span><span class="nav-label">Pesan</span></button>
-      <button class="nav-item active" onclick="switchTabOrtu(this,'profil-ortu')"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
 
@@ -6079,24 +6089,12 @@
     </div>
     <div class="form-body">
       <input type="hidden" id="fm-id">
-
-      <!-- Foto Profil Murid -->
-      <div class="form-group" style="text-align:center;">
-        <label class="form-label" style="text-align:left;display:block;">Foto Profil Murid</label>
-        <div style="position:relative;width:80px;height:80px;margin:0 auto 8px;">
-          <div id="fm-foto-preview" style="width:80px;height:80px;border-radius:50%;background:#E8F5E9;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:32px;overflow:hidden;background-size:cover;background-position:center;"></div>
-          <label for="fm-foto-input" style="position:absolute;bottom:-2px;right:-2px;width:26px;height:26px;border-radius:50%;background:var(--yellow);border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;">✏️</label>
-          <input type="file" id="fm-foto-input" accept="image/*" style="display:none;" onchange="previewFotoMurid(this)">
-        </div>
-        <div style="font-size:11px;color:var(--gray-400);">Tap ✏️ untuk ganti foto (maks 2MB)</div>
-      </div>
-
       <div class="form-group">
         <label class="form-label">Nama Lengkap *</label>
         <input type="text" id="fm-nama" class="form-input" placeholder="cth: Nama Lengkap Murid">
       </div>
       <div class="form-group">
-        <label class="form-label">Pilih Avatar (jika tidak ada foto)</label>
+        <label class="form-label">Pilih Avatar</label>
         <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:12px;">
           <!-- Avatar laki -->
           <div onclick="pilihAvatar(this,'👦')" class="avatar-opt" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#BBDEFB,#90CAF9);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;">👦</div>
@@ -6161,7 +6159,7 @@
         <div style="padding:0 16px;margin-bottom:8px;font-size:12px;font-weight:700;color:var(--gray-500);">INFORMASI UMUM</div>
         <div class="settings-group">
           <div class="menu-item" id="menu-info-sekolah" onclick="bukaInfoSekolahSesuaiPeran()">
-            <div class="menu-item-icon" style="background:#E8F5E9;">🏫</div>
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-building-school" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label" id="menu-info-sekolah-label">Edit Informasi Sekolah</div><div style="font-size:11px;color:var(--gray-400);" id="menu-info-sekolah-sub">Ubah data & profil sekolah</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -6169,17 +6167,17 @@
         <div style="padding:0 16px;margin:12px 0 8px;font-size:12px;font-weight:700;color:var(--gray-500);">KELOLA DATA</div>
         <div class="settings-group">
           <div class="menu-item" onclick="goToFromDashboard('kelola-kelas','pengaturan');renderKelolaKelas()">
-            <div class="menu-item-icon" style="background:#E3F2FD;">🎒</div>
+            <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-backpack" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Kelola Kelas</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" id="menu-kelola-guru" onclick="goToFromDashboard('kelola-guru','pengaturan');renderKelolaGuru()">
-            <div class="menu-item-icon" style="background:#FFF3E0;">🧑‍🏫</div>
+            <div class="menu-item-icon" style="background:#FFF3E0;color:#E65100;"><i class="ti ti-chalkboard" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Kelola Guru</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('kelola-murid','pengaturan');initKelolaMusid()">
-            <div class="menu-item-icon" style="background:#F3E5F5;">👦</div>
+            <div class="menu-item-icon" style="background:#F3E5F5;color:#7B1FA2;"><i class="ti ti-user" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Kelola Murid</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -6187,12 +6185,12 @@
         <div style="padding:0 16px;margin:12px 0 8px;font-size:12px;font-weight:700;color:var(--gray-500);">PENILAIAN & DATA</div>
         <div class="settings-group">
           <div class="menu-item" onclick="goToFromDashboard('pengaturan-penilaian','pengaturan')">
-            <div class="menu-item-icon" style="background:#E8F5E9;">📝</div>
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-pencil" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Pengaturan Penilaian</div></div>
             <span class="menu-chevron">›</span>
           </div>
           <div class="menu-item" onclick="goToFromDashboard('backup-restore','pengaturan')">
-            <div class="menu-item-icon" style="background:#E3F2FD;">💾</div>
+            <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-database" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Backup & Restore</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -6200,7 +6198,7 @@
         <div style="padding:0 16px;margin:12px 0 8px;font-size:12px;font-weight:700;color:var(--gray-500);">LAINNYA</div>
         <div class="settings-group">
           <div class="menu-item" onclick="goToFromDashboard('tentang-app','pengaturan')">
-            <div class="menu-item-icon" style="background:#FFF8E1;">ℹ️</div>
+            <div class="menu-item-icon" style="background:#FFF8E1;color:#F57F17;"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Tentang Aplikasi</div></div>
             <span class="menu-chevron">›</span>
           </div>
@@ -9680,12 +9678,8 @@ async function tandaTanganSetujui(type, id) {
 function avatarDivHtml(m, sizePx, extraStyle) {
   const size = sizePx || 48;
   const fallbackGradient = m.jk === 'L' ? '#BBDEFB,#90CAF9' : '#FFE0B2,#FFCC80';
-  const isL = m.jk === 'L';
-  // Prioritas: foto_url dari Supabase
-  if (m.foto_url) {
-    return `<div style="width:${size}px;height:${size}px;border-radius:50%;background-image:url(${m.foto_url});background-size:cover;background-position:center;flex-shrink:0;${extraStyle||''}"></div>`;
-  }
   const isDefault = !m.avatar || m.avatar === '👦' || m.avatar === '👧';
+  const isL = m.jk === 'L';
   if (isDefault) {
     const cls = isL ? 'av-murid-l' : 'av-murid-p';
     return `<div class="${cls}" style="width:${size}px;height:${size}px;border-radius:50%;flex-shrink:0;${extraStyle||''}"></div>`;
@@ -9730,8 +9724,7 @@ async function saveMuridList(list) {
       const { error } = await supabaseClient.from('murid').upsert(list.map(m => ({
         id: m.id, nama: m.nama, jk: m.jk, avatar: m.avatar || null,
         kelompok: m.kelompok || null, tgl: m.tgl || null, ortu: m.ortu || null,
-        hp: m.hp || null, catatan: m.catatan || null,
-        foto_url: m.foto_url || null
+        hp: m.hp || null, catatan: m.catatan || null
       })));
       if (error) throw error;
     }
@@ -9827,34 +9820,10 @@ function hitungUmur(tgl) {
   return `${tahun} Th ${bulan} Bln`;
 }
 
-function previewFotoMurid(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  if (!file.type.startsWith('image/')) { showToast('File harus berupa gambar ⚠️'); input.value=''; return; }
-  if (file.size > 2 * 1024 * 1024) { showToast('Ukuran foto maksimal 2MB ⚠️'); input.value=''; return; }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const prev = document.getElementById('fm-foto-preview');
-    if (prev) {
-      prev.style.backgroundImage = 'url(' + e.target.result + ')';
-      prev.style.backgroundSize = 'cover';
-      prev.style.backgroundPosition = 'center';
-      prev.textContent = '';
-    }
-  };
-  reader.readAsDataURL(file);
-}
-
 function bukaFormTambahMurid() {
   editMuridId = null; selectedJK = '';
   document.getElementById('form-murid-judul').textContent = 'Tambah Murid';
   ['fm-nama','fm-tgl','fm-ortu','fm-hp','fm-catatan','fm-avatar'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
-  // Reset foto preview
-  const prev = document.getElementById('fm-foto-preview');
-  if (prev) { prev.style.backgroundImage=''; prev.textContent='📷'; }
-  const inp = document.getElementById('fm-foto-input');
-  if (inp) inp.value = '';
-  window._fmFotoUrl = null;
   isiDropdownKelas('fm-kelompok');
   document.getElementById('fm-kelompok').value = 'A';
   document.getElementById('btn-hapus-murid').style.display = 'none';
@@ -9894,26 +9863,6 @@ function bukaEditMurid(id) {
   }
   resetPilihJK(); pilihJK(m.jk);
   setTimeout(() => resetAvatarGrid(m.avatar || ''), 100);
-  // Load foto murid dari Supabase
-  window._fmFotoUrl = null;
-  const prev = document.getElementById('fm-foto-preview');
-  const inp = document.getElementById('fm-foto-input');
-  if (inp) inp.value = '';
-  if (prev) {
-    prev.style.backgroundImage = '';
-    prev.textContent = '📷';
-    if (m.id) {
-      supabaseClient.from('murid').select('foto_url').eq('id', m.id).maybeSingle().then(({ data }) => {
-        if (data?.foto_url) {
-          prev.style.backgroundImage = 'url(' + data.foto_url + ')';
-          prev.style.backgroundSize = 'cover';
-          prev.style.backgroundPosition = 'center';
-          prev.textContent = '';
-          window._fmFotoUrl = data.foto_url;
-        }
-      });
-    }
-  }
   goToFromDashboard('form-murid', 'kelola-murid');
 }
 
@@ -9970,53 +9919,26 @@ function resetPilihJK() {
   });
 }
 
-async function simpanMurid() {
+function simpanMurid() {
   const nama = document.getElementById('fm-nama').value.trim();
   if (!nama) { showToast('Nama murid wajib diisi! ⚠️'); return; }
   if (!selectedJK) { showToast('Pilih jenis kelamin! ⚠️'); return; }
   const avatarPilihan = document.getElementById('fm-avatar').value || (selectedJK === 'L' ? '👦' : '👧');
   const kelompokPilihan = document.getElementById('fm-kelompok').value || 'A';
-
-  // Upload foto jika ada file baru
-  let fotoUrl = window._fmFotoUrl || null;
-  const fotoInput = document.getElementById('fm-foto-input');
-  if (fotoInput && fotoInput.files && fotoInput.files[0]) {
-    showLoading();
-    try {
-      const file = fotoInput.files[0];
-      const muridId = editMuridId || Date.now().toString();
-      const ext = file.name.split('.').pop();
-      const path = 'murid-foto/' + muridId + '.' + ext;
-      const { error: upErr } = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
-      if (upErr) throw upErr;
-      const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(path);
-      fotoUrl = urlData.publicUrl;
-    } catch(e) {
-      hideLoading();
-      showToast('Gagal upload foto: ' + (e.message||e) + ' ⚠️');
-      return;
-    }
-    hideLoading();
-  }
-
   const list = getMuridList();
   if (editMuridId) {
     const idx = list.findIndex(m => m.id === editMuridId);
     if (idx !== -1) list[idx] = {...list[idx], nama, jk: selectedJK,
-      avatar: avatarPilihan, foto_url: fotoUrl,
+      avatar: avatarPilihan,
       kelompok: kelompokPilihan,
       tgl: document.getElementById('fm-tgl').value,
       ortu: document.getElementById('fm-ortu').value.trim(),
       hp: document.getElementById('fm-hp').value.trim(),
       catatan: document.getElementById('fm-catatan').value.trim()};
-    // Update foto_url ke Supabase jika ada foto baru
-    if (fotoUrl) {
-      await supabaseClient.from('murid').update({ foto_url: fotoUrl }).eq('id', editMuridId);
-    }
     showToast('Data murid diperbarui! ✅');
   } else {
     list.push({id: Date.now().toString(), nama, jk: selectedJK,
-      avatar: avatarPilihan, foto_url: fotoUrl,
+      avatar: avatarPilihan,
       kelompok: kelompokPilihan,
       tgl: document.getElementById('fm-tgl').value,
       ortu: document.getElementById('fm-ortu').value.trim(),
@@ -11319,33 +11241,15 @@ async function muatLaporanBulananOrtu() {
   const murid = getMuridList().find(m => m.nama === namaAnak);
   const kelas = murid ? getKelasList().find(k => k.id === murid.kelompok) : null;
   if (el('lb-kelas-info')) {
-    const ta = (infoSekolahCache && infoSekolahCache.tahunAjaran) ? infoSekolahCache.tahunAjaran : '2026/2027';
-    el('lb-kelas-info').textContent = (kelas ? kelas.nama : (murid?.kelompok || '-')) + ' · Tahun Ajaran ' + ta;
+    el('lb-kelas-info').textContent = (kelas ? kelas.nama : (murid?.kelompok || '-')) + ' · Tahun Ajaran 2025/2026';
   }
-  // Avatar - prioritaskan foto dari Supabase
+  // Avatar
   const av = el('lb-avatar');
   if (av && murid) {
-    if (murid.foto_url) {
-      av.className = '';
-      av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;background-image:url(' + murid.foto_url + ');background-size:cover;background-position:center;';
-      av.textContent = '';
-    } else {
-      // Coba load dari Supabase langsung
-      supabaseClient.from('murid').select('foto_url').eq('nama', namaAnak).maybeSingle().then(({ data }) => {
-        if (data?.foto_url) {
-          av.className = '';
-          av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;background-image:url(' + data.foto_url + ');background-size:cover;background-position:center;';
-          av.textContent = '';
-          // Update cache lokal
-          if (murid) murid.foto_url = data.foto_url;
-        } else {
-          const emoji = murid.jk === 'L' ? '👦' : '👧';
-          av.textContent = emoji;
-          av.className = '';
-          av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(255,255,255,0.2);';
-        }
-      });
-    }
+    const emoji = murid.jk === 'L' ? '👦' : '👧';
+    av.textContent = emoji;
+    av.className = '';
+    av.style.cssText = 'width:52px;height:52px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(255,255,255,0.2);';
   }
 
   // Tanggal awal & akhir bulan
