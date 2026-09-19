@@ -592,13 +592,22 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 16px;
-    background: white;
-    border-bottom: 1px solid var(--gray-100);
+    padding: 20px 18px 24px;
+    background: linear-gradient(160deg, #1B5E20 0%, #2E7D32 55%, #43A047 100%);
+    position: relative;
+    overflow: hidden;
     flex-shrink: 0;
   }
+  .dg-topbar::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
   .dg-avatar {
-    width: 44px; height: 44px;
+    width: 48px; height: 48px;
     border-radius: 50%;
     background: linear-gradient(135deg, #FFD54F, #FFA726);
     display: flex;
@@ -606,11 +615,13 @@
     justify-content: center;
     font-size: 22px;
     flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border: 2px solid rgba(255,255,255,0.5);
+    position: relative;
+    z-index: 1;
   }
-  .dg-greet { flex: 1; }
-  .dg-hi { font-size: 15px; font-weight: 800; color: var(--gray-900); }
-  .dg-date { font-size: 11.5px; color: var(--gray-500); margin-top: 1px; }
+  .dg-greet { flex: 1; position: relative; z-index: 1; }
+  .dg-hi { font-size: 15px; font-weight: 700; color: white; }
+  .dg-date { font-size: 11.5px; color: rgba(255,255,255,0.75); margin-top: 1px; }
   .dg-stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2389,26 +2400,26 @@
         <div class="dg-hi" id="dg-greet-nama">Assalamu'alaikum, Ustadzah</div>
         <div class="dg-date" id="dashDate">Senin, 16 Juni 2026</div>
       </div>
-      <button class="notif-btn" style="position:static;background:var(--gray-100);color:var(--gray-700);border-radius:50%;border:none;" onclick="goTo('notifikasi')">🔔<div class="notif-badge" style="border-color:white;"></div></button>
+      <button class="notif-btn" style="position:static;background:rgba(255,255,255,0.15);color:white;border-radius:50%;border:none;z-index:1;" onclick="goTo('notifikasi')"><i class="ti ti-bell" aria-hidden="true"></i><div class="notif-badge" style="border-color:#2E7D32;"></div></button>
     </div>
     <div class="scroll-content">
       <div class="section" style="padding-bottom:4px;">
         <div class="section-title">Ringkasan Hari Ini</div>
         <div class="dg-stats-grid">
-          <div class="dg-stat-card">
-            <div class="dg-stat-icon" style="background:#E8F5E9;">👦</div>
+          <div class="dg-stat-card" style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:none;">
+            <div class="dg-stat-icon" style="background:white;"><i class="ti ti-users" style="color:#2E7D32;" aria-hidden="true"></i></div>
             <div><div class="dg-stat-val" id="dg-stat-murid">-</div><div class="dg-stat-lbl">Jumlah Murid</div></div>
           </div>
-          <div class="dg-stat-card">
-            <div class="dg-stat-icon" style="background:#FFF3E0;">📌</div>
+          <div class="dg-stat-card" style="background:linear-gradient(135deg,#FFF3E0,#FFF8E1);border:none;">
+            <div class="dg-stat-icon" style="background:white;"><i class="ti ti-pin" style="color:#E65100;" aria-hidden="true"></i></div>
             <div><div class="dg-stat-val" id="dg-stat-aktivitas">-</div><div class="dg-stat-lbl">Aktivitas Hari Ini</div></div>
           </div>
-          <div class="dg-stat-card">
-            <div class="dg-stat-icon" style="background:#E3F2FD;">📁</div>
+          <div class="dg-stat-card" style="background:linear-gradient(135deg,#E3F2FD,#E1F5FE);border:none;">
+            <div class="dg-stat-icon" style="background:white;"><i class="ti ti-folder" style="color:#1565C0;" aria-hidden="true"></i></div>
             <div><div class="dg-stat-val" id="dg-stat-dokumentasi">-</div><div class="dg-stat-lbl">Dokumentasi</div></div>
           </div>
-          <div class="dg-stat-card">
-            <div class="dg-stat-icon" style="background:#FFF8E1;">⭐</div>
+          <div class="dg-stat-card" style="background:linear-gradient(135deg,#FFF8E1,#FFFDE7);border:none;">
+            <div class="dg-stat-icon" style="background:white;"><i class="ti ti-star" style="color:#F57F17;" aria-hidden="true"></i></div>
             <div><div class="dg-stat-val" id="dg-stat-penilaian">-</div><div class="dg-stat-lbl">Penilaian</div></div>
           </div>
         </div>
@@ -2453,6 +2464,12 @@
             <span>Pengumuman</span>
             <div id="badge-pengumuman-guru" style="display:none;position:absolute;top:4px;right:14px;background:#F44336;color:white;font-size:10px;font-weight:800;padding:2px 6px;border-radius:10px;">0</div>
           </button>
+        </div>
+      </div>
+      <div class="section" style="padding-top:0;">
+        <div style="background:linear-gradient(135deg,#FFF8E1,#FFF3E0);border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center;">
+          <i class="ti ti-bulb" style="font-size:24px;color:#F57F17;flex-shrink:0;" aria-hidden="true"></i>
+          <div style="font-size:12px;color:#5D4037;line-height:1.5;" id="dg-quote">Setiap anak istimewa dengan caranya sendiri. Teruslah bersabar dan menginspirasi hari ini.</div>
         </div>
       </div>
       <div class="section" style="padding-top:0;">
@@ -4964,50 +4981,70 @@
 
   <!-- ===== PROFIL USER ===== -->
   <div id="profil-user" class="screen">
-    <div class="top-bar">
-      <button class="back-btn" onclick="goBack()">‹</button>
-      <h2>Profil</h2>
+    <div class="top-bar" style="background:transparent;border-bottom:none;position:absolute;top:0;left:0;right:0;z-index:2;">
+      <button class="back-btn" style="color:white;" onclick="goBack()">‹</button>
     </div>
-    <div class="scroll-content">
-      <div class="pm-header" style="padding:20px 16px;">
-        <div class="pu-avatar-sm" id="pu-avatar">👩🏻‍🏫</div>
-        <div class="pm-name-wrap">
-          <div class="pm-name" id="pu-name">Memuat...</div>
-          <div class="pm-sub" id="pu-sub">Guru Kelas A</div>
+    <div class="scroll-content" style="padding-top:0;">
+      <div style="background:linear-gradient(160deg,#1B5E20 0%,#2E7D32 60%,#43A047 100%);padding:44px 20px 60px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);"></div>
+        <div style="position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06);"></div>
+        <div style="position:relative;z-index:1;text-align:center;">
+          <div class="pu-avatar-sm" id="pu-avatar" style="width:88px;height:88px;margin:0 auto 12px;border:3px solid rgba(255,255,255,0.5);font-size:36px;"></div>
+          <div class="pm-name" id="pu-name" style="color:white;font-size:19px;font-weight:700;">Memuat...</div>
+          <div class="pm-sub" id="pu-sub" style="color:rgba(255,255,255,0.85);font-size:13px;margin-top:2px;">Guru Kelas A</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.18);padding:4px 12px;border-radius:20px;margin-top:10px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#8BC34A;"></div>
+            <span style="color:white;font-size:11px;font-weight:600;" id="pu-status">Aktif Mengajar</span>
+          </div>
         </div>
       </div>
-      <div class="menu-list">
-        <div class="menu-item" onclick="goToFromDashboard('info-pribadi','profil-user')">
-          <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
-          <div class="menu-item-text"><div class="menu-item-label">Informasi Pribadi</div></div>
-          <span class="menu-chevron">›</span>
-        </div>
-        <div class="menu-item" onclick="goToFromDashboard('pengaturan','profil-user');updatePengaturanView()">
-          <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-settings" aria-hidden="true"></i></div>
-          <div class="menu-item-text"><div class="menu-item-label">Pengaturan Akun</div></div>
-          <span class="menu-chevron">›</span>
-        </div>
-        <div class="menu-item" onclick="goToFromDashboard('ubah-password','profil-user')">
-          <div class="menu-item-icon" style="background:#FFF8E1;color:#F57F17;"><i class="ti ti-lock" aria-hidden="true"></i></div>
-          <div class="menu-item-text"><div class="menu-item-label">Ubah Password</div></div>
-          <span class="menu-chevron">›</span>
-        </div>
-        <div class="menu-item" onclick="goToFromDashboard('bantuan','profil-user')">
-          <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
-          <div class="menu-item-text"><div class="menu-item-label">Bantuan</div></div>
-          <span class="menu-chevron">›</span>
-        </div>
-        <div class="menu-item" onclick="goToFromDashboard('tentang-app','profil-user')">
-          <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
-          <div class="menu-item-text"><div class="menu-item-label">Tentang SchoolID</div></div>
-          <span class="menu-chevron">›</span>
-        </div>
-        <div class="menu-item danger" onclick="confirmLogout()">
-          <div class="menu-item-icon" style="display:flex;align-items:center;justify-content:center;background:#FFEBEE;color:#C62828;"><i class="ti ti-logout" aria-hidden="true"></i></div>
-          <div class="menu-item-text"><div class="menu-item-label">Keluar</div></div>
+
+      <div style="margin:-40px 16px 0;background:white;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.12);padding:16px;position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;">
+        <div><div style="font-size:18px;font-weight:700;color:var(--green);" id="pu-stat-murid">-</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Murid</div></div>
+        <div style="border-left:1px solid #eee;border-right:1px solid #eee;"><div style="font-size:18px;font-weight:700;color:#1565C0;" id="pu-stat-kelas">-</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Kelas</div></div>
+        <div><div style="font-size:18px;font-weight:700;color:#E65100;" id="pu-stat-tahun">-</div><div style="font-size:10px;color:var(--gray-500);margin-top:2px;">Th Ngajar</div></div>
+      </div>
+
+      <div style="padding:20px 16px 8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--gray-400);letter-spacing:0.5px;margin-bottom:10px;">AKUN SAYA</div>
+        <div class="menu-list" style="border:1px solid #F0F0F0;border-radius:14px;overflow:hidden;">
+          <div class="menu-item" onclick="goToFromDashboard('info-pribadi','profil-user')">
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-user-circle" aria-hidden="true"></i></div>
+            <div class="menu-item-text"><div class="menu-item-label">Informasi Pribadi</div></div>
+            <span class="menu-chevron">›</span>
+          </div>
+          <div class="menu-item" onclick="goToFromDashboard('pengaturan','profil-user');updatePengaturanView()">
+            <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-settings" aria-hidden="true"></i></div>
+            <div class="menu-item-text"><div class="menu-item-label">Pengaturan Akun</div></div>
+            <span class="menu-chevron">›</span>
+          </div>
+          <div class="menu-item" onclick="goToFromDashboard('ubah-password','profil-user')">
+            <div class="menu-item-icon" style="background:#FFF8E1;color:#F57F17;"><i class="ti ti-lock" aria-hidden="true"></i></div>
+            <div class="menu-item-text"><div class="menu-item-label">Ubah Password</div></div>
+            <span class="menu-chevron">›</span>
+          </div>
         </div>
       </div>
-      <div style="height:8px;"></div>
+
+      <div style="padding:8px 16px 20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--gray-400);letter-spacing:0.5px;margin-bottom:10px;">LAINNYA</div>
+        <div class="menu-list" style="border:1px solid #F0F0F0;border-radius:14px;overflow:hidden;">
+          <div class="menu-item" onclick="goToFromDashboard('bantuan','profil-user')">
+            <div class="menu-item-icon" style="background:#E1F5FE;color:#0288D1;"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
+            <div class="menu-item-text"><div class="menu-item-label">Bantuan</div></div>
+            <span class="menu-chevron">›</span>
+          </div>
+          <div class="menu-item" onclick="goToFromDashboard('tentang-app','profil-user')">
+            <div class="menu-item-icon" style="background:#E8F5E9;color:#2E7D32;"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
+            <div class="menu-item-text"><div class="menu-item-label">Tentang SchoolID</div></div>
+            <span class="menu-chevron">›</span>
+          </div>
+          <div class="menu-item danger" onclick="confirmLogout()">
+            <div class="menu-item-icon" style="display:flex;align-items:center;justify-content:center;background:#FFEBEE;color:#C62828;"><i class="ti ti-logout" aria-hidden="true"></i></div>
+            <div class="menu-item-text"><div class="menu-item-label">Keluar</div></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -8641,6 +8678,22 @@ async function muatRingkasanDashboardGuru() {
   if (!currentUserProfile) return;
   const today = new Date().toISOString().split('T')[0];
 
+  // Quote motivasi harian (rotasi berdasarkan tanggal)
+  const quotes = [
+    'Setiap anak istimewa dengan caranya sendiri. Teruslah bersabar dan menginspirasi hari ini.',
+    'Senyummu hari ini bisa jadi kenangan indah bagi anak-anak di kelas.',
+    'Mendidik dengan hati membuat ilmu lebih mudah diterima.',
+    'Kesabaran seorang guru adalah investasi masa depan anak bangsa.',
+    'Hari ini adalah kesempatan baru untuk menumbuhkan cinta belajar pada anak-anak.',
+    'Setiap pertanyaan anak adalah pintu menuju rasa ingin tahu yang lebih besar.',
+    'Guru hebat bukan yang tahu segalanya, tapi yang terus belajar bersama muridnya.',
+  ];
+  const quoteEl = document.getElementById('dg-quote');
+  if (quoteEl) {
+    const dayIndex = new Date().getDate() % quotes.length;
+    quoteEl.textContent = quotes[dayIndex];
+  }
+
   try {
     // Jumlah murid di kelas guru ini
     const { count: jumlahMurid } = await supabaseClient
@@ -11512,7 +11565,7 @@ function updateProfilUserView() {
     // Terapkan foto profil jika ada
     if (currentUserProfile?.id) {
       supabaseClient.from('guru')
-        .select('nama, jabatan, foto_url')
+        .select('nama, jabatan, foto_url, kelas_id, tanggal_bergabung')
         .eq('user_id', currentUserProfile.id)
         .maybeSingle()
         .then(({ data }) => {
@@ -11526,7 +11579,21 @@ function updateProfilUserView() {
             avatar.style.backgroundSize = 'cover';
             avatar.style.backgroundPosition = 'center';
           }
+          // Isi stat card
+          const kelasEl = document.getElementById('pu-stat-kelas');
+          if (kelasEl) kelasEl.textContent = data.kelas_id || '-';
+          const tahunEl = document.getElementById('pu-stat-tahun');
+          if (tahunEl && data.tanggal_bergabung) {
+            const thn = new Date().getFullYear() - new Date(data.tanggal_bergabung).getFullYear();
+            tahunEl.textContent = thn > 0 ? thn : '<1';
+          }
         });
+      // Hitung jumlah murid di kelas guru ini
+      const muridEl = document.getElementById('pu-stat-murid');
+      if (muridEl) {
+        const list = getMuridList().filter(m => m.status !== 'nonaktif');
+        muridEl.textContent = list.length;
+      }
     }
   }
 }
