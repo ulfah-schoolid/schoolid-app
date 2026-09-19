@@ -8832,7 +8832,7 @@ async function uploadFotoOrtu(input) {
     const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(path, file, { upsert: true });
     if (uploadError) throw uploadError;
     const { data: urlData } = supabaseClient.storage.from('avatars').getPublicUrl(path);
-    const fotoUrl = urlData.publicUrl;
+    const fotoUrl = urlData.publicUrl + '?t=' + Date.now();
     // Simpan ke tabel profiles atau buat kolom foto_url di profiles
     await supabaseClient.from('profiles').update({ foto_url: fotoUrl }).eq('id', userId);
     // Update tampilan avatar
@@ -11758,7 +11758,7 @@ async function uploadFotoGuru(input) {
     const { data: urlData } = supabaseClient.storage
       .from('avatars')
       .getPublicUrl(path);
-    const fotoUrl = urlData.publicUrl;
+    const fotoUrl = urlData.publicUrl + '?t=' + Date.now();
 
     await supabaseClient.from('guru').update({ foto_url: fotoUrl }).eq('user_id', userId);
 
