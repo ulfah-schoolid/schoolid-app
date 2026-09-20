@@ -6202,7 +6202,7 @@
             <div class="menu-item-text"><div class="menu-item-label">Kelola Kelas</div></div>
             <span class="menu-chevron">›</span>
           </div>
-          <div class="menu-item" id="menu-kelola-guru" onclick="goToFromDashboard('kelola-guru','pengaturan');renderKelolaGuru()">
+          <div class="menu-item" id="menu-kelola-guru" onclick="goToFromDashboard('kelola-guru','pengaturan');muatGuruDariSupabase().then(()=>renderKelolaGuru())">
             <div class="menu-item-icon" style="background:#FFF3E0;color:#E65100;"><i class="ti ti-chalkboard" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Kelola Guru</div></div>
             <span class="menu-chevron">›</span>
