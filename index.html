@@ -8242,7 +8242,7 @@ async function muatGuruDariSupabase() {
   try {
     const { data, error } = await supabaseClient.from('guru').select('*').order('nama');
     if (error) throw error;
-    guruCache = (data || []).map(g => ({ id: g.id, nama: g.nama, kelasId: g.kelas_id, status: g.status, avatar: g.avatar }));
+    guruCache = (data || []).map(g => ({ id: g.id, nama: g.nama, kelasId: g.kelas_id, status: g.status, avatar: g.avatar, foto_url: g.foto_url, jabatan: g.jabatan }));
     guruIdSebelumnya = guruCache.map(g => g.id);
   } catch (e) {
     console.error('Gagal muat guru dari Supabase:', e);
@@ -8284,11 +8284,14 @@ function renderKelolaGuru() {
   container.innerHTML = guru.map(g => {
     const k = kelas.find(x => x.id === g.kelasId);
     const aktif = g.status === 'aktif';
+    const avatarHtml = g.foto_url
+      ? `<div style="width:46px;height:46px;border-radius:50%;background-image:url(${g.foto_url});background-size:cover;background-position:center;flex-shrink:0;"></div>`
+      : `<div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${g.avatar || '🧑‍🏫'}</div>`;
     return `<div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="bukaModalGuruEdit('${g.id}')">
-      <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#FFE0B2,#FFCC80);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">${g.avatar || '🧑‍🏫'}</div>
+      ${avatarHtml}
       <div style="flex:1;">
         <div style="font-weight:700;font-size:14px;">${g.nama}</div>
-        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">${k ? k.nama : 'Belum ada kelas'} · ${aktif ? 'Aktif' : 'Non-aktif'}</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">${g.jabatan && g.jabatan.toLowerCase().includes('kepala') ? g.jabatan : (k ? k.nama : (g.kelasId || 'Belum ada kelas'))} · ${aktif ? 'Aktif' : 'Non-aktif'}</div>
       </div>
       <span style="background:${aktif ? '#E8F5E9' : '#FFEBEE'};color:${aktif ? 'var(--green)' : '#F44336'};font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;">${aktif ? 'Aktif' : 'Non-aktif'}</span>
     </div>`;
@@ -8328,6 +8331,18 @@ function closeModalGuru() {
   document.getElementById('modalGuru').classList.remove('show');
 }
 
+async function sinkronWaliKelas() {
+  try {
+    const { data: guruAktif } = await supabaseClient.from('guru').select('nama, kelas_id').eq('status', 'aktif').not('kelas_id', 'is', null);
+    const { data: semuaKelas } = await supabaseClient.from('kelas').select('id');
+    if (!semuaKelas) return;
+    for (const k of semuaKelas) {
+      const guruDiKelas = (guruAktif || []).find(g => g.kelas_id === k.id);
+      await supabaseClient.from('kelas').update({ wali: guruDiKelas ? guruDiKelas.nama : null }).eq('id', k.id);
+    }
+  } catch (e) { console.error('Gagal sinkron wali kelas:', e); }
+}
+
 async function simpanGuru() {
   const nama = document.getElementById('mg-nama').value.trim();
   if (!nama) { showToast('Nama guru wajib diisi! ⚠️'); return; }
@@ -8359,6 +8374,8 @@ async function simpanGuru() {
 
       list.push({ id: result.userId, nama, kelasId, status, avatar: '🧑‍🏫' });
       await saveGuruList(list);
+      await sinkronWaliKelas();
+      await muatKelasDariSupabase();
       showToast(`Akun Guru "${nama}" berhasil dibuat ✅ — beri tahu email & password ke guru tsb`);
       closeModalGuru();
       renderKelolaGuru();
@@ -8371,6 +8388,8 @@ async function simpanGuru() {
     const idx = list.findIndex(x => x.id === guruModalId);
     if (idx !== -1) list[idx] = { ...list[idx], nama, kelasId, status };
     await saveGuruList(list);
+    await sinkronWaliKelas();
+    await muatKelasDariSupabase();
     showToast('Data guru diperbarui ✅');
     closeModalGuru();
     renderKelolaGuru();
