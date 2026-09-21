@@ -5176,6 +5176,65 @@
     </div>
   </div>
 
+  <!-- ===== BANTUAN ORANG TUA ===== -->
+  <div id="bantuan-ortu" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
+      <h2>Bantuan</h2>
+    </div>
+    <div class="scroll-content">
+      <div style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div onclick="toggleFaq(this)" style="padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-900);flex:1;padding-right:8px;">Bagaimana cara melihat perkembangan anak?</div>
+            <span style="font-size:18px;color:var(--green);flex-shrink:0;">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;padding:0 14px 14px;font-size:13px;color:var(--gray-600);line-height:1.6;">Buka menu <b>Laporan</b> di beranda utama. Di sana Anda bisa melihat rekap absensi, aktivitas harian, dan penilaian anak per bulan.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div onclick="toggleFaq(this)" style="padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-900);flex:1;padding-right:8px;">Bagaimana cara melihat rapor anak?</div>
+            <span style="font-size:18px;color:var(--green);flex-shrink:0;">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;padding:0 14px 14px;font-size:13px;color:var(--gray-600);line-height:1.6;">Buka menu <b>Rapor</b> di beranda utama. Rapor tersedia setelah guru mengisi dan kepala sekolah menyetujuinya. Anda dapat melihat laporan perkembangan anak sesuai 6 aspek perkembangan.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div onclick="toggleFaq(this)" style="padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-900);flex:1;padding-right:8px;">Bagaimana cara mengubah data profil saya?</div>
+            <span style="font-size:18px;color:var(--green);flex-shrink:0;">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;padding:0 14px 14px;font-size:13px;color:var(--gray-600);line-height:1.6;">Buka menu <b>Profil</b> lalu tap <b>Data Orang Tua</b>. Isi atau perbarui data diri Anda, lalu tap tombol <b>Simpan</b>.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div onclick="toggleFaq(this)" style="padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-900);flex:1;padding-right:8px;">Bagaimana cara menghubungi guru kelas?</div>
+            <span style="font-size:18px;color:var(--green);flex-shrink:0;">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;padding:0 14px 14px;font-size:13px;color:var(--gray-600);line-height:1.6;">Buka menu <b>Profil</b> lalu tap <b>Profil Guru</b>. Di sana tersedia informasi dan kontak guru kelas anak Anda.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div onclick="toggleFaq(this)" style="padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-900);flex:1;padding-right:8px;">Bagaimana cara menghubungi pihak sekolah?</div>
+            <span style="font-size:18px;color:var(--green);flex-shrink:0;">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;padding:0 14px 14px;font-size:13px;color:var(--gray-600);line-height:1.6;">Buka menu <b>Informasi Sekolah</b> di beranda untuk melihat nomor telepon dan alamat sekolah. Anda juga bisa datang langsung ke sekolah pada jam operasional.</div>
+        </div>
+        <div style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;">
+          <div onclick="toggleFaq(this)" style="padding:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;">
+            <div style="font-size:13px;font-weight:700;color:var(--gray-900);flex:1;padding-right:8px;">Aplikasi tidak bisa dibuka atau error. Apa yang harus dilakukan?</div>
+            <span style="font-size:18px;color:var(--green);flex-shrink:0;">+</span>
+          </div>
+          <div class="faq-answer" style="display:none;padding:0 14px 14px;font-size:13px;color:var(--gray-600);line-height:1.6;">(1) Refresh halaman atau tutup dan buka kembali aplikasi. (2) Pastikan koneksi internet stabil. (3) Jika masih bermasalah, hubungi pihak sekolah untuk mendapatkan bantuan.</div>
+        </div>
+        <div style="background:linear-gradient(135deg,#1B5E20,#2E7D32);border-radius:var(--radius);padding:16px;text-align:center;margin-top:8px;">
+          <div style="font-size:14px;font-weight:700;color:white;margin-bottom:4px;">Butuh bantuan lebih lanjut?</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:12px;">Hubungi pihak sekolah secara langsung</div>
+          <button onclick="bukaKontakSekolah()" style="background:white;color:var(--green);border:none;border-radius:20px;padding:8px 20px;font-size:13px;font-weight:700;cursor:pointer;">&#128222; Hubungi Sekolah</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== TENTANG SCHOOLID ===== -->
   <div id="tentang-app" class="screen">
     <div class="top-bar">
@@ -5316,7 +5375,7 @@
         <!-- Lainnya -->
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);padding:4px 0;margin-top:4px;">LAINNYA</div>
         <div class="menu-list" style="margin:0;">
-          <div class="menu-item" onclick="goToFromDashboard('bantuan','profil-ortu')">
+          <div class="menu-item" onclick="goToFromDashboard('bantuan-ortu','profil-ortu')">
             <div class="menu-item-icon" style="background:#E3F2FD;color:#1565C0;"><i class="ti ti-help-circle" aria-hidden="true"></i></div>
             <div class="menu-item-text"><div class="menu-item-label">Bantuan</div></div>
             <span class="menu-chevron">›</span>
@@ -6354,7 +6413,7 @@ function goBack() {
 
     const ortuScreens = ['laporan-bulanan','rapor','detail-rapor','notifikasi','ortu-info-pribadi',
       'ortu-data-anak','ortu-ubah-hp','ortu-notifikasi','ortu-ubah-password','ortu-profil-guru',
-      'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view'];
+      'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view','bantuan-ortu'];
 
     const kepalaScreens = ['laporan-kepala','kalender-kepala','pendaftaran-masuk',
       'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala'];
@@ -8909,6 +8968,18 @@ function bukaInfoSekolahSesuaiPeran() {
   } else {
     goToFromDashboard('info-sekolah-view', 'pengaturan');
     loadInfoSekolahView();
+  }
+}
+
+async function bukaKontakSekolah() {
+  const d = await getInfoSekolah();
+  const telp = d.telp || '';
+  if (telp) {
+    const noWa = telp.replace(/[^0-9]/g, '');
+    const wa = noWa.startsWith('0') ? '62' + noWa.slice(1) : noWa;
+    window.open('https://wa.me/' + wa, '_blank');
+  } else {
+    showToast('Nomor telepon sekolah belum tersedia');
   }
 }
 
