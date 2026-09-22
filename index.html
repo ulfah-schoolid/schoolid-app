@@ -4057,29 +4057,24 @@
   <!-- ===== DOKUMENTASI FOTO ===== -->
   <div id="dokumentasi" class="screen">
     <div class="top-bar">
-      <button class="back-btn" onclick="goBack()">‹</button>
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
       <h2>Dokumentasi</h2>
-      <button class="notif-btn" onclick="showToast('Pilih foto untuk dibagikan')">⬆️</button>
+      <div style="width:36px;"></div>
     </div>
     <div class="filter-tabs">
-      <button class="filter-tab active" onclick="switchFilter(this)">Hari Ini</button>
-      <button class="filter-tab" onclick="switchFilter(this)">Minggu Ini</button>
-      <button class="filter-tab" onclick="switchFilter(this)">Bulan Ini</button>
+      <button class="filter-tab active" onclick="switchDokFilter(this,'hari')">Hari Ini</button>
+      <button class="filter-tab" onclick="switchDokFilter(this,'minggu')">Minggu Ini</button>
+      <button class="filter-tab" onclick="switchDokFilter(this,'bulan')">Bulan Ini</button>
     </div>
     <div class="scroll-content" style="padding-top:8px;">
-      <div class="photo-grid">
-        <div class="photo-cell" onclick="showPhotoModal()">📄</div>
-        <div class="photo-cell" onclick="showPhotoModal()">✂️</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🦢</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🎤</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🎶</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🎵</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🖍️</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🎨</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🖼️</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🧩</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🎯</div>
-        <div class="photo-cell" onclick="showPhotoModal()">🏆</div>
+      <div id="dok-grid-wrap">
+        <div id="dok-empty" style="display:none;flex-direction:column;align-items:center;padding:56px 24px;gap:12px;">
+          <div style="width:72px;height:72px;background:#F1F8E9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;">&#128247;</div>
+          <div style="font-size:14px;font-weight:700;color:var(--gray-700);">Belum ada foto</div>
+          <div style="font-size:12px;color:var(--gray-400);text-align:center;line-height:1.5;">Foto akan muncul di sini<br>setelah guru menambahkan aktivitas</div>
+        </div>
+        <div id="dok-loading" style="text-align:center;padding:48px 16px;color:var(--gray-400);font-size:13px;">Memuat foto...</div>
+        <div id="dok-group-list"></div>
       </div>
     </div>
     <nav class="bottom-nav" id="dokNavGuru">
@@ -4096,6 +4091,13 @@
       <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
+  </div>
+
+  <!-- Lightbox foto -->
+  <div id="dok-lightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;flex-direction:column;align-items:center;justify-content:center;" onclick="tutupLightbox()">
+    <button style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;">&#x2715;</button>
+    <img id="dok-lightbox-img" src="" style="max-width:95vw;max-height:80vh;border-radius:12px;object-fit:contain;">
+    <div id="dok-lightbox-caption" style="color:rgba(255,255,255,0.8);font-size:12px;margin-top:12px;text-align:center;padding:0 24px;"></div>
   </div>
 
   <!-- ===== LAPORAN HARIAN ===== -->
@@ -6470,6 +6472,117 @@ function updateDokumentasiNav() {
       navOrtu.style.display = 'none';
     }
   }
+  muatDokumentasi('hari');
+}
+
+let dokFilterAktif = 'hari';
+
+function switchDokFilter(btn, filter) {
+  document.querySelectorAll('#dokumentasi .filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  dokFilterAktif = filter;
+  muatDokumentasi(filter);
+}
+
+async function muatDokumentasi(filter) {
+  const loading = document.getElementById('dok-loading');
+  const empty = document.getElementById('dok-empty');
+  const groupList = document.getElementById('dok-group-list');
+  if (!groupList) return;
+  if (loading) loading.style.display = 'block';
+  if (empty) empty.style.display = 'none';
+  groupList.innerHTML = '';
+
+  try {
+    const now = new Date();
+    let tglMulai;
+    if (filter === 'hari') {
+      tglMulai = now.toISOString().split('T')[0];
+    } else if (filter === 'minggu') {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      tglMulai = new Date(now.setDate(diff)).toISOString().split('T')[0];
+    } else {
+      tglMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    }
+
+    // Filter berdasarkan role - ortu hanya lihat aktivitas anaknya
+    let query = supabaseClient.from('modul_ajar').select('id, data, updated_at').gte('updated_at', tglMulai + 'T00:00:00').order('updated_at', { ascending: false });
+    if (currentRole === 'ortu' && currentUserProfile) {
+      // Ambil nama anak dari profiles
+      const { data: prof } = await supabaseClient.from('profiles').select('anak_nama').eq('id', currentUserProfile.id).maybeSingle();
+      if (prof?.anak_nama) query = query.contains('data->peserta', JSON.stringify([prof.anak_nama]));
+    } else if (currentRole === 'guru' && kelasGuru) {
+      query = query.eq('data->>kelompok', kelasGuru);
+    }
+
+    const { data, error } = await query.limit(100);
+    if (error) throw error;
+
+    // Kumpulkan semua foto dari semua modul
+    const semuaFoto = [];
+    (data || []).forEach(m => {
+      const d = typeof m.data === 'string' ? JSON.parse(m.data) : (m.data || {});
+      const urls = d.foto_urls || [];
+      const tanggal = d.tanggal || m.updated_at?.split('T')[0] || '';
+      const namaAktivitas = d.nama || 'Aktivitas';
+      urls.forEach(url => {
+        semuaFoto.push({ url, tanggal, namaAktivitas });
+      });
+    });
+
+    if (loading) loading.style.display = 'none';
+
+    if (semuaFoto.length === 0) {
+      if (empty) empty.style.display = 'flex';
+      return;
+    }
+
+    // Kelompokkan per tanggal
+    const perTanggal = {};
+    semuaFoto.forEach(f => {
+      if (!perTanggal[f.tanggal]) perTanggal[f.tanggal] = [];
+      perTanggal[f.tanggal].push(f);
+    });
+
+    groupList.innerHTML = Object.entries(perTanggal).sort((a,b) => b[0].localeCompare(a[0])).map(([tgl, fotos]) => {
+      const d = new Date(tgl + 'T00:00:00');
+      const label = d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+      const gridHtml = fotos.map((f, i) => `
+        <div onclick="bukaLightbox('${f.url}','${f.namaAktivitas.replace(/'/g,"\\'")}','${tgl}')" style="aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;background:#E8F5E9;">
+          <img src="${f.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+        </div>`).join('');
+      return `<div style="padding:0 16px 16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;padding-top:4px;">${label} · ${fotos.length} foto</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">${gridHtml}</div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    console.error('Gagal muat dokumentasi:', e);
+    if (loading) loading.style.display = 'none';
+    if (groupList) groupList.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);font-size:13px;">Gagal memuat foto</div>';
+  }
+}
+
+function bukaLightbox(url, nama, tgl) {
+  const lb = document.getElementById('dok-lightbox');
+  const img = document.getElementById('dok-lightbox-img');
+  const cap = document.getElementById('dok-lightbox-caption');
+  if (!lb || !img) return;
+  img.src = url;
+  if (cap) {
+    const d = new Date(tgl + 'T00:00:00');
+    cap.textContent = nama + ' · ' + d.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+  }
+  lb.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function tutupLightbox() {
+  const lb = document.getElementById('dok-lightbox');
+  if (lb) lb.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 function updatePesanNav() {
@@ -10531,6 +10644,20 @@ async function simpanAktivitasBaru() {
   showLoading();
   try {
     const newId = crypto.randomUUID();
+
+    // Upload foto ke Storage terlebih dahulu
+    const fotoUrls = [];
+    for (let i = 0; i < fotoAktivitasFiles.length; i++) {
+      const file = fotoAktivitasFiles[i];
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = newId + '/' + i + '_' + Date.now() + '.' + ext;
+      const { error: upErr } = await supabaseClient.storage.from('aktivitas-foto').upload(path, file, { upsert: true });
+      if (!upErr) {
+        const { data: urlData } = supabaseClient.storage.from('aktivitas-foto').getPublicUrl(path);
+        if (urlData?.publicUrl) fotoUrls.push(urlData.publicUrl);
+      }
+    }
+
     const { error } = await supabaseClient.from('modul_ajar').insert({
       id: newId,
       data: {
@@ -10541,14 +10668,15 @@ async function simpanAktivitasBaru() {
         aspek: kategori,
         deskripsi: deskripsi || null,
         peserta: peserta,
-        kelompok: kelasGuru
+        kelompok: kelasGuru,
+        foto_urls: fotoUrls
       },
       status: 'draft'
     });
     if (error) throw error;
 
     hideLoading();
-    showToast('Aktivitas berhasil disimpan! ✅');
+    showToast('Aktivitas berhasil disimpan!' + (fotoUrls.length > 0 ? ' (' + fotoUrls.length + ' foto) ✅' : ' ✅'));
     // Notifikasi ke ortu murid yang ikut aktivitas
     try {
       if (peserta.length > 0) {
@@ -11133,7 +11261,6 @@ async function masukKeDashboardSesuaiProfil(userId) {
     goTo('dashboard-guru');
     setTimeout(() => cekNotifBadge(), 300);
   }
-  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); }, 300); }
 }
 
