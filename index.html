@@ -10652,7 +10652,10 @@ async function simpanAktivitasBaru() {
       const ext = file.name.split('.').pop() || 'jpg';
       const path = newId + '/' + i + '_' + Date.now() + '.' + ext;
       const { error: upErr } = await supabaseClient.storage.from('aktivitas-foto').upload(path, file, { upsert: true });
-      if (!upErr) {
+      if (upErr) {
+        console.error('Upload foto gagal:', upErr);
+        showToast('Upload foto gagal: ' + upErr.message + ' ⚠️');
+      } else {
         const { data: urlData } = supabaseClient.storage.from('aktivitas-foto').getPublicUrl(path);
         if (urlData?.publicUrl) fotoUrls.push(urlData.publicUrl);
       }
