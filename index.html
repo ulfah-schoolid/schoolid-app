@@ -4059,7 +4059,8 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">&#8249;</button>
       <h2>Dokumentasi</h2>
-      <div style="width:36px;"></div>
+      <button id="dok-edit-btn" onclick="toggleDokEditMode()" style="display:none;background:var(--gray-100);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--gray-700);cursor:pointer;">&#9999;&#65039; Edit</button>
+      <div id="dok-edit-placeholder" style="width:60px;display:block;"></div>
     </div>
     <div class="filter-tabs">
       <button class="filter-tab active" onclick="switchDokFilter(this,'hari')">Hari Ini</button>
@@ -6463,19 +6464,66 @@ let currentRole = 'guru';
 function updateDokumentasiNav() {
   const navGuru = document.getElementById('dokNavGuru');
   const navOrtu = document.getElementById('dokNavOrtu');
+  const editBtn = document.getElementById('dok-edit-btn');
+  const editPlaceholder = document.getElementById('dok-edit-placeholder');
   if (navGuru && navOrtu) {
     if (currentRole === 'ortu') {
       navGuru.style.display = 'none';
       navOrtu.style.display = 'flex';
+      if (editBtn) editBtn.style.display = 'none';
+      if (editPlaceholder) editPlaceholder.style.display = 'block';
     } else {
       navGuru.style.display = 'flex';
       navOrtu.style.display = 'none';
+      if (editBtn) editBtn.style.display = '';
+      if (editPlaceholder) editPlaceholder.style.display = 'none';
     }
   }
+  dokEditMode = false;
   muatDokumentasi('hari');
 }
 
 let dokFilterAktif = 'hari';
+let dokEditMode = false;
+let dokFotoData = []; // simpan data foto untuk keperluan hapus
+
+function toggleDokEditMode() {
+  dokEditMode = !dokEditMode;
+  const btn = document.getElementById('dok-edit-btn');
+  if (btn) {
+    btn.textContent = dokEditMode ? '✅ Selesai' : '✏️ Edit';
+    btn.style.background = dokEditMode ? '#E8F5E9' : 'var(--gray-100)';
+    btn.style.color = dokEditMode ? 'var(--green)' : 'var(--gray-700)';
+  }
+  muatDokumentasi(dokFilterAktif);
+}
+
+async function hapusFotoDok(modulId, fotoUrl, idxFoto) {
+  if (!confirm('Hapus foto ini?')) return;
+  showLoading();
+  try {
+    // Hapus dari Storage
+    const urlObj = new URL(fotoUrl);
+    const pathParts = urlObj.pathname.split('/aktivitas-foto/');
+    if (pathParts[1]) {
+      await supabaseClient.storage.from('aktivitas-foto').remove([decodeURIComponent(pathParts[1])]);
+    }
+    // Update foto_urls di modul_ajar
+    const { data: modul } = await supabaseClient.from('modul_ajar').select('data').eq('id', modulId).single();
+    if (modul) {
+      const d = typeof modul.data === 'string' ? JSON.parse(modul.data) : (modul.data || {});
+      const fotoUrls = (d.foto_urls || []).filter(u => u !== fotoUrl);
+      d.foto_urls = fotoUrls;
+      await supabaseClient.from('modul_ajar').update({ data: d }).eq('id', modulId);
+    }
+    hideLoading();
+    showToast('Foto berhasil dihapus 🗑️');
+    muatDokumentasi(dokFilterAktif);
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal hapus foto: ' + e.message + ' ⚠️');
+  }
+}
 
 function switchDokFilter(btn, filter) {
   document.querySelectorAll('#dokumentasi .filter-tab').forEach(b => b.classList.remove('active'));
@@ -6535,7 +6583,7 @@ async function muatDokumentasi(filter) {
       const tanggal = d.tanggal || m.updated_at?.split('T')[0] || '';
       const namaAktivitas = d.nama || 'Aktivitas';
       urls.forEach(url => {
-        semuaFoto.push({ url, tanggal, namaAktivitas });
+        semuaFoto.push({ url, tanggal, namaAktivitas, modulId: m.id });
       });
     });
 
@@ -6556,14 +6604,22 @@ async function muatDokumentasi(filter) {
     groupList.innerHTML = Object.entries(perTanggal).sort((a,b) => b[0].localeCompare(a[0])).map(([tgl, fotos]) => {
       const d = new Date(tgl + 'T00:00:00');
       const label = d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-      const gridHtml = fotos.map((f, i) => `
-        <div onclick="bukaLightbox('${f.url}','${f.namaAktivitas.replace(/'/g,"\\'")}','${tgl}')" style="aspect-ratio:1;border-radius:10px;overflow:hidden;cursor:pointer;background:#E8F5E9;">
-          <img src="${f.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
-        </div>`).join('');
-      return `<div style="padding:0 16px 16px;">
-        <div style="font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;padding-top:4px;">${label} · ${fotos.length} foto</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">${gridHtml}</div>
-      </div>`;
+      const gridHtml = fotos.map((f, i) => {
+        const safeUrl = f.url.replace(/'/g, "\\'");
+        const safeNama = (f.namaAktivitas || '').replace(/'/g, "\\'");
+        const hapusBtn = (dokEditMode && currentRole !== 'ortu')
+          ? '<button onclick="event.stopPropagation();hapusFotoDok(\'' + f.modulId + '\',\'' + safeUrl + '\',' + i + ')" style="position:absolute;top:4px;right:4px;width:26px;height:26px;background:rgba(211,47,47,0.9);border:none;border-radius:50%;color:white;font-size:14px;font-weight:700;cursor:pointer;line-height:1;z-index:2;">×</button>'
+          : '';
+        const clickHandler = dokEditMode ? '' : ('onclick="bukaLightbox(\'' + safeUrl + '\',\'' + safeNama + '\',\'' + tgl + '\')"');
+        return '<div ' + clickHandler + ' style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#E8F5E9;cursor:' + (dokEditMode ? 'default' : 'pointer') + ';">'
+          + '<img src="' + f.url + '" style="width:100%;height:100%;object-fit:cover;" loading="lazy">'
+          + hapusBtn
+          + '</div>';
+      }).join('');
+      return '<div style="padding:0 16px 16px;">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;padding-top:4px;">' + label + ' &middot; ' + fotos.length + ' foto</div>'
+        + '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">' + gridHtml + '</div>'
+        + '</div>';
     }).join('');
 
   } catch(e) {
