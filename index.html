@@ -11264,6 +11264,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
     goTo('dashboard-guru');
     setTimeout(() => cekNotifBadge(), 300);
   }
+  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); }, 300); }
 }
 
