@@ -6508,20 +6508,28 @@ async function muatDokumentasi(filter) {
 
     // Filter berdasarkan role - ortu hanya lihat aktivitas anaknya
     let query = supabaseClient.from('modul_ajar').select('id, data, updated_at').gte('updated_at', tglMulai + 'T00:00:00').order('updated_at', { ascending: false });
-    if (currentRole === 'ortu' && currentUserProfile) {
-      // Ambil nama anak dari profiles
-      const { data: prof } = await supabaseClient.from('profiles').select('anak_nama').eq('id', currentUserProfile.id).maybeSingle();
-      if (prof?.anak_nama) query = query.contains('data->peserta', JSON.stringify([prof.anak_nama]));
-    } else if (currentRole === 'guru' && kelasGuru) {
-      query = query.eq('data->>kelompok', kelasGuru);
-    }
-
-    const { data, error } = await query.limit(100);
+    const { data, error } = await query.limit(200);
     if (error) throw error;
+
+    // Filter client-side berdasarkan peserta
+    let hasilData = data || [];
+    if (currentRole === 'ortu' && currentUserProfile?.anak_nama) {
+      const namaAnak = currentUserProfile.anak_nama;
+      hasilData = hasilData.filter(m => {
+        const d = typeof m.data === 'string' ? JSON.parse(m.data) : (m.data || {});
+        const peserta = d.peserta || [];
+        return Array.isArray(peserta) ? peserta.includes(namaAnak) : String(peserta).includes(namaAnak);
+      });
+    } else if (currentRole === 'guru' && kelasGuru) {
+      hasilData = hasilData.filter(m => {
+        const d = typeof m.data === 'string' ? JSON.parse(m.data) : (m.data || {});
+        return d.kelompok === kelasGuru;
+      });
+    }
 
     // Kumpulkan semua foto dari semua modul
     const semuaFoto = [];
-    (data || []).forEach(m => {
+    hasilData.forEach(m => {
       const d = typeof m.data === 'string' ? JSON.parse(m.data) : (m.data || {});
       const urls = d.foto_urls || [];
       const tanggal = d.tanggal || m.updated_at?.split('T')[0] || '';
@@ -11591,13 +11599,16 @@ async function muatTimelineOrtu(tanggal) {
   if (!tlList) return;
   tlList.innerHTML = '<div style="text-align:center;padding:40px 16px;color:var(--gray-400);font-size:13px;">Memuat...</div>';
   try {
-    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('id, data').order('updated_at', { ascending: true });
+    const { data: aktivitas } = await supabaseClient
+      .from('modul_ajar')
+      .select('id, data')
+      .eq('data->>tanggal', tanggal)
+      .order('updated_at', { ascending: true });
     const aktHariIni = (aktivitas || []).filter(a => {
       const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data || {});
-      const tglAkt = d.tanggal || '';
       const peserta = d.peserta || [];
-      const ikut = !namaAnak || (Array.isArray(peserta) ? peserta.includes(namaAnak) : String(peserta).includes(namaAnak));
-      return tglAkt === tanggal && ikut;
+      if (!namaAnak) return true;
+      return Array.isArray(peserta) ? peserta.includes(namaAnak) : String(peserta).includes(namaAnak);
     });
     if (aktHariIni.length === 0) {
       tlList.innerHTML = '<div class="tl-empty-state"><div class="tl-empty-icon">&#128197;</div><div style="font-size:14px;font-weight:700;color:var(--gray-700);">Tidak ada aktivitas</div><div style="font-size:12px;color:var(--gray-400);text-align:center;line-height:1.5;">Belum ada kegiatan yang tercatat<br>untuk tanggal ini</div></div>';
