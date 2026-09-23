@@ -6466,20 +6466,16 @@ function updateDokumentasiNav() {
   const navOrtu = document.getElementById('dokNavOrtu');
   const editBtn = document.getElementById('dok-edit-btn');
   const editPlaceholder = document.getElementById('dok-edit-placeholder');
-  if (navGuru && navOrtu) {
-    if (currentRole === 'ortu') {
-      navGuru.style.display = 'none';
-      navOrtu.style.display = 'flex';
-      if (editBtn) editBtn.style.display = 'none';
-      if (editPlaceholder) editPlaceholder.style.display = 'block';
-    } else {
-      navGuru.style.display = 'flex';
-      navOrtu.style.display = 'none';
-      if (editBtn) editBtn.style.display = '';
-      if (editPlaceholder) editPlaceholder.style.display = 'none';
-    }
-  }
+
+  const isOrtu = currentRole === 'ortu';
+
+  if (navGuru) navGuru.style.display = isOrtu ? 'none' : 'flex';
+  if (navOrtu) navOrtu.style.display = isOrtu ? 'flex' : 'none';
+  if (editBtn) editBtn.style.display = isOrtu ? 'none' : 'inline-block';
+  if (editPlaceholder) editPlaceholder.style.display = isOrtu ? 'block' : 'none';
+
   dokEditMode = false;
+  if (editBtn) { editBtn.textContent = '✏️ Edit'; editBtn.style.background = 'var(--gray-100)'; editBtn.style.color = 'var(--gray-700)'; }
   muatDokumentasi('hari');
 }
 
