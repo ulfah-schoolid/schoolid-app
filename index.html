@@ -4059,8 +4059,7 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">&#8249;</button>
       <h2>Dokumentasi</h2>
-      <button id="dok-edit-btn" onclick="toggleDokEditMode()" style="display:none;background:var(--gray-100);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--gray-700);cursor:pointer;">&#9999;&#65039; Edit</button>
-      <div id="dok-edit-placeholder" style="width:60px;display:block;"></div>
+      <button id="dok-edit-btn" onclick="toggleDokEditMode()" style="flex-shrink:0;background:var(--green-bg);border:1.5px solid var(--green);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--green);cursor:pointer;">&#9998; Edit</button>
     </div>
     <div class="filter-tabs">
       <button class="filter-tab active" onclick="switchDokFilter(this,'hari')">Hari Ini</button>
@@ -6465,12 +6464,16 @@ function updateDokumentasiNav() {
   const navGuru = document.getElementById('dokNavGuru');
   const navOrtu = document.getElementById('dokNavOrtu');
   const editBtn = document.getElementById('dok-edit-btn');
-  const editPlaceholder = document.getElementById('dok-edit-placeholder');
   const isOrtu = currentRole === 'ortu';
   if (navGuru) navGuru.style.display = isOrtu ? 'none' : 'flex';
   if (navOrtu) navOrtu.style.display = isOrtu ? 'flex' : 'none';
-  if (editBtn) { editBtn.style.display = isOrtu ? 'none' : 'inline-block'; editBtn.textContent = '✏️ Edit'; editBtn.style.background = 'var(--gray-100)'; editBtn.style.color = 'var(--gray-700)'; }
-  if (editPlaceholder) editPlaceholder.style.display = isOrtu ? 'block' : 'none';
+  if (editBtn) {
+    editBtn.style.display = isOrtu ? 'none' : 'inline-block';
+    editBtn.textContent = '✏️ Edit';
+    editBtn.style.background = 'var(--green-bg)';
+    editBtn.style.color = 'var(--green)';
+    editBtn.style.border = '1.5px solid var(--green)';
+  }
   dokEditMode = false;
   muatDokumentasi(dokFilterAktif || 'hari');
 }
