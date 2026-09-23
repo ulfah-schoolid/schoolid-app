@@ -217,7 +217,13 @@
     border: none;
     cursor: pointer;
     font-size: 18px;
-    opacity: 0.5;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    top: 50%;
+    transform: translateY(-50%);
   }
   .forgot { text-align: right; }
   .forgot a { color: var(--green); font-size: 13px; text-decoration: none; font-weight: 500; }
@@ -1838,7 +1844,7 @@
         <div class="input-wrap">
           <span class="input-icon">&#128274;</span>
           <input type="password" placeholder="Masukkan password" id="loginPass">
-          <button class="eye-toggle" onclick="togglePass()">&#128065;</button>
+          <button class="eye-toggle" onclick="togglePass()"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <div class="forgot"><a href="#" onclick="showToast('Link reset password telah dikirim!')">Lupa Password?</a></div>
@@ -1917,7 +1923,7 @@
         <div class="input-wrap">
           <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="reg-password" placeholder="Minimal 6 karakter">
-          <button class="eye-toggle" onclick="togglePassById('reg-password')">👁</button>
+          <button class="eye-toggle" onclick="togglePassById('reg-password')"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
 
@@ -1926,7 +1932,7 @@
         <div class="input-wrap">
           <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="reg-password2" placeholder="Ulangi password">
-          <button class="eye-toggle" onclick="togglePassById('reg-password2')">👁</button>
+          <button class="eye-toggle" onclick="togglePassById('reg-password2')"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
 
@@ -1973,7 +1979,7 @@
         <div class="input-wrap">
           <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="guru-reg-password" placeholder="Minimal 6 karakter">
-          <button class="eye-toggle" onclick="togglePassById('guru-reg-password')">👁</button>
+          <button class="eye-toggle" onclick="togglePassById('guru-reg-password')"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
 
@@ -1982,7 +1988,7 @@
         <div class="input-wrap">
           <span class="input-icon"><i class="ti ti-lock" aria-hidden="true"></i></span>
           <input type="password" id="guru-reg-password2" placeholder="Ulangi password">
-          <button class="eye-toggle" onclick="togglePassById('guru-reg-password2')">👁</button>
+          <button class="eye-toggle" onclick="togglePassById('guru-reg-password2')"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
 
@@ -5217,21 +5223,21 @@
         <label class="form-label">Password Lama</label>
         <div style="position:relative;">
           <input type="password" id="pw-lama" class="form-input" placeholder="Masukkan password lama">
-          <button onclick="togglePw('pw-lama')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;">👁️</button>
+          <button onclick="togglePw('pw-lama')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Password Baru</label>
         <div style="position:relative;">
           <input type="password" id="pw-baru" class="form-input" placeholder="Masukkan password baru">
-          <button onclick="togglePw('pw-baru')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;">👁️</button>
+          <button onclick="togglePw('pw-baru')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Konfirmasi Password Baru</label>
         <div style="position:relative;">
           <input type="password" id="pw-konfirm" class="form-input" placeholder="Ulangi password baru">
-          <button onclick="togglePw('pw-konfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;">👁️</button>
+          <button onclick="togglePw('pw-konfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <button class="btn-save" onclick="ubahPassword()">🔒 Ubah Password</button>
@@ -5721,21 +5727,21 @@
         <label class="form-label">Password Lama</label>
         <div style="position:relative;">
           <input type="password" id="ortu-pw-lama" class="form-input" placeholder="Masukkan password lama">
-          <button onclick="togglePw('ortu-pw-lama')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;">👁️</button>
+          <button onclick="togglePw('ortu-pw-lama')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Password Baru</label>
         <div style="position:relative;">
           <input type="password" id="ortu-pw-baru" class="form-input" placeholder="Masukkan password baru">
-          <button onclick="togglePw('ortu-pw-baru')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;">👁️</button>
+          <button onclick="togglePw('ortu-pw-baru')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <div class="form-group">
         <label class="form-label">Konfirmasi Password Baru</label>
         <div style="position:relative;">
           <input type="password" id="ortu-pw-konfirm" class="form-input" placeholder="Ulangi password baru">
-          <button onclick="togglePw('ortu-pw-konfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;">👁️</button>
+          <button onclick="togglePw('ortu-pw-konfirm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:18px;cursor:pointer;"><i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i></button>
         </div>
       </div>
       <button class="btn-save" onclick="ubahPasswordOrtu()">🔒 Ubah Password</button>
@@ -8241,7 +8247,12 @@ function toggleAlamatAnak(select) {
 
 function togglePw(id) {
   const el = document.getElementById(id);
-  if (el) el.type = el.type === 'password' ? 'text' : 'password';
+  if (!el) return;
+  el.type = el.type === 'password' ? 'text' : 'password';
+  const btn = el.parentElement ? el.parentElement.querySelector('button') : null;
+  if (btn) btn.innerHTML = el.type === 'password'
+    ? '<i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i>'
+    : '<i class="ti ti-eye-off" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i>';
 }
 
 function ubahPassword() {
@@ -11356,7 +11367,7 @@ function togglePass() {
   const input = document.getElementById('loginPass');
   const btn = input.parentElement.querySelector('.eye-toggle');
   input.type = input.type === 'password' ? 'text' : 'password';
-  if (btn) btn.textContent = input.type === 'password' ? '👁' : '🙈';
+  if (btn) btn.innerHTML = input.type === 'password' ? '<i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i>' : '<i class="ti ti-eye-off" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i>';
 }
 
 function togglePassById(id) {
@@ -11364,7 +11375,7 @@ function togglePassById(id) {
   if (!input) return;
   const btn = input.parentElement.querySelector('.eye-toggle');
   input.type = input.type === 'password' ? 'text' : 'password';
-  if (btn) btn.textContent = input.type === 'password' ? '👁' : '🙈';
+  if (btn) btn.innerHTML = input.type === 'password' ? '<i class="ti ti-eye" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i>' : '<i class="ti ti-eye-off" style="font-size:16px;color:var(--gray-500);pointer-events:none;"></i>';
 }
 
 // ===== ROLE SELECTION =====
