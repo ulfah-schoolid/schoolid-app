@@ -6466,17 +6466,13 @@ function updateDokumentasiNav() {
   const navOrtu = document.getElementById('dokNavOrtu');
   const editBtn = document.getElementById('dok-edit-btn');
   const editPlaceholder = document.getElementById('dok-edit-placeholder');
-
   const isOrtu = currentRole === 'ortu';
-
   if (navGuru) navGuru.style.display = isOrtu ? 'none' : 'flex';
   if (navOrtu) navOrtu.style.display = isOrtu ? 'flex' : 'none';
-  if (editBtn) editBtn.style.display = isOrtu ? 'none' : 'inline-block';
+  if (editBtn) { editBtn.style.display = isOrtu ? 'none' : 'inline-block'; editBtn.textContent = '✏️ Edit'; editBtn.style.background = 'var(--gray-100)'; editBtn.style.color = 'var(--gray-700)'; }
   if (editPlaceholder) editPlaceholder.style.display = isOrtu ? 'block' : 'none';
-
   dokEditMode = false;
-  if (editBtn) { editBtn.textContent = '✏️ Edit'; editBtn.style.background = 'var(--gray-100)'; editBtn.style.color = 'var(--gray-700)'; }
-  muatDokumentasi('hari');
+  muatDokumentasi(dokFilterAktif || 'hari');
 }
 
 let dokFilterAktif = 'hari';
