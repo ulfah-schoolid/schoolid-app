@@ -1164,6 +1164,80 @@
     box-shadow: 0 2px 8px rgba(46,125,50,0.08);
   }
 
+  /* ===== BANNER CAROUSEL ===== */
+  .banner-carousel {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .banner-track {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+  .banner-slide {
+    min-width: 100%;
+    padding: 18px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100px;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  .banner-slide::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+  }
+  .banner-slide::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 10px;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+  }
+  .banner-judul {
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .banner-subjudul {
+    font-size: 12px;
+    opacity: 0.85;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1;
+  }
+  .banner-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 0 4px;
+    background: white;
+  }
+  .banner-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gray-300);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .banner-dot.active {
+    width: 18px;
+    border-radius: 3px;
+    background: var(--green);
+  }
+
   .timeline-item {
     background: white;
     border-radius: var(--radius);
@@ -4030,6 +4104,12 @@
       </div>
     </div>
 
+    <!-- Banner Carousel -->
+    <div class="banner-carousel" id="banner-carousel" style="display:none;">
+      <div class="banner-track" id="banner-track"></div>
+      <div class="banner-dots" id="banner-dots"></div>
+    </div>
+
     <div class="scroll-content">
       <!-- Summary strip -->
       <div id="tl-summary-strip" style="display:none;padding:12px 16px 4px;">
@@ -4752,6 +4832,17 @@
             </div>
           </div>
           <div class="section">
+            <div class="section-title">Kelola Banner</div>
+            <div onclick="goToFromDashboard('kelola-banner','dashboard-kepala');initKelolaBanner()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#C62828,#E53935);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-photo-plus" style="font-size:22px;color:white;"></i></div>
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;">Banner & Pengumuman Visual</div>
+                <div style="font-size:12px;color:var(--gray-500);margin-top:2px;">Kelola banner carousel untuk ortu & guru</div>
+              </div>
+              <span class="chevron">›</span>
+            </div>
+          </div>
+          <div class="section">
             <div class="section-title">Arsip Modul &amp; Asesmen Guru</div>
             <div onclick="goToFromDashboard('kepala-arsip','dashboard-kepala');renderArsipKepala()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
               <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#5E35B1,#7E57C2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-book-2" style="font-size:22px;color:white;"></i></div>
@@ -4870,6 +4961,93 @@
   </div>
 
   <!-- ===== ARSIP MODUL & ASESMEN (KEPALA SEKOLAH) ===== -->
+  <!-- ===== KELOLA BANNER ===== -->
+  <div id="kelola-banner" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
+      <h2>Kelola Banner</h2>
+      <button onclick="bukaFormTambahBanner()" style="background:var(--green);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Tambah</button>
+    </div>
+    <div class="scroll-content">
+      <div style="padding:12px 16px;font-size:12px;color:var(--gray-500);background:#FFF8E1;border-bottom:1px solid #FFE082;">
+        &#128161; Banner aktif akan tampil sebagai carousel di dashboard orang tua atau guru sesuai target.
+      </div>
+      <div id="banner-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat banner...</div>
+      </div>
+    </div>
+    <!-- Form Tambah/Edit Banner -->
+    <div id="banner-form-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:flex-end;">
+      <div style="background:white;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;max-height:85vh;overflow-y:auto;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:800;color:var(--gray-900);" id="banner-form-title">Tambah Banner</div>
+          <button onclick="tutupFormBanner()" style="background:var(--gray-100);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;">&#x2715;</button>
+        </div>
+        <input type="hidden" id="banner-form-id">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Judul Banner *</label>
+            <input id="banner-form-judul" type="text" placeholder="Judul banner" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Subjudul / Deskripsi</label>
+            <input id="banner-form-subjudul" type="text" placeholder="Deskripsi singkat (opsional)" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Foto Banner (opsional)</label>
+            <div style="margin-top:4px;border:1.5px dashed var(--gray-300);border-radius:10px;padding:12px;text-align:center;cursor:pointer;" onclick="document.getElementById('banner-foto-input').click()">
+              <div id="banner-foto-preview" style="display:none;margin-bottom:8px;"><img id="banner-foto-img" style="max-width:100%;max-height:120px;border-radius:8px;object-fit:cover;"></div>
+              <div id="banner-foto-placeholder"><i class="ti ti-photo-plus" style="font-size:24px;color:var(--gray-400);"></i><div style="font-size:12px;color:var(--gray-400);margin-top:4px;">Tap untuk upload foto</div></div>
+              <input type="file" id="banner-foto-input" accept="image/*" style="display:none;" onchange="previewBannerFoto(this)">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Warna Background</label>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                <input type="color" id="banner-form-warna-bg" value="#1B5E20" style="width:40px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:2px;">
+                <span id="banner-warna-bg-label" style="font-size:12px;color:var(--gray-500);">#1B5E20</span>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Warna Teks</label>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                <input type="color" id="banner-form-warna-teks" value="#FFFFFF" style="width:40px;height:36px;border:none;border-radius:8px;cursor:pointer;padding:2px;">
+                <span id="banner-warna-teks-label" style="font-size:12px;color:var(--gray-500);">#FFFFFF</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Ditampilkan Untuk</label>
+            <select id="banner-form-target" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;background:white;">
+              <option value="semua">Semua (Ortu & Guru)</option>
+              <option value="ortu">Orang Tua saja</option>
+              <option value="guru">Guru saja</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Urutan Tampil</label>
+            <input id="banner-form-urutan" type="number" value="1" min="1" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;box-sizing:border-box;">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Status Aktif</label>
+            <input type="checkbox" id="banner-form-aktif" checked style="width:18px;height:18px;cursor:pointer;">
+          </div>
+          <!-- Preview -->
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Preview</label>
+            <div id="banner-preview-box" style="margin-top:6px;border-radius:12px;padding:16px 20px;background:#1B5E20;color:white;min-height:70px;">
+              <div id="banner-preview-judul" style="font-size:14px;font-weight:800;">Judul Banner</div>
+              <div id="banner-preview-subjudul" style="font-size:12px;opacity:0.85;margin-top:4px;">Subjudul</div>
+            </div>
+          </div>
+          <button onclick="simpanBanner()" style="background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;">Simpan Banner</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KEPALA ARSIP ===== -->
   <div id="kepala-arsip" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
@@ -6707,7 +6885,7 @@ function goBack() {
       'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view','bantuan-ortu'];
 
     const kepalaScreens = ['laporan-kepala','kalender-kepala','pendaftaran-masuk',
-      'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala'];
+      'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala','kelola-banner'];
 
     if (sharedScreens.includes(id)) {
       if (currentRole === 'ortu') prev = 'timeline-ortu';
@@ -11636,6 +11814,297 @@ const ASPEK_WARNA = {
   'Seni':'#FFE0B2,#FFCC80','default':'#E8F5E9,#A5D6A7'
 };
 
+// ===== KELOLA BANNER (KEPALA) =====
+let bannerFotoFile = null;
+let bannerEditId = null;
+
+async function initKelolaBanner() {
+  await renderDaftarBanner();
+}
+
+async function renderDaftarBanner() {
+  const list = document.getElementById('banner-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat...</div>';
+  try {
+    const { data, error } = await supabaseClient.from('banner_carousel').select('*').order('urutan');
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Belum ada banner</div>';
+      return;
+    }
+    const targetLabel = { semua: 'Semua', ortu: 'Orang Tua', guru: 'Guru' };
+    list.innerHTML = data.map(b => `
+      <div style="background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);overflow:hidden;">
+        ${b.gambar_url ? `<img src="${b.gambar_url}" style="width:100%;height:100px;object-fit:cover;">` :
+          `<div style="background:${b.warna_bg||'#1B5E20'};padding:14px 16px;color:${b.warna_teks||'#fff'};">
+            <div style="font-size:13px;font-weight:800;">${b.judul||''}</div>
+            ${b.subjudul ? `<div style="font-size:11px;opacity:0.85;margin-top:3px;">${b.subjudul}</div>` : ''}
+          </div>`}
+        <div style="padding:10px 14px;display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:var(--gray-900);">${b.judul||'(tanpa judul)'}</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">
+              Target: ${targetLabel[b.target_role]||'Semua'} · Urutan: ${b.urutan}
+              <span style="margin-left:6px;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;background:${b.aktif?'#E8F5E9':'#FFEBEE'};color:${b.aktif?'#2E7D32':'#C62828'};">${b.aktif?'Aktif':'Non-aktif'}</span>
+            </div>
+          </div>
+          <button onclick="editBanner('${b.id}')" style="background:#E3F2FD;color:#1565C0;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">Edit</button>
+          <button onclick="hapusBanner('${b.id}')" style="background:#FFEBEE;color:#C62828;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">Hapus</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat banner</div>';
+  }
+}
+
+function bukaFormTambahBanner() {
+  bannerEditId = null;
+  bannerFotoFile = null;
+  document.getElementById('banner-form-id').value = '';
+  document.getElementById('banner-form-judul').value = '';
+  document.getElementById('banner-form-subjudul').value = '';
+  document.getElementById('banner-form-target').value = 'semua';
+  document.getElementById('banner-form-urutan').value = '1';
+  document.getElementById('banner-form-aktif').checked = true;
+  document.getElementById('banner-form-warna-bg').value = '#1B5E20';
+  document.getElementById('banner-form-warna-teks').value = '#FFFFFF';
+  document.getElementById('banner-warna-bg-label').textContent = '#1B5E20';
+  document.getElementById('banner-warna-teks-label').textContent = '#FFFFFF';
+  document.getElementById('banner-foto-preview').style.display = 'none';
+  document.getElementById('banner-foto-placeholder').style.display = '';
+  document.getElementById('banner-foto-input').value = '';
+  document.getElementById('banner-form-title').textContent = 'Tambah Banner';
+  updateBannerPreview();
+  const modal = document.getElementById('banner-form-modal');
+  modal.style.display = 'flex';
+
+  // Live preview
+  ['banner-form-judul','banner-form-subjudul'].forEach(id => {
+    document.getElementById(id).oninput = updateBannerPreview;
+  });
+  document.getElementById('banner-form-warna-bg').oninput = function() {
+    document.getElementById('banner-warna-bg-label').textContent = this.value;
+    updateBannerPreview();
+  };
+  document.getElementById('banner-form-warna-teks').oninput = function() {
+    document.getElementById('banner-warna-teks-label').textContent = this.value;
+    updateBannerPreview();
+  };
+}
+
+async function editBanner(id) {
+  const { data: b } = await supabaseClient.from('banner_carousel').select('*').eq('id', id).single();
+  if (!b) return;
+  bannerEditId = id;
+  bannerFotoFile = null;
+  document.getElementById('banner-form-id').value = id;
+  document.getElementById('banner-form-judul').value = b.judul || '';
+  document.getElementById('banner-form-subjudul').value = b.subjudul || '';
+  document.getElementById('banner-form-target').value = b.target_role || 'semua';
+  document.getElementById('banner-form-urutan').value = b.urutan || 1;
+  document.getElementById('banner-form-aktif').checked = b.aktif !== false;
+  document.getElementById('banner-form-warna-bg').value = b.warna_bg || '#1B5E20';
+  document.getElementById('banner-form-warna-teks').value = b.warna_teks || '#FFFFFF';
+  document.getElementById('banner-warna-bg-label').textContent = b.warna_bg || '#1B5E20';
+  document.getElementById('banner-warna-teks-label').textContent = b.warna_teks || '#FFFFFF';
+  if (b.gambar_url) {
+    document.getElementById('banner-foto-img').src = b.gambar_url;
+    document.getElementById('banner-foto-preview').style.display = '';
+    document.getElementById('banner-foto-placeholder').style.display = 'none';
+  } else {
+    document.getElementById('banner-foto-preview').style.display = 'none';
+    document.getElementById('banner-foto-placeholder').style.display = '';
+  }
+  document.getElementById('banner-form-title').textContent = 'Edit Banner';
+  updateBannerPreview();
+  const modal = document.getElementById('banner-form-modal');
+  modal.style.display = 'flex';
+  ['banner-form-judul','banner-form-subjudul'].forEach(id2 => {
+    document.getElementById(id2).oninput = updateBannerPreview;
+  });
+  document.getElementById('banner-form-warna-bg').oninput = function() {
+    document.getElementById('banner-warna-bg-label').textContent = this.value;
+    updateBannerPreview();
+  };
+  document.getElementById('banner-form-warna-teks').oninput = function() {
+    document.getElementById('banner-warna-teks-label').textContent = this.value;
+    updateBannerPreview();
+  };
+}
+
+function updateBannerPreview() {
+  const judul = document.getElementById('banner-form-judul')?.value || 'Judul Banner';
+  const subjudul = document.getElementById('banner-form-subjudul')?.value || 'Subjudul';
+  const bg = document.getElementById('banner-form-warna-bg')?.value || '#1B5E20';
+  const teks = document.getElementById('banner-form-warna-teks')?.value || '#FFFFFF';
+  const box = document.getElementById('banner-preview-box');
+  if (box) { box.style.background = bg; box.style.color = teks; }
+  const pj = document.getElementById('banner-preview-judul');
+  if (pj) pj.textContent = judul;
+  const ps = document.getElementById('banner-preview-subjudul');
+  if (ps) ps.textContent = subjudul;
+}
+
+function previewBannerFoto(input) {
+  if (!input.files || !input.files[0]) return;
+  bannerFotoFile = input.files[0];
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('banner-foto-img').src = e.target.result;
+    document.getElementById('banner-foto-preview').style.display = '';
+    document.getElementById('banner-foto-placeholder').style.display = 'none';
+  };
+  reader.readAsDataURL(bannerFotoFile);
+}
+
+function tutupFormBanner() {
+  document.getElementById('banner-form-modal').style.display = 'none';
+  bannerFotoFile = null;
+  bannerEditId = null;
+}
+
+async function simpanBanner() {
+  const judul = document.getElementById('banner-form-judul').value.trim();
+  if (!judul) { showToast('Judul banner wajib diisi ⚠️'); return; }
+  showLoading();
+  try {
+    let gambar_url = null;
+    // Upload foto jika ada
+    if (bannerFotoFile) {
+      const ext = bannerFotoFile.name.split('.').pop() || 'jpg';
+      const path = 'banner_' + Date.now() + '.' + ext;
+      const { error: upErr } = await supabaseClient.storage.from('banner-images').upload(path, bannerFotoFile, { upsert: true });
+      if (!upErr) {
+        const { data: urlData } = supabaseClient.storage.from('banner-images').getPublicUrl(path);
+        gambar_url = urlData?.publicUrl || null;
+      }
+    }
+    const payload = {
+      judul,
+      subjudul: document.getElementById('banner-form-subjudul').value.trim() || null,
+      warna_bg: document.getElementById('banner-form-warna-bg').value,
+      warna_teks: document.getElementById('banner-form-warna-teks').value,
+      target_role: document.getElementById('banner-form-target').value,
+      urutan: parseInt(document.getElementById('banner-form-urutan').value) || 1,
+      aktif: document.getElementById('banner-form-aktif').checked,
+    };
+    if (gambar_url) payload.gambar_url = gambar_url;
+
+    if (bannerEditId) {
+      await supabaseClient.from('banner_carousel').update(payload).eq('id', bannerEditId);
+    } else {
+      await supabaseClient.from('banner_carousel').insert(payload);
+    }
+    hideLoading();
+    tutupFormBanner();
+    showToast('Banner berhasil disimpan ✅');
+    renderDaftarBanner();
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal simpan banner: ' + e.message + ' ⚠️');
+  }
+}
+
+async function hapusBanner(id) {
+  if (!confirm('Hapus banner ini?')) return;
+  showLoading();
+  try {
+    await supabaseClient.from('banner_carousel').delete().eq('id', id);
+    hideLoading();
+    showToast('Banner dihapus 🗑️');
+    renderDaftarBanner();
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal hapus banner ⚠️');
+  }
+}
+
+// ===== BANNER CAROUSEL (ORTU & GURU) =====
+async function muatBannerCarousel() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('banner_carousel')
+      .select('*')
+      .eq('aktif', true)
+      .order('urutan', { ascending: true });
+    if (error || !data || data.length === 0) return;
+
+    // Filter berdasarkan role
+    const filtered = data.filter(b =>
+      !b.target_role || b.target_role === 'semua' || b.target_role === currentRole
+    );
+    if (filtered.length === 0) return;
+
+    const wrap = document.getElementById('banner-carousel');
+    const track = document.getElementById('banner-track');
+    const dots = document.getElementById('banner-dots');
+    if (!wrap || !track || !dots) return;
+
+    bannerTotal = filtered.length;
+    bannerIndex = 0;
+
+    track.innerHTML = filtered.map(b => {
+      if (b.gambar_url) {
+        return `<div class="banner-slide" style="background:#000;padding:0;">
+          <img src="${b.gambar_url}" style="width:100%;height:120px;object-fit:cover;display:block;">
+        </div>`;
+      }
+      return `<div class="banner-slide" style="background:${b.warna_bg||'#1B5E20'};color:${b.warna_teks||'#fff'};">
+        <div class="banner-judul">${b.judul||''}</div>
+        ${b.subjudul ? `<div class="banner-subjudul">${b.subjudul}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    dots.innerHTML = filtered.map((_, i) =>
+      `<div class="banner-dot${i===0?' active':''}" onclick="goBannerSlide(${i})"></div>`
+    ).join('');
+
+    wrap.style.display = '';
+
+    let startX = 0;
+    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) diff > 0 ? nextBanner() : prevBanner();
+    }, { passive: true });
+
+    startBannerAuto();
+  } catch(e) { console.error('Gagal muat banner:', e); }
+}
+
+function goBannerSlide(idx) {
+  bannerIndex = idx;
+  renderBannerPos();
+  resetBannerAuto();
+}
+
+function nextBanner() {
+  bannerIndex = (bannerIndex + 1) % bannerTotal;
+  renderBannerPos();
+}
+
+function prevBanner() {
+  bannerIndex = (bannerIndex - 1 + bannerTotal) % bannerTotal;
+  renderBannerPos();
+}
+
+function renderBannerPos() {
+  const track = document.getElementById('banner-track');
+  const dots = document.querySelectorAll('#banner-dots .banner-dot');
+  if (track) track.style.transform = `translateX(-${bannerIndex * 100}%)`;
+  dots.forEach((d, i) => d.classList.toggle('active', i === bannerIndex));
+}
+
+function startBannerAuto() {
+  if (bannerTimer) clearInterval(bannerTimer);
+  if (bannerTotal > 1) bannerTimer = setInterval(nextBanner, 4000);
+}
+
+function resetBannerAuto() {
+  startBannerAuto();
+}
+
 function updateTlDateDisplay(val) {
   const el = document.getElementById('tl-tanggal-display');
   if (!el || !val) return;
@@ -11650,6 +12119,7 @@ async function initTimelineOrtu() {
   const tlInput = document.getElementById('tl-tanggal');
   if (tlInput) tlInput.value = today;
   updateTlDateDisplay(today);
+  muatBannerCarousel();
   await muatTimelineOrtu(today);
 }
 
