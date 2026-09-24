@@ -11854,7 +11854,7 @@ async function renderDaftarBanner() {
         </div>
       </div>`).join('');
   } catch(e) {
-    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat banner</div>';
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat banner: ' + (e.message || JSON.stringify(e)) + '</div>';
   }
 }
 
