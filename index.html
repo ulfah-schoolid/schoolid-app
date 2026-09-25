@@ -2576,9 +2576,12 @@
       </div>
       <button class="notif-btn" style="position:static;background:rgba(255,255,255,0.15);color:white;border-radius:50%;border:none;z-index:1;" onclick="goTo('notifikasi')"><i class="ti ti-bell" aria-hidden="true"></i><div class="notif-badge" style="border-color:#2E7D32;"></div></button>
     </div>
+    <!-- Banner Carousel Guru -->
+    <div class="banner-carousel" id="banner-carousel-guru" style="display:none;">
+      <div class="banner-track" id="banner-track-guru"></div>
+      <div class="banner-dots" id="banner-dots-guru"></div>
+    </div>
     <div class="scroll-content">
-      <div class="section" style="padding-bottom:4px;">
-        <div class="section-title">Ringkasan Hari Ini</div>
         <div class="dg-stats-grid">
           <div class="dg-stat-card" style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:none;">
             <div class="dg-stat-icon" style="background:white;"><i class="ti ti-users" style="color:#2E7D32;" aria-hidden="true"></i></div>
@@ -6860,8 +6863,7 @@ function goTo(screenId) {
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
-    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
-    if (screenId === 'notifikasi') muatNotifikasi();
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
   }
 }
 
@@ -11510,7 +11512,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
       });
     }
     goTo('dashboard-guru');
-    setTimeout(() => cekNotifBadge(), 300);
+    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); }, 300);
   }
   else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); }, 300); }
@@ -11597,7 +11599,7 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'aktivitas') initAktivitasBaru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
-    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
   }
 }
 
@@ -12021,6 +12023,84 @@ async function hapusBanner(id) {
 }
 
 // ===== BANNER CAROUSEL (ORTU & GURU) =====
+async function muatBannerCarouselGuru() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('banner_carousel')
+      .select('*')
+      .eq('aktif', true)
+      .order('urutan', { ascending: true });
+    if (error || !data || data.length === 0) return;
+
+    const filtered = data.filter(b =>
+      !b.target_role || b.target_role === 'semua' || b.target_role === 'guru'
+    );
+    if (filtered.length === 0) return;
+
+    const wrap = document.getElementById('banner-carousel-guru');
+    const track = document.getElementById('banner-track-guru');
+    const dots = document.getElementById('banner-dots-guru');
+    if (!wrap || !track || !dots) return;
+
+    let guruBannerIndex = 0;
+    const guruBannerTotal = filtered.length;
+
+    track.innerHTML = filtered.map(b => {
+      if (b.gambar_url) {
+        return `<div class="banner-slide" style="background:#f0f8f0;padding:0;">
+          <img src="${b.gambar_url}" style="width:100%;display:block;object-fit:contain;">
+        </div>`;
+      }
+      return `<div class="banner-slide" style="background:${b.warna_bg||'#1B5E20'};color:${b.warna_teks||'#fff'};">
+        <div class="banner-judul">${b.judul||''}</div>
+        ${b.subjudul ? `<div class="banner-subjudul">${b.subjudul}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    dots.innerHTML = filtered.map((_, i) =>
+      `<div class="banner-dot${i===0?' active':''}" onclick="goGuruBannerSlide(${i})"></div>`
+    ).join('');
+
+    wrap.style.display = '';
+
+    let startX = 0;
+    track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) {
+        guruBannerIndex = diff > 0
+          ? (guruBannerIndex + 1) % guruBannerTotal
+          : (guruBannerIndex - 1 + guruBannerTotal) % guruBannerTotal;
+        renderGuruBannerPos();
+        resetGuruBannerAuto();
+      }
+    }, { passive: true });
+
+    function renderGuruBannerPos() {
+      track.style.transform = `translateX(-${guruBannerIndex * 100}%)`;
+      document.querySelectorAll('#banner-dots-guru .banner-dot').forEach((d, i) =>
+        d.classList.toggle('active', i === guruBannerIndex));
+    }
+
+    window.goGuruBannerSlide = function(idx) {
+      guruBannerIndex = idx;
+      renderGuruBannerPos();
+      resetGuruBannerAuto();
+    };
+
+    let guruTimer = null;
+    function resetGuruBannerAuto() {
+      if (guruTimer) clearInterval(guruTimer);
+      if (guruBannerTotal > 1) guruTimer = setInterval(() => {
+        guruBannerIndex = (guruBannerIndex + 1) % guruBannerTotal;
+        renderGuruBannerPos();
+      }, 4000);
+    }
+    resetGuruBannerAuto();
+
+  } catch(e) { console.error('Gagal muat banner guru:', e); }
+}
+
 async function muatBannerCarousel() {
   try {
     const { data, error } = await supabaseClient
@@ -12661,7 +12741,7 @@ function switchSidebarKepala(btn, screenId) {
     if (sc) sc.scrollTop = 0;
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
-    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); }
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
   }
 }
 
