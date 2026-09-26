@@ -2576,11 +2576,6 @@
       </div>
       <button class="notif-btn" style="position:static;background:rgba(255,255,255,0.15);color:white;border-radius:50%;border:none;z-index:1;" onclick="goTo('notifikasi')"><i class="ti ti-bell" aria-hidden="true"></i><div class="notif-badge" style="border-color:#2E7D32;"></div></button>
     </div>
-    <!-- Banner Carousel Guru -->
-    <div class="banner-carousel" id="banner-carousel-guru" style="display:none;">
-      <div class="banner-track" id="banner-track-guru"></div>
-      <div class="banner-dots" id="banner-dots-guru"></div>
-    </div>
     <div class="scroll-content">
       <div class="section" style="padding-bottom:4px;">
         <div class="section-title">Ringkasan Hari Ini</div>
@@ -2663,6 +2658,11 @@
           <div style="text-align:center;padding:24px;color:var(--gray-400);font-size:13px;">Memuat data murid...</div>
         </div>
       </div>
+    </div>
+    <!-- Banner Carousel Bawah Guru -->
+    <div class="banner-carousel" id="banner-carousel-guru" style="display:none;border-top:1px solid var(--gray-100);">
+      <div class="banner-track" id="banner-track-guru"></div>
+      <div class="banner-dots" id="banner-dots-guru" style="padding:5px 0 3px;"></div>
     </div>
     <nav class="bottom-nav" id="bottomNav-guru">
       <button class="nav-item active" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
@@ -5021,6 +5021,13 @@
                 <span id="banner-warna-teks-label" style="font-size:12px;color:var(--gray-500);">#FFFFFF</span>
               </div>
             </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Posisi Banner</label>
+            <select id="banner-form-posisi" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;background:white;">
+              <option value="atas">Atas — Beranda Orang Tua</option>
+              <option value="bawah">Bawah — Di atas Nav Guru</option>
+            </select>
           </div>
           <div>
             <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Ditampilkan Untuk</label>
@@ -11869,6 +11876,7 @@ function bukaFormTambahBanner() {
   document.getElementById('banner-form-judul').value = '';
   document.getElementById('banner-form-subjudul').value = '';
   document.getElementById('banner-form-target').value = 'semua';
+  document.getElementById('banner-form-posisi').value = 'atas';
   document.getElementById('banner-form-urutan').value = '1';
   document.getElementById('banner-form-aktif').checked = true;
   document.getElementById('banner-form-warna-bg').value = '#1B5E20';
@@ -11906,6 +11914,7 @@ async function editBanner(id) {
   document.getElementById('banner-form-judul').value = b.judul || '';
   document.getElementById('banner-form-subjudul').value = b.subjudul || '';
   document.getElementById('banner-form-target').value = b.target_role || 'semua';
+  document.getElementById('banner-form-posisi').value = b.posisi || 'atas';
   document.getElementById('banner-form-urutan').value = b.urutan || 1;
   document.getElementById('banner-form-aktif').checked = b.aktif !== false;
   document.getElementById('banner-form-warna-bg').value = b.warna_bg || '#1B5E20';
@@ -11990,6 +11999,7 @@ async function simpanBanner() {
       warna_bg: document.getElementById('banner-form-warna-bg').value,
       warna_teks: document.getElementById('banner-form-warna-teks').value,
       target_role: document.getElementById('banner-form-target').value,
+      posisi: document.getElementById('banner-form-posisi').value,
       urutan: parseInt(document.getElementById('banner-form-urutan').value) || 1,
       aktif: document.getElementById('banner-form-aktif').checked,
     };
@@ -12034,8 +12044,10 @@ async function muatBannerCarouselGuru() {
       .order('urutan', { ascending: true });
     if (error || !data || data.length === 0) return;
 
+    // Filter: guru lihat banner posisi 'bawah' atau target guru/semua
     const filtered = data.filter(b =>
-      !b.target_role || b.target_role === 'semua' || b.target_role === 'guru'
+      (b.posisi === 'bawah') &&
+      (!b.target_role || b.target_role === 'semua' || b.target_role === 'guru')
     );
     if (filtered.length === 0) return;
 
@@ -12049,18 +12061,18 @@ async function muatBannerCarouselGuru() {
 
     track.innerHTML = filtered.map(b => {
       if (b.gambar_url) {
-        return `<div class="banner-slide" style="background:#f0f8f0;padding:0;">
-          <img src="${b.gambar_url}" style="width:100%;display:block;object-fit:contain;">
+        return `<div class="banner-slide" style="background:#000;padding:0;min-height:0;">
+          <img src="${b.gambar_url}" style="width:100%;height:70px;display:block;object-fit:contain;background:#111;">
         </div>`;
       }
-      return `<div class="banner-slide" style="background:${b.warna_bg||'#1B5E20'};color:${b.warna_teks||'#fff'};">
-        <div class="banner-judul">${b.judul||''}</div>
-        ${b.subjudul ? `<div class="banner-subjudul">${b.subjudul}</div>` : ''}
+      return `<div class="banner-slide" style="background:${b.warna_bg||'#1B5E20'};color:${b.warna_teks||'#fff'};min-height:0;padding:10px 16px;">
+        <div style="font-size:12px;font-weight:800;line-height:1.3;">${b.judul||''}</div>
+        ${b.subjudul ? `<div style="font-size:11px;opacity:0.85;margin-top:2px;">${b.subjudul}</div>` : ''}
       </div>`;
     }).join('');
 
     dots.innerHTML = filtered.map((_, i) =>
-      `<div class="banner-dot${i===0?' active':''}" onclick="goGuruBannerSlide(${i})"></div>`
+      `<div class="banner-dot${i===0?' active':''}" onclick="goGuruBannerSlide(${i})" style="width:5px;height:5px;"></div>`
     ).join('');
 
     wrap.style.display = '';
@@ -12112,9 +12124,10 @@ async function muatBannerCarousel() {
       .order('urutan', { ascending: true });
     if (error || !data || data.length === 0) return;
 
-    // Filter berdasarkan role
+    // Filter berdasarkan role dan posisi atas
     const filtered = data.filter(b =>
-      !b.target_role || b.target_role === 'semua' || b.target_role === currentRole
+      (b.posisi === 'atas' || !b.posisi) &&
+      (!b.target_role || b.target_role === 'semua' || b.target_role === currentRole)
     );
     if (filtered.length === 0) return;
 
