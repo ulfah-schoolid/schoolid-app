@@ -2881,7 +2881,16 @@
       <!-- Kartu statistik -->
       <div style="margin:-14px 16px 0;background:white;border-radius:var(--radius);box-shadow:0 4px 20px rgba(0,0,0,0.1);padding:14px;position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px;" id="pdm-stats"></div>
 
+      <!-- Tab navigasi -->
+      <div style="display:flex;gap:0;padding:12px 16px 0;border-bottom:2px solid var(--gray-100);">
+        <button onclick="switchPdmTab('info')" id="pdm-tab-info" style="flex:1;border:none;background:none;padding:8px 4px;font-size:12px;font-weight:700;color:var(--green);border-bottom:2px solid var(--green);cursor:pointer;margin-bottom:-2px;">📋 Info</button>
+        <button onclick="switchPdmTab('perkembangan')" id="pdm-tab-perkembangan" style="flex:1;border:none;background:none;padding:8px 4px;font-size:12px;font-weight:700;color:var(--gray-500);cursor:pointer;">📈 Perkembangan</button>
+        <button onclick="switchPdmTab('aktivitas')" id="pdm-tab-aktivitas" style="flex:1;border:none;background:none;padding:8px 4px;font-size:12px;font-weight:700;color:var(--gray-500);cursor:pointer;">🎯 Aktivitas</button>
+      </div>
+
       <div id="pdm-content" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="pdm-perkembangan" style="display:none;padding:14px 16px;"></div>
+      <div id="pdm-aktivitas-list" style="display:none;padding:14px 16px;"></div>
     </div>
   </div>
 
@@ -4126,13 +4135,21 @@
         <div style="text-align:center;padding:40px 16px;color:var(--gray-400);font-size:13px;">Memuat aktivitas...</div>
       </div>
       <!-- Catatan guru -->
-      <div id="tl-catatan-wrap" style="padding:0 0 16px;">
+      <div id="tl-catatan-wrap" style="padding:0 0 8px;">
         <div style="padding:4px 16px 8px;font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;text-transform:uppercase;">Catatan Guru</div>
         <div class="tl-catatan-card">
           <div style="display:flex;align-items:flex-start;gap:10px;">
             <div style="font-size:20px;flex-shrink:0;margin-top:1px;">&#128221;</div>
             <div id="tl-catatan-guru" style="font-size:13px;color:var(--gray-600);line-height:1.6;font-style:italic;">Belum ada catatan dari guru hari ini.</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Ringkasan Perkembangan Mingguan -->
+      <div id="ortu-perkembangan-wrap" style="padding:0 16px 16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px;">Perkembangan Minggu Ini</div>
+        <div id="ortu-perkembangan-content" style="background:white;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,0.08);padding:14px;">
+          <div style="text-align:center;color:var(--gray-400);font-size:12px;">Memuat...</div>
         </div>
       </div>
     </div>
@@ -4837,6 +4854,17 @@
             </div>
           </div>
           <div class="section">
+            <div class="section-title">Tahun Ajaran</div>
+            <div onclick="goToFromDashboard('kelola-ta','dashboard-kepala');initKelolaTahunAjaran()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+              <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#0277BD,#0288D1);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-calendar-stats" style="font-size:22px;color:white;"></i></div>
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:14px;" id="menu-ta-label">Tahun Ajaran Aktif</div>
+                <div style="font-size:12px;color:var(--gray-500);margin-top:2px;" id="menu-ta-sub">Kelola periode & semester</div>
+              </div>
+              <span class="chevron">›</span>
+            </div>
+          </div>
+          <div class="section">
             <div class="section-title">Kelola Banner</div>
             <div onclick="goToFromDashboard('kelola-banner','dashboard-kepala');initKelolaBanner()" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
               <div style="width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,#C62828,#E53935);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-photo-plus" style="font-size:22px;color:white;"></i></div>
@@ -4966,6 +4994,64 @@
   </div>
 
   <!-- ===== ARSIP MODUL & ASESMEN (KEPALA SEKOLAH) ===== -->
+  <!-- ===== KELOLA TAHUN AJARAN ===== -->
+  <div id="kelola-ta" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
+      <h2>Tahun Ajaran</h2>
+      <button onclick="bukaFormTambahTA()" style="background:var(--green);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Tambah</button>
+    </div>
+    <div class="scroll-content">
+      <div id="ta-aktif-banner" style="margin:12px 16px;border-radius:14px;padding:14px 16px;background:linear-gradient(135deg,#0277BD,#0288D1);color:white;display:none;">
+        <div style="font-size:11px;opacity:0.8;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Tahun Ajaran Aktif</div>
+        <div style="font-size:18px;font-weight:800;margin-top:4px;" id="ta-aktif-nama">-</div>
+        <div style="font-size:12px;opacity:0.85;margin-top:2px;" id="ta-aktif-detail">-</div>
+      </div>
+      <div id="ta-list" style="padding:4px 16px 16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat...</div>
+      </div>
+    </div>
+    <!-- Form Modal -->
+    <div id="ta-form-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:flex-end;">
+      <div style="background:white;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;box-sizing:border-box;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div style="font-size:15px;font-weight:800;" id="ta-form-title">Tambah Tahun Ajaran</div>
+          <button onclick="tutupFormTA()" style="background:var(--gray-100);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;">&#x2715;</button>
+        </div>
+        <input type="hidden" id="ta-form-id">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Nama Tahun Ajaran *</label>
+            <input id="ta-form-nama" type="text" placeholder="contoh: 2026/2027" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Semester</label>
+            <select id="ta-form-semester" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;background:white;">
+              <option value="Ganjil">Ganjil (Juli - Desember)</option>
+              <option value="Genap">Genap (Januari - Juni)</option>
+            </select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Tanggal Mulai</label>
+              <input id="ta-form-mulai" type="date" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;box-sizing:border-box;">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Tanggal Selesai</label>
+              <input id="ta-form-selesai" type="date" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;box-sizing:border-box;">
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#E3F2FD;padding:10px 12px;border-radius:10px;">
+            <input type="checkbox" id="ta-form-aktif" style="width:18px;height:18px;cursor:pointer;accent-color:var(--green);">
+            <label for="ta-form-aktif" style="font-size:13px;font-weight:700;color:#0277BD;cursor:pointer;">Jadikan Tahun Ajaran Aktif</label>
+          </div>
+          <div style="font-size:11px;color:var(--gray-500);background:#FFF8E1;padding:10px 12px;border-radius:8px;">&#9888; Mengaktifkan tahun ajaran ini akan menonaktifkan yang sedang berjalan. Semua data baru (absensi, aktivitas, penilaian) akan otomatis terhubung ke tahun ajaran yang aktif.</div>
+          <button onclick="simpanTahunAjaran()" style="background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== KELOLA BANNER ===== -->
   <div id="kelola-banner" class="screen">
     <div class="top-bar">
@@ -6896,7 +6982,7 @@ function goBack() {
       'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view','bantuan-ortu'];
 
     const kepalaScreens = ['laporan-kepala','kalender-kepala','pendaftaran-masuk',
-      'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala','kelola-banner'];
+      'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala','kelola-banner','kelola-ta'];
 
     if (sharedScreens.includes(id)) {
       if (currentRole === 'ortu') prev = 'timeline-ortu';
@@ -7026,11 +7112,157 @@ function renderDaftarMuridGuru() {
   }).join('');
 }
 
+function switchPdmTab(tab) {
+  const tabs = ['info','perkembangan','aktivitas'];
+  const panels = { info: 'pdm-content', perkembangan: 'pdm-perkembangan', aktivitas: 'pdm-aktivitas-list' };
+  tabs.forEach(t => {
+    const btn = document.getElementById('pdm-tab-' + t);
+    const panel = document.getElementById(panels[t]);
+    const aktif = t === tab;
+    if (btn) { btn.style.color = aktif ? 'var(--green)' : 'var(--gray-500)'; btn.style.borderBottom = aktif ? '2px solid var(--green)' : 'none'; }
+    if (panel) panel.style.display = aktif ? 'flex' : 'none';
+    if (panel && aktif && t !== 'info') panel.style.flexDirection = 'column';
+  });
+  if (tab === 'perkembangan') muatPerkembanganMurid();
+  if (tab === 'aktivitas') muatAktivitasMurid();
+}
+
+let pdmMuridAktif = null;
+
+async function muatPerkembanganMurid() {
+  if (!pdmMuridAktif) return;
+  const panel = document.getElementById('pdm-perkembangan');
+  if (!panel) return;
+  panel.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat perkembangan...</div>';
+  try {
+    const nama = pdmMuridAktif.nama;
+    const taId = getTahunAjaranAktifId();
+
+    // Ambil absensi bulan ini
+    const now = new Date();
+    const bulanMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const { data: absensi } = await supabaseClient.from('absensi').select('status').eq('murid_nama', nama).gte('tanggal', bulanMulai);
+    const totalHadir = (absensi||[]).filter(a => a.status === 'H').length;
+    const totalAbsen = (absensi||[]).length;
+    const pctHadir = totalAbsen > 0 ? Math.round(totalHadir/totalAbsen*100) : 0;
+
+    // Ambil aktivitas bulan ini
+    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('data').gte('updated_at', bulanMulai + 'T00:00:00');
+    const aktMurid = (aktivitas||[]).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return (d.peserta||[]).includes(nama);
+    });
+
+    // Hitung aspek perkembangan dari aktivitas
+    const aspekCount = {};
+    aktMurid.forEach(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      const aspek = d.aspek || 'Lainnya';
+      aspekCount[aspek] = (aspekCount[aspek]||0) + 1;
+    });
+    const aspekWarna = { 'Motorik Halus':'#BBDEFB','Kreativitas':'#FFE0B2','Bahasa':'#E1BEE7','Kognitif':'#D1C4E9','Sosial':'#F8BBD0','Agama':'#C8E6C9','Motorik Kasar':'#DCEDC8','Seni':'#FFE0B2','default':'#E8F5E9' };
+    const aspekEmoji = { 'Motorik Halus':'✍️','Kreativitas':'🎨','Bahasa':'💬','Kognitif':'🧠','Sosial':'❤️','Agama':'🕌','Motorik Kasar':'🤸','Seni':'🎨','default':'📄' };
+
+    // Ambil foto bulan ini
+    const fotoCount = aktMurid.reduce((sum, a) => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return sum + (d.foto_urls||[]).length;
+    }, 0);
+
+    const taNama = tahunAjaranAktif ? tahunAjaranAktif.nama + ' — Semester ' + tahunAjaranAktif.semester : 'Tahun Ajaran Aktif';
+
+    panel.innerHTML = `
+      <div style="background:#E8F5E9;border-radius:12px;padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:#2E7D32;text-transform:uppercase;letter-spacing:0.5px;">${taNama}</div>
+        <div style="font-size:12px;color:var(--gray-600);margin-top:2px;">Ringkasan bulan ${now.toLocaleDateString('id-ID',{month:'long',year:'numeric'})}</div>
+      </div>
+
+      <!-- Kehadiran -->
+      <div style="background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:14px;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:800;color:var(--gray-700);margin-bottom:10px;">📅 Kehadiran Bulan Ini</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;background:var(--gray-100);border-radius:20px;height:10px;overflow:hidden;">
+            <div style="height:100%;width:${pctHadir}%;background:linear-gradient(90deg,#2E7D32,#43A047);border-radius:20px;transition:width 0.5s;"></div>
+          </div>
+          <div style="font-size:18px;font-weight:800;color:var(--green);">${pctHadir}%</div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:10px;">
+          <div style="flex:1;text-align:center;background:#E8F5E9;border-radius:8px;padding:8px;"><div style="font-size:16px;font-weight:800;color:#2E7D32;">${totalHadir}</div><div style="font-size:10px;color:var(--gray-500);">Hadir</div></div>
+          <div style="flex:1;text-align:center;background:#FFF8E1;border-radius:8px;padding:8px;"><div style="font-size:16px;font-weight:800;color:#F57F17;">${(absensi||[]).filter(a=>a.status==='S').length}</div><div style="font-size:10px;color:var(--gray-500);">Sakit</div></div>
+          <div style="flex:1;text-align:center;background:#E3F2FD;border-radius:8px;padding:8px;"><div style="font-size:16px;font-weight:800;color:#1565C0;">${(absensi||[]).filter(a=>a.status==='I').length}</div><div style="font-size:10px;color:var(--gray-500);">Izin</div></div>
+          <div style="flex:1;text-align:center;background:#FFEBEE;border-radius:8px;padding:8px;"><div style="font-size:16px;font-weight:800;color:#C62828;">${(absensi||[]).filter(a=>a.status==='A').length}</div><div style="font-size:10px;color:var(--gray-500);">Alpa</div></div>
+        </div>
+      </div>
+
+      <!-- Aktivitas & Aspek -->
+      <div style="background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:14px;margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:800;color:var(--gray-700);margin-bottom:10px;">🎯 Aspek Perkembangan (${aktMurid.length} aktivitas, ${fotoCount} foto)</div>
+        ${Object.keys(aspekCount).length === 0
+          ? '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px;">Belum ada aktivitas bulan ini</div>'
+          : Object.entries(aspekCount).sort((a,b)=>b[1]-a[1]).map(([aspek, jumlah]) => {
+              const maxVal = Math.max(...Object.values(aspekCount));
+              const pct = Math.round(jumlah/maxVal*100);
+              const warna = aspekWarna[aspek]||aspekWarna.default;
+              const emoji = aspekEmoji[aspek]||aspekEmoji.default;
+              return `<div style="margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+                  <span style="font-weight:600;">${emoji} ${aspek}</span>
+                  <span style="font-weight:800;color:var(--green);">${jumlah}x</span>
+                </div>
+                <div style="background:var(--gray-100);border-radius:20px;height:8px;overflow:hidden;">
+                  <div style="height:100%;width:${pct}%;background:${warna.includes(',') ? warna.split(',')[0] : warna};border-radius:20px;"></div>
+                </div>
+              </div>`;
+            }).join('')
+        }
+      </div>`;
+  } catch(e) {
+    const panel2 = document.getElementById('pdm-perkembangan');
+    if (panel2) panel2.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat: ' + e.message + '</div>';
+  }
+}
+
+async function muatAktivitasMurid() {
+  if (!pdmMuridAktif) return;
+  const panel = document.getElementById('pdm-aktivitas-list');
+  if (!panel) return;
+  panel.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat aktivitas...</div>';
+  try {
+    const nama = pdmMuridAktif.nama;
+    const { data } = await supabaseClient.from('modul_ajar').select('data,updated_at').order('updated_at', { ascending: false }).limit(20);
+    const aktMurid = (data||[]).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return (d.peserta||[]).includes(nama);
+    });
+    if (aktMurid.length === 0) {
+      panel.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Belum ada aktivitas tercatat</div>';
+      return;
+    }
+    panel.innerHTML = aktMurid.map(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      const tgl = d.tanggal ? new Date(d.tanggal+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}) : '-';
+      const fotoCount = (d.foto_urls||[]).length;
+      return `<div style="background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;">
+        <div style="width:40px;height:40px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${ASPEK_EMOJI[d.aspek]||ASPEK_EMOJI.default}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:var(--gray-900);">${d.nama||'Aktivitas'}</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">${tgl} · ${d.aspek||'-'}${fotoCount > 0 ? ' · 📷 '+fotoCount+' foto' : ''}</div>
+          ${d.deskripsi ? '<div style="font-size:12px;color:var(--gray-600);margin-top:4px;line-height:1.4;">' + d.deskripsi.substring(0,80) + (d.deskripsi.length > 80 ? '...' : '') + '</div>' : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    panel.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat aktivitas</div>';
+  }
+}
+
 function bukaProfilDetailMurid(nama) {
   const list = getMuridList();
   const m = list.find(x => x.nama === nama);
   if (!m) return;
-
+  pdmMuridAktif = m;
+  // Reset tab ke Info
+  switchPdmTab('info');
   // Cek data pendaftaran dari orang tua
   const daftarList = getPendaftaranList();
   const d = daftarList.find(x => x.anak?.nama?.toLowerCase() === nama.toLowerCase());
@@ -10933,7 +11165,8 @@ async function simpanAktivitasBaru() {
         kelompok: kelasGuru,
         foto_urls: fotoUrls
       },
-      status: 'draft'
+      status: 'draft',
+      tahun_ajaran_id: getTahunAjaranAktifId()
     });
     if (error) throw error;
 
@@ -11022,7 +11255,8 @@ async function simpanAbsensi() {
       kelompok: kelasGuru,
       murid_id: m.id,
       murid_nama: m.nama,
-      status: statusAbsensi[m.nama] || 'H'
+      status: statusAbsensi[m.nama] || 'H',
+      tahun_ajaran_id: getTahunAjaranAktifId()
     }));
 
     const { error } = await supabaseClient
@@ -11521,10 +11755,10 @@ async function masukKeDashboardSesuaiProfil(userId) {
       });
     }
     goTo('dashboard-guru');
-    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); }, 300);
+    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); }, 300);
   }
   else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); }, 300); }
-  else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); }, 300); }
+  else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); muatTahunAjaranAktif(); }, 300); }
 }
 
 async function cekSesiAktif() {
@@ -11824,6 +12058,176 @@ const ASPEK_WARNA = {
   'Sosial':'#F8BBD0,#F48FB1','Agama':'#C8E6C9,#A5D6A7',
   'Seni':'#FFE0B2,#FFCC80','default':'#E8F5E9,#A5D6A7'
 };
+
+// ===== ACADEMIC YEAR ENGINE =====
+let tahunAjaranAktif = null;
+
+async function muatTahunAjaranAktif() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('tahun_ajaran')
+      .select('*')
+      .eq('aktif', true)
+      .single();
+    if (error || !data) return null;
+    tahunAjaranAktif = data;
+    // Update label di menu dashboard kepala
+    const label = document.getElementById('menu-ta-label');
+    const sub = document.getElementById('menu-ta-sub');
+    if (label) label.textContent = data.nama + ' — Semester ' + data.semester;
+    if (sub) {
+      const mulai = new Date(data.tanggal_mulai).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+      const selesai = new Date(data.tanggal_selesai).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+      sub.textContent = mulai + ' s/d ' + selesai;
+    }
+    // Update info_sekolah tahun_ajaran juga
+    const taEl = document.getElementById('isv-tahun-ajaran');
+    if (taEl) taEl.textContent = data.nama + ' — Semester ' + data.semester;
+    return data;
+  } catch(e) { return null; }
+}
+
+function getTahunAjaranAktifId() {
+  return tahunAjaranAktif?.id || null;
+}
+
+async function initKelolaTahunAjaran() {
+  await renderDaftarTA();
+}
+
+async function renderDaftarTA() {
+  const list = document.getElementById('ta-list');
+  const banner = document.getElementById('ta-aktif-banner');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat...</div>';
+  try {
+    const { data, error } = await supabaseClient.from('tahun_ajaran').select('*').order('tanggal_mulai', { ascending: false });
+    if (error) throw error;
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Belum ada tahun ajaran</div>';
+      return;
+    }
+    const aktif = data.find(t => t.aktif);
+    if (aktif && banner) {
+      banner.style.display = '';
+      document.getElementById('ta-aktif-nama').textContent = aktif.nama + ' — Semester ' + aktif.semester;
+      const mulai = new Date(aktif.tanggal_mulai).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+      const selesai = new Date(aktif.tanggal_selesai).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+      document.getElementById('ta-aktif-detail').textContent = mulai + ' s/d ' + selesai;
+    }
+    list.innerHTML = data.map(t => {
+      const mulai = new Date(t.tanggal_mulai).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+      const selesai = new Date(t.tanggal_selesai).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
+      return `<div style="background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:14px 16px;${t.aktif ? 'border-left:4px solid var(--green);' : ''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="font-size:14px;font-weight:800;color:var(--gray-900);">${t.nama} <span style="font-weight:600;color:var(--gray-500);">— Semester ${t.semester}</span></div>
+          ${t.aktif ? '<span style="background:#E8F5E9;color:#2E7D32;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;">AKTIF</span>' : ''}
+        </div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px;"><i class="ti ti-calendar" style="font-size:11px;"></i> ${mulai} s/d ${selesai}</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="editTA('${t.id}')" style="flex:1;background:#E3F2FD;color:#1565C0;border:none;border-radius:8px;padding:7px;font-size:12px;font-weight:700;cursor:pointer;">Edit</button>
+          ${!t.aktif ? `<button onclick="aktifkanTA('${t.id}')" style="flex:1;background:#E8F5E9;color:#2E7D32;border:none;border-radius:8px;padding:7px;font-size:12px;font-weight:700;cursor:pointer;">Aktifkan</button>` : ''}
+          ${!t.aktif ? `<button onclick="hapusTA('${t.id}')" style="background:#FFEBEE;color:#C62828;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;">Hapus</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat: ' + e.message + '</div>';
+  }
+}
+
+function bukaFormTambahTA() {
+  document.getElementById('ta-form-id').value = '';
+  document.getElementById('ta-form-nama').value = '';
+  document.getElementById('ta-form-semester').value = 'Ganjil';
+  document.getElementById('ta-form-mulai').value = '';
+  document.getElementById('ta-form-selesai').value = '';
+  document.getElementById('ta-form-aktif').checked = false;
+  document.getElementById('ta-form-title').textContent = 'Tambah Tahun Ajaran';
+  document.getElementById('ta-form-modal').style.display = 'flex';
+}
+
+async function editTA(id) {
+  const { data: t } = await supabaseClient.from('tahun_ajaran').select('*').eq('id', id).single();
+  if (!t) return;
+  document.getElementById('ta-form-id').value = t.id;
+  document.getElementById('ta-form-nama').value = t.nama;
+  document.getElementById('ta-form-semester').value = t.semester;
+  document.getElementById('ta-form-mulai').value = t.tanggal_mulai;
+  document.getElementById('ta-form-selesai').value = t.tanggal_selesai;
+  document.getElementById('ta-form-aktif').checked = t.aktif;
+  document.getElementById('ta-form-title').textContent = 'Edit Tahun Ajaran';
+  document.getElementById('ta-form-modal').style.display = 'flex';
+}
+
+function tutupFormTA() {
+  document.getElementById('ta-form-modal').style.display = 'none';
+}
+
+async function simpanTahunAjaran() {
+  const nama = document.getElementById('ta-form-nama').value.trim();
+  const semester = document.getElementById('ta-form-semester').value;
+  const mulai = document.getElementById('ta-form-mulai').value;
+  const selesai = document.getElementById('ta-form-selesai').value;
+  const aktif = document.getElementById('ta-form-aktif').checked;
+  const id = document.getElementById('ta-form-id').value;
+  if (!nama || !mulai || !selesai) { showToast('Nama, tanggal mulai & selesai wajib diisi ⚠️'); return; }
+  showLoading();
+  try {
+    if (aktif) {
+      // Nonaktifkan semua dulu
+      await supabaseClient.from('tahun_ajaran').update({ aktif: false }).neq('id', id || '00000000-0000-0000-0000-000000000000');
+    }
+    const payload = { nama, semester, tanggal_mulai: mulai, tanggal_selesai: selesai, aktif };
+    if (id) {
+      await supabaseClient.from('tahun_ajaran').update(payload).eq('id', id);
+    } else {
+      await supabaseClient.from('tahun_ajaran').insert(payload);
+    }
+    hideLoading();
+    tutupFormTA();
+    showToast('Tahun ajaran berhasil disimpan ✅');
+    if (aktif) {
+      tahunAjaranAktif = null;
+      await muatTahunAjaranAktif();
+    }
+    renderDaftarTA();
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal simpan: ' + e.message + ' ⚠️');
+  }
+}
+
+async function aktifkanTA(id) {
+  if (!confirm('Aktifkan tahun ajaran ini? Tahun ajaran yang sedang aktif akan dinonaktifkan.')) return;
+  showLoading();
+  try {
+    await supabaseClient.from('tahun_ajaran').update({ aktif: false }).neq('id', id);
+    await supabaseClient.from('tahun_ajaran').update({ aktif: true }).eq('id', id);
+    hideLoading();
+    showToast('Tahun ajaran diaktifkan ✅');
+    tahunAjaranAktif = null;
+    await muatTahunAjaranAktif();
+    renderDaftarTA();
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal: ' + e.message + ' ⚠️');
+  }
+}
+
+async function hapusTA(id) {
+  if (!confirm('Hapus tahun ajaran ini?')) return;
+  showLoading();
+  try {
+    await supabaseClient.from('tahun_ajaran').delete().eq('id', id);
+    hideLoading();
+    showToast('Tahun ajaran dihapus 🗑️');
+    renderDaftarTA();
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal hapus: ' + e.message + ' ⚠️');
+  }
+}
 
 // ===== KELOLA BANNER (KEPALA) =====
 let bannerFotoFile = null;
@@ -12209,12 +12613,73 @@ function updateTlDateDisplay(val) {
   el.textContent = hari + ', ' + d.getDate() + ' ' + bulan + ' ' + d.getFullYear();
 }
 
+async function muatPerkembanganOrtu() {
+  const el = document.getElementById('ortu-perkembangan-content');
+  if (!el || !currentUserProfile?.anak_nama) return;
+  try {
+    const nama = currentUserProfile.anak_nama;
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const mingguMulai = new Date(new Date().setDate(diff)).toISOString().split('T')[0];
+
+    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('data').gte('updated_at', mingguMulai + 'T00:00:00');
+    const aktMurid = (aktivitas||[]).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return (d.peserta||[]).includes(nama);
+    });
+
+    const { data: absensi } = await supabaseClient.from('absensi').select('status,tanggal').eq('murid_nama', nama).gte('tanggal', mingguMulai);
+    const hadir = (absensi||[]).filter(a => a.status === 'H').length;
+    const totalAbsensi = (absensi||[]).length;
+
+    const aspekCount = {};
+    let fotoCount = 0;
+    aktMurid.forEach(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      aspekCount[d.aspek||'Lainnya'] = (aspekCount[d.aspek||'Lainnya']||0) + 1;
+      fotoCount += (d.foto_urls||[]).length;
+    });
+    const topAspek = Object.entries(aspekCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+
+    if (aktMurid.length === 0 && totalAbsensi === 0) {
+      el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px;">Belum ada data minggu ini</div>';
+      return;
+    }
+
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
+        <div style="text-align:center;background:#E8F5E9;border-radius:10px;padding:10px 4px;">
+          <div style="font-size:20px;font-weight:800;color:#2E7D32;">${hadir}</div>
+          <div style="font-size:10px;color:var(--gray-500);">Hari Hadir</div>
+        </div>
+        <div style="text-align:center;background:#E3F2FD;border-radius:10px;padding:10px 4px;">
+          <div style="font-size:20px;font-weight:800;color:#1565C0;">${aktMurid.length}</div>
+          <div style="font-size:10px;color:var(--gray-500);">Aktivitas</div>
+        </div>
+        <div style="text-align:center;background:#FFF8E1;border-radius:10px;padding:10px 4px;">
+          <div style="font-size:20px;font-weight:800;color:#F57F17;">${fotoCount}</div>
+          <div style="font-size:10px;color:var(--gray-500);">Foto</div>
+        </div>
+      </div>
+      ${topAspek.length > 0 ? `
+        <div style="font-size:11px;font-weight:700;color:var(--gray-500);margin-bottom:6px;">ASPEK YANG DILATIH:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${topAspek.map(([aspek, jml]) => `<span style="background:#F1F8E9;color:#33691E;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">${aspek} (${jml}x)</span>`).join('')}
+        </div>` : ''}`;
+  } catch(e) {
+    const el2 = document.getElementById('ortu-perkembangan-content');
+    if (el2) el2.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px;">Gagal memuat data</div>';
+  }
+}
+
 async function initTimelineOrtu() {
   const today = new Date().toISOString().split('T')[0];
   const tlInput = document.getElementById('tl-tanggal');
   if (tlInput) tlInput.value = today;
   updateTlDateDisplay(today);
   muatBannerCarousel();
+  muatPerkembanganOrtu();
   await muatTimelineOrtu(today);
 }
 
