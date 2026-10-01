@@ -2577,6 +2577,16 @@
       <button class="notif-btn" style="position:static;background:rgba(255,255,255,0.15);color:white;border-radius:50%;border:none;z-index:1;" onclick="goTo('notifikasi')"><i class="ti ti-bell" aria-hidden="true"></i><div class="notif-badge" style="border-color:#2E7D32;"></div></button>
     </div>
     <div class="scroll-content">
+      <!-- TEACHER TODAY -->
+      <div id="teacher-today-section" style="padding:12px 16px 4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:800;color:var(--gray-900);">📋 Tugas Hari Ini</div>
+          <div id="teacher-today-tanggal" style="font-size:11px;color:var(--gray-500);font-weight:600;"></div>
+        </div>
+        <div id="teacher-today-list" style="display:flex;flex-direction:column;gap:6px;">
+          <div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px;">Memuat...</div>
+        </div>
+      </div>
       <div class="section" style="padding-bottom:4px;">
         <div class="section-title">Ringkasan Hari Ini</div>
         <div class="dg-stats-grid">
@@ -2621,9 +2631,9 @@
             <div class="quick-btn-icon" style="background:#7E57C2;color:white;"><i class="ti ti-camera" aria-hidden="true"></i></div>
             <span>Dokumentasi</span>
           </button>
-          <button class="quick-btn" onclick="goToFromDashboard('laporan-harian','dashboard-guru')">
-            <div class="quick-btn-icon" style="background:#42A5F5;color:white;"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
-            <span>Laporan Harian</span>
+          <button class="quick-btn" onclick="goToFromDashboard('daftar-aktivitas-guru','dashboard-guru');muatDaftarAktivitasGuru('hari')">
+            <div class="quick-btn-icon" style="background:#42A5F5;color:white;"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
+            <span>Aktivitas</span>
           </button>
           <button class="quick-btn" onclick="goToFromDashboard('guru-modul-list','dashboard-guru');renderGuruModulList()">
             <div class="quick-btn-icon" style="background:#5E35B1;color:white;"><i class="ti ti-book-2" aria-hidden="true"></i></div>
@@ -4209,6 +4219,26 @@
   </div>
 
   <!-- ===== LAPORAN HARIAN ===== -->
+  <!-- ===== DAFTAR AKTIVITAS GURU ===== -->
+  <div id="daftar-aktivitas-guru" class="screen">
+    <div class="top-bar">
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
+      <h2>Aktivitas</h2>
+      <button onclick="goToFromDashboard('tambah-aktivitas','daftar-aktivitas-guru')" style="background:var(--green);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Baru</button>
+    </div>
+    <div style="padding:8px 16px;display:flex;gap:6px;flex-shrink:0;overflow-x:auto;">
+      <button onclick="filterAktivitasGuru('hari',this)" class="filter-tab active" style="white-space:nowrap;">Hari Ini</button>
+      <button onclick="filterAktivitasGuru('minggu',this)" class="filter-tab" style="white-space:nowrap;">Minggu Ini</button>
+      <button onclick="filterAktivitasGuru('bulan',this)" class="filter-tab" style="white-space:nowrap;">Bulan Ini</button>
+      <button onclick="filterAktivitasGuru('semua',this)" class="filter-tab" style="white-space:nowrap;">Semua</button>
+    </div>
+    <div class="scroll-content">
+      <div id="dag-list" style="padding:8px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat...</div>
+      </div>
+    </div>
+  </div>
+
   <div id="laporan-harian" class="screen">
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">‹</button>
@@ -6958,7 +6988,7 @@ function goTo(screenId) {
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
-    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); muatTeacherToday(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
   }
 }
 
@@ -6971,7 +7001,7 @@ function goBack() {
     // Screen dipakai bersama — cek currentRole
     const sharedScreens = ['dokumentasi','pesan','profil-user'];
 
-    const guruScreens = ['laporan-harian','aktivitas','penilaian','laporan-murid',
+    const guruScreens = ['laporan-harian','aktivitas','penilaian','laporan-murid','daftar-aktivitas-guru',
       'profil-murid','detail-murid','guru-rapor-siswa','guru-form-rapor','daftar-murid-guru',
       'profil-detail-murid','absensi','info-pribadi','ubah-password','bantuan','tentang-app',
       'pengaturan','info-sekolah','kelola-guru','kelola-kelas','kelola-murid','pengaturan-penilaian',
@@ -9590,6 +9620,215 @@ async function simpanCatatanHarian() {
   showToast('Catatan tersimpan ✅');
 }
 
+// ===== DAFTAR AKTIVITAS GURU =====
+let dagFilterAktif = 'hari';
+
+function filterAktivitasGuru(filter, btn) {
+  dagFilterAktif = filter;
+  document.querySelectorAll('#daftar-aktivitas-guru .filter-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  muatDaftarAktivitasGuru(filter);
+}
+
+async function muatDaftarAktivitasGuru(filter) {
+  const list = document.getElementById('dag-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Memuat...</div>';
+  try {
+    const now = new Date();
+    let tglMulai;
+    if (filter === 'hari') {
+      tglMulai = now.toISOString().split('T')[0];
+    } else if (filter === 'minggu') {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      tglMulai = new Date(new Date().setDate(diff)).toISOString().split('T')[0];
+    } else if (filter === 'bulan') {
+      tglMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    }
+
+    let query = supabaseClient.from('modul_ajar').select('id,data,updated_at').order('updated_at', { ascending: false }).limit(50);
+    if (tglMulai) query = query.gte('updated_at', tglMulai + 'T00:00:00');
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const aktKelas = (data||[]).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return d.kelompok === kelasGuru;
+    });
+
+    if (aktKelas.length === 0) {
+      list.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;padding:48px 16px;gap:10px;"><div style="font-size:40px;">📋</div><div style="font-size:14px;font-weight:700;color:var(--gray-700);">Belum ada aktivitas</div><div style="font-size:12px;color:var(--gray-400);text-align:center;">Tap tombol + Baru untuk mulai mencatat aktivitas</div></div>';
+      return;
+    }
+
+    // Cek penilaian yang sudah ada
+    const aktIds = aktKelas.map(a => a.id);
+    const { data: nilaiAda } = await supabaseClient.from('penilaian').select('aktivitas_id').in('aktivitas_id', aktIds);
+    const sudahDinilaiIds = new Set((nilaiAda||[]).map(n => n.aktivitas_id));
+
+    list.innerHTML = aktKelas.map(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      const nama = d.nama || 'Aktivitas';
+      const aspek = d.aspek || '-';
+      const tanggal = d.tanggal ? new Date(d.tanggal+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short'}) : '-';
+      const peserta = (d.peserta||[]).length;
+      const foto = (d.foto_urls||[]).length;
+      const sudahDinilai = sudahDinilaiIds.has(a.id);
+      const emoji = ASPEK_EMOJI[aspek] || ASPEK_EMOJI.default;
+
+      return `<div style="background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;">
+        <div style="padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:40px;height:40px;border-radius:10px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${emoji}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:800;color:var(--gray-900);">${nama}</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:3px;">${tanggal} · ${aspek} · ${peserta} murid${foto > 0 ? ' · 📷 '+foto : ''}</div>
+          </div>
+          <span style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;background:${sudahDinilai?'#E8F5E9':'#FFF3E0'};color:${sudahDinilai?'#2E7D32':'#E65100'};">${sudahDinilai?'✓ Dinilai':'Belum'}</span>
+        </div>
+        <div style="display:flex;gap:0;border-top:1px solid var(--gray-100);">
+          <button onclick="bukaDetailAktivitas('${a.id}')" style="flex:1;background:none;border:none;border-right:1px solid var(--gray-100);padding:10px;font-size:12px;font-weight:700;color:var(--gray-600);cursor:pointer;"><i class="ti ti-eye"></i> Detail</button>
+          <button onclick="bukaNilaiAktivitas('${a.id}')" style="flex:2;background:${sudahDinilai?'none':'#FFF3E0'};border:none;padding:10px;font-size:12px;font-weight:700;color:${sudahDinilai?'#2E7D32':'#E65100'};cursor:pointer;"><i class="ti ti-star"></i> ${sudahDinilai?'Lihat Penilaian':'Nilai Sekarang'}</button>
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat: ' + e.message + '</div>';
+  }
+}
+
+function bukaDetailAktivitas(id) {
+  // Arahkan ke penilaian-cepat dengan filter aktivitas ini
+  showToast('Fitur detail aktivitas segera hadir 🔧');
+}
+
+async function bukaNilaiAktivitas(aktivitasId) {
+  // Simpan ID aktivitas yang akan dinilai lalu buka penilaian cepat
+  window._nilaiAktivitasId = aktivitasId;
+  // Ambil data aktivitas
+  const { data: akt } = await supabaseClient.from('modul_ajar').select('data').eq('id', aktivitasId).single();
+  if (akt) {
+    const d = typeof akt.data === 'string' ? JSON.parse(akt.data) : (akt.data||{});
+    window._nilaiAktivitasData = d;
+  }
+  goToFromDashboard('penilaian-cepat', 'daftar-aktivitas-guru');
+}
+
+// ===== TEACHER TODAY =====
+async function muatTeacherToday() {
+  const list = document.getElementById('teacher-today-list');
+  const tglEl = document.getElementById('teacher-today-tanggal');
+  if (!list) return;
+
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  if (tglEl) tglEl.textContent = today.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long' });
+
+  const muridAktif = getMuridAktif();
+  const tasks = [];
+
+  try {
+    // 1. Cek absensi hari ini
+    const { data: absensiHariIni } = await supabaseClient
+      .from('absensi').select('id').eq('tanggal', todayStr).eq('kelompok', kelasGuru).limit(1);
+    const sudahAbsensi = absensiHariIni && absensiHariIni.length > 0;
+    tasks.push({
+      id: 'absensi',
+      selesai: sudahAbsensi,
+      label: 'Absensi murid',
+      sub: sudahAbsensi ? 'Sudah diisi hari ini' : muridAktif.length + ' murid belum diabsen',
+      icon: 'ti-clipboard-check',
+      warna: sudahAbsensi ? '#E8F5E9' : '#FFF3E0',
+      warnaIkon: sudahAbsensi ? '#2E7D32' : '#E65100',
+      aksi: sudahAbsensi ? null : "goToFromDashboard('absensi','dashboard-guru')"
+    });
+
+    // 2. Cek aktivitas hari ini
+    const { data: aktHariIni } = await supabaseClient
+      .from('modul_ajar').select('id,data').eq('data->>tanggal', todayStr);
+    const aktKelas = (aktHariIni||[]).filter(a => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return d.kelompok === kelasGuru;
+    });
+    tasks.push({
+      id: 'aktivitas',
+      selesai: aktKelas.length > 0,
+      label: 'Aktivitas hari ini',
+      sub: aktKelas.length > 0 ? aktKelas.length + ' aktivitas tercatat' : 'Belum ada aktivitas hari ini',
+      icon: 'ti-clipboard-list',
+      warna: aktKelas.length > 0 ? '#E8F5E9' : '#E3F2FD',
+      warnaIkon: aktKelas.length > 0 ? '#2E7D32' : '#1565C0',
+      aksi: "goToFromDashboard('daftar-aktivitas-guru','dashboard-guru');muatDaftarAktivitasGuru('hari')"
+    });
+
+    // 3. Cek penilaian — murid yang belum dinilai dari aktivitas hari ini
+    let belumDinilai = 0;
+    if (aktKelas.length > 0) {
+      const aktIds = aktKelas.map(a => a.id);
+      const { data: nilaiAda } = await supabaseClient
+        .from('penilaian').select('aktivitas_id').in('aktivitas_id', aktIds);
+      const sudahDinilaiIds = new Set((nilaiAda||[]).map(n => n.aktivitas_id));
+      belumDinilai = aktIds.filter(id => !sudahDinilaiIds.has(id)).length;
+    }
+    tasks.push({
+      id: 'penilaian',
+      selesai: aktKelas.length > 0 && belumDinilai === 0,
+      label: 'Penilaian aktivitas',
+      sub: aktKelas.length === 0 ? 'Buat aktivitas dulu' : belumDinilai > 0 ? belumDinilai + ' aktivitas belum dinilai' : 'Semua aktivitas sudah dinilai ✓',
+      icon: 'ti-star',
+      warna: (aktKelas.length > 0 && belumDinilai === 0) ? '#E8F5E9' : '#FFF8E1',
+      warnaIkon: (aktKelas.length > 0 && belumDinilai === 0) ? '#2E7D32' : '#F57F17',
+      aksi: belumDinilai > 0 ? "goToFromDashboard('penilaian-cepat','dashboard-guru')" : null
+    });
+
+    // 4. Cek dokumentasi hari ini
+    const fotoHariIni = aktKelas.reduce((sum, a) => {
+      const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
+      return sum + (d.foto_urls||[]).length;
+    }, 0);
+    tasks.push({
+      id: 'dokumentasi',
+      selesai: fotoHariIni > 0,
+      label: 'Dokumentasi foto',
+      sub: fotoHariIni > 0 ? fotoHariIni + ' foto terupload hari ini' : 'Belum ada foto hari ini',
+      icon: 'ti-camera',
+      warna: fotoHariIni > 0 ? '#E8F5E9' : '#F3E5F5',
+      warnaIkon: fotoHariIni > 0 ? '#2E7D32' : '#6A1B9A',
+      aksi: "goToFromDashboard('tambah-aktivitas','dashboard-guru')"
+    });
+
+    const selesaiCount = tasks.filter(t => t.selesai).length;
+    const pct = Math.round(selesaiCount / tasks.length * 100);
+
+    list.innerHTML = `
+      <div style="background:white;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:12px 14px;margin-bottom:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="font-size:12px;font-weight:700;color:var(--gray-700);">${selesaiCount} dari ${tasks.length} tugas selesai</div>
+          <div style="font-size:13px;font-weight:800;color:${pct === 100 ? '#2E7D32' : '#E65100'};">${pct}%</div>
+        </div>
+        <div style="background:var(--gray-100);border-radius:20px;height:6px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${pct===100?'#2E7D32':'#E65100'},${pct===100?'#43A047':'#FF9800'});border-radius:20px;transition:width 0.5s;"></div>
+        </div>
+      </div>
+      ${tasks.map(t => `
+      <div onclick="${t.aksi||''}" style="background:white;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.06);padding:10px 14px;display:flex;align-items:center;gap:12px;cursor:${t.aksi?'pointer':'default'};">
+        <div style="width:36px;height:36px;border-radius:10px;background:${t.warna};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          ${t.selesai ? '<i class="ti ti-circle-check" style="color:#2E7D32;font-size:18px;"></i>' : `<i class="ti ${t.icon}" style="color:${t.warnaIkon};font-size:18px;"></i>`}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:700;color:${t.selesai?'var(--gray-500)':'var(--gray-900)'};${t.selesai?'text-decoration:none;':''}">${t.label}</div>
+          <div style="font-size:11px;color:${t.selesai?'#2E7D32':'var(--gray-500)'};margin-top:1px;">${t.sub}</div>
+        </div>
+        ${!t.selesai && t.aksi ? '<i class="ti ti-chevron-right" style="color:var(--gray-400);font-size:16px;"></i>' : ''}
+      </div>`).join('')}`;
+
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px;">Gagal memuat tugas hari ini</div>';
+  }
+}
+
 async function muatRingkasanDashboardGuru() {
   if (!currentUserProfile) return;
   const today = new Date().toISOString().split('T')[0];
@@ -11755,7 +11994,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
       });
     }
     goTo('dashboard-guru');
-    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); }, 300);
+    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); muatTeacherToday(); }, 300);
   }
   else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); muatTahunAjaranAktif(); }, 300); }
@@ -11839,10 +12078,11 @@ function switchTab(screenId, btn, role) {
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'info-pribadi' && (currentRole === 'guru' || currentRole === 'kepala')) isiFormProfilGuru();
     if (screenId === 'laporan-harian') muatLaporanHarian();
+    if (screenId === 'daftar-aktivitas-guru') muatDaftarAktivitasGuru(dagFilterAktif||'hari');
     if (screenId === 'aktivitas') initAktivitasBaru();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
-    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); muatTeacherToday(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
   }
 }
 
@@ -13221,7 +13461,7 @@ function switchSidebarKepala(btn, screenId) {
     if (sc) sc.scrollTop = 0;
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
-    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
+    if (screenId === 'dashboard-guru') { updateBadgePengumumanGuru(); muatRingkasanDashboardGuru(); muatTeacherToday(); terapkanNamaGuruAsli(); muatBannerCarouselGuru(); }
   }
 }
 
