@@ -9647,8 +9647,12 @@ async function muatDaftarAktivitasGuru(filter) {
       tglMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     }
 
-    let query = supabaseClient.from('modul_ajar').select('id,data,updated_at').order('updated_at', { ascending: false }).limit(50);
-    if (tglMulai) query = query.gte('updated_at', tglMulai + 'T00:00:00');
+    let query = supabaseClient.from('modul_ajar').select('id,data,updated_at').order('updated_at', { ascending: false }).limit(100);
+    if (filter === 'hari') {
+      query = query.eq('data->>tanggal', tglMulai);
+    } else if (tglMulai) {
+      query = query.gte('data->>tanggal', tglMulai);
+    }
 
     const { data, error } = await query;
     if (error) throw error;
@@ -9742,7 +9746,7 @@ async function muatTeacherToday() {
       icon: 'ti-clipboard-check',
       warna: sudahAbsensi ? '#E8F5E9' : '#FFF3E0',
       warnaIkon: sudahAbsensi ? '#2E7D32' : '#E65100',
-      aksi: sudahAbsensi ? null : "goToFromDashboard('absensi','dashboard-guru')"
+      aksi: sudahAbsensi ? null : "goToFromDashboard('absensi','dashboard-guru');initAbsensi()"
     });
 
     // 2. Cek aktivitas hari ini
