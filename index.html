@@ -3882,8 +3882,6 @@
       <h2>Penilaian Murid</h2>
     </div>
     <div class="scroll-content">
-      <!-- Konteks aktivitas dari daftar aktivitas -->
-      <div id="pn-konteks" style="display:none;padding:8px 16px 0;"></div>
       <!-- Pilih Aktivitas -->
       <div style="padding:12px 16px;background:white;border-bottom:1px solid var(--gray-100);">
         <div style="font-size:12px;font-weight:700;color:var(--gray-500);margin-bottom:6px;">AKTIVITAS YANG DINILAI</div>
@@ -8760,9 +8758,6 @@ function pilihAspek(btn, aspek) {
 }
 
 async function initPenilaian() {
-  // Reset konteks aktivitas
-  const konteksEl = document.getElementById('pn-konteks');
-  if (konteksEl) konteksEl.style.display = 'none';
   // Set tanggal aktif ke hari ini
   pnTanggalAktif = new Date().toISOString().split('T')[0];
 
@@ -8972,10 +8967,6 @@ async function simpanPenilaian() {
 
     if (error) throw error;
     showToast('Penilaian berhasil disimpan! ✅');
-    setTimeout(() => {
-      muatTeacherToday();
-      if (document.getElementById('dag-list')) muatDaftarAktivitasGuru(dagFilterAktif||'hari');
-    }, 500);
   } catch(e) {
     console.error('Gagal simpan penilaian:', e);
     showToast('Gagal simpan: ' + (e.message || 'coba lagi') + ' ⚠️');
@@ -9678,8 +9669,8 @@ async function muatDaftarAktivitasGuru(filter) {
 
     // Cek penilaian yang sudah ada
     const aktIds = aktKelas.map(a => a.id);
-    const { data: nilaiAda } = await supabaseClient.from('penilaian').select('aktivitas_id').in('aktivitas_id', aktIds);
-    const sudahDinilaiIds = new Set((nilaiAda||[]).map(n => n.aktivitas_id));
+    const { data: nilaiAda } = await supabaseClient.from('penilaian').select('modul_ajar_id').in('modul_ajar_id', aktIds);
+    const sudahDinilaiIds = new Set((nilaiAda||[]).map(n => n.modul_ajar_id));
 
     list.innerHTML = aktKelas.map(a => {
       const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
@@ -9713,52 +9704,20 @@ async function muatDaftarAktivitasGuru(filter) {
 }
 
 function bukaDetailAktivitas(id) {
+  // Arahkan ke penilaian-cepat dengan filter aktivitas ini
   showToast('Fitur detail aktivitas segera hadir 🔧');
 }
 
 async function bukaNilaiAktivitas(aktivitasId) {
-  showLoading();
-  try {
-    const { data: akt } = await supabaseClient.from('modul_ajar').select('data').eq('id', aktivitasId).single();
-    const d = akt ? (typeof akt.data === 'string' ? JSON.parse(akt.data) : (akt.data||{})) : {};
-    const aspek = d.aspek || 'Motorik Halus';
-    const namaAkt = d.nama || 'Aktivitas';
-    const peserta = d.peserta || [];
-
-    await initPenilaian();
-
-    // Pre-select aspek dari aktivitas
-    const aspekBtn = document.querySelector(`.aspek-btn`);
-    if (aspekBtn) {
-      document.querySelectorAll('.aspek-btn').forEach(b => {
-        const isTarget = b.textContent.trim() === aspek;
-        b.classList.toggle('active-aspek', isTarget);
-        b.style.background = isTarget ? 'var(--green)' : 'white';
-        b.style.color = isTarget ? 'white' : 'var(--gray-500)';
-        b.style.border = isTarget ? 'none' : '1.5px solid var(--gray-200)';
-      });
-      aspekAktif = aspek;
-    }
-
-    // Pre-select aktivitas di dropdown jika ada
-    const selectAkt = document.getElementById('pn-aktivitas');
-    if (selectAkt) selectAkt.value = aktivitasId;
-
-    renderPenilaian();
-
-    // Tampilkan info konteks aktivitas
-    const headerEl = document.getElementById('pn-konteks');
-    if (headerEl) {
-      headerEl.style.display = '';
-      headerEl.innerHTML = `<div style="background:#E8F5E9;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;color:#2E7D32;"><b>🎯 Menilai aktivitas:</b> ${namaAkt} · ${peserta.length} murid</div>`;
-    }
-
-    hideLoading();
-    goToFromDashboard('penilaian', 'daftar-aktivitas-guru');
-  } catch(e) {
-    hideLoading();
-    showToast('Gagal membuka penilaian ⚠️');
+  // Simpan ID aktivitas yang akan dinilai lalu buka penilaian cepat
+  window._nilaiAktivitasId = aktivitasId;
+  // Ambil data aktivitas
+  const { data: akt } = await supabaseClient.from('modul_ajar').select('data').eq('id', aktivitasId).single();
+  if (akt) {
+    const d = typeof akt.data === 'string' ? JSON.parse(akt.data) : (akt.data||{});
+    window._nilaiAktivitasData = d;
   }
+  goToFromDashboard('penilaian-cepat', 'daftar-aktivitas-guru');
 }
 
 // ===== TEACHER TODAY =====
@@ -9813,8 +9772,8 @@ async function muatTeacherToday() {
     if (aktKelas.length > 0) {
       const aktIds = aktKelas.map(a => a.id);
       const { data: nilaiAda } = await supabaseClient
-        .from('penilaian').select('aktivitas_id').in('aktivitas_id', aktIds);
-      const sudahDinilaiIds = new Set((nilaiAda||[]).map(n => n.aktivitas_id));
+        .from('penilaian').select('modul_ajar_id').in('modul_ajar_id', aktIds);
+      const sudahDinilaiIds = new Set((nilaiAda||[]).map(n => n.modul_ajar_id));
       belumDinilai = aktIds.filter(id => !sudahDinilaiIds.has(id)).length;
     }
     tasks.push({
@@ -9825,7 +9784,7 @@ async function muatTeacherToday() {
       icon: 'ti-star',
       warna: (aktKelas.length > 0 && belumDinilai === 0) ? '#E8F5E9' : '#FFF8E1',
       warnaIkon: (aktKelas.length > 0 && belumDinilai === 0) ? '#2E7D32' : '#F57F17',
-      aksi: belumDinilai > 0 ? "goToFromDashboard('daftar-aktivitas-guru','dashboard-guru');muatDaftarAktivitasGuru('hari')" : null
+      aksi: belumDinilai > 0 ? "goToFromDashboard('penilaian-cepat','dashboard-guru')" : null
     });
 
     // 4. Cek dokumentasi hari ini
@@ -9841,7 +9800,7 @@ async function muatTeacherToday() {
       icon: 'ti-camera',
       warna: fotoHariIni > 0 ? '#E8F5E9' : '#F3E5F5',
       warnaIkon: fotoHariIni > 0 ? '#2E7D32' : '#6A1B9A',
-      aksi: "switchTab('dokumentasi', document.querySelector('#bottomNav-guru .nav-item'), 'guru');updateDokumentasiNav()"
+      aksi: "goToFromDashboard('tambah-aktivitas','dashboard-guru')"
     });
 
     const selesaiCount = tasks.filter(t => t.selesai).length;
@@ -11456,7 +11415,6 @@ async function simpanAktivitasBaru() {
 
     hideLoading();
     showToast('Aktivitas berhasil disimpan!' + (fotoUrls.length > 0 ? ' (' + fotoUrls.length + ' foto) ✅' : ' ✅'));
-    setTimeout(() => { muatTeacherToday(); muatRingkasanDashboardGuru(); }, 800);
     // Notifikasi ke ortu murid yang ikut aktivitas
     try {
       if (peserta.length > 0) {
@@ -11551,7 +11509,7 @@ async function simpanAbsensi() {
 
     hideLoading();
     showToast('Absensi berhasil disimpan! ✅');
-    setTimeout(() => { goBack(); setTimeout(muatTeacherToday, 500); }, 300);
+    setTimeout(goBack, 300);
   } catch (e) {
     hideLoading();
     showToast('Gagal simpan absensi: ' + (e.message || e) + ' ❌');
