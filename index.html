@@ -1164,6 +1164,58 @@
     box-shadow: 0 2px 8px rgba(46,125,50,0.08);
   }
 
+  /* ===== CHAT / PESAN ===== */
+  .chat-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-100);
+    cursor: pointer;
+    background: white;
+  }
+  .chat-item:active { background: #F5F5F5; }
+  .chat-avatar {
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green), #43A047);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: white; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .chat-bubble-saya {
+    align-self: flex-end;
+    background: var(--green);
+    color: white;
+    border-radius: 16px 16px 4px 16px;
+    padding: 10px 14px;
+    max-width: 75%;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .chat-bubble-lawan {
+    align-self: flex-start;
+    background: white;
+    color: var(--gray-900);
+    border-radius: 16px 16px 16px 4px;
+    padding: 10px 14px;
+    max-width: 75%;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+  .chat-waktu {
+    font-size: 10px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 4px;
+    text-align: right;
+  }
+  .chat-waktu-lawan {
+    font-size: 10px;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+
   /* ===== BANNER CAROUSEL ===== */
   .banner-carousel {
     position: relative;
@@ -2676,9 +2728,9 @@
     </div>
     <nav class="bottom-nav" id="bottomNav-guru">
       <button class="nav-item active" onclick="switchTab('dashboard-guru', this, 'guru')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
-      <button class="nav-item" onclick="switchTab('aktivitas', this, 'guru')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
+      <button class="nav-item" onclick="switchTab('daftar-aktivitas-guru', this, 'guru');muatDaftarAktivitasGuru('hari')"><i class="ti ti-clipboard-list" aria-hidden="true"></i><span class="nav-label">Aktivitas</span></button>
       <button class="nav-item" onclick="switchTab('daftar-murid-guru', this, 'guru');renderDaftarMuridGuru()"><i class="ti ti-users" aria-hidden="true"></i><span class="nav-label">Murid</span></button>
-      <button class="nav-item" onclick="switchTab('laporan-harian', this, 'guru')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
+      <button class="nav-item" onclick="switchTab('pesan', this, 'guru');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-guru" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item" onclick="switchTab('profil-user', this, 'guru')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
@@ -4167,7 +4219,7 @@
       <button class="nav-item active" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-ortu" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
@@ -4206,7 +4258,7 @@
       <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
       <button class="nav-item active" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-ortu" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
@@ -4373,7 +4425,7 @@
       <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
       <button class="nav-item active" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-ortu" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
@@ -4444,7 +4496,7 @@
       <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
       <button class="nav-item active" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-ortu" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
@@ -5377,15 +5429,15 @@
   <!-- ===== PESAN/CHAT ===== -->
   <div id="pesan" class="screen">
     <div class="top-bar">
-      <button class="back-btn" onclick="goBack()">‹</button>
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
       <h2>Pesan</h2>
+      <button id="pesan-tulis-btn" onclick="bukaTulisanPesan()" style="display:none;background:var(--green);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">&#9998; Tulis</button>
     </div>
     <div class="scroll-content">
-      <div class="chat-list" id="pesan-list">
-        <div style="text-align:center;padding:60px 16px;color:var(--gray-400);">
-          <div style="margin-bottom:12px;"><i class="ti ti-message-circle" style="font-size:40px;color:var(--gray-300);"></i></div>
-          <div style="font-size:14px;font-weight:600;">Belum ada pesan</div>
-          <div style="font-size:12px;margin-top:4px;">Fitur pesan antara ortu dan guru akan segera hadir</div>
+      <div id="pesan-list" style="display:flex;flex-direction:column;">
+        <div style="text-align:center;padding:48px 16px;color:var(--gray-400);">
+          <i class="ti ti-message-circle" style="font-size:40px;color:var(--gray-300);"></i>
+          <div style="font-size:14px;font-weight:600;margin-top:8px;">Memuat...</div>
         </div>
       </div>
     </div>
@@ -5400,9 +5452,46 @@
       <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
-      <button class="nav-item active" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item active" onclick="switchTabOrtu(this,'pesan');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-ortu2" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
+  </div>
+
+  <!-- ===== CHAT DETAIL ===== -->
+  <div id="chat-detail" class="screen" style="display:flex;flex-direction:column;">
+    <div class="top-bar" style="flex-shrink:0;">
+      <button class="back-btn" onclick="goBack()">&#8249;</button>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:800;color:var(--gray-900);" id="chat-nama-lawan">-</div>
+        <div style="font-size:11px;color:var(--gray-500);" id="chat-sub-lawan">-</div>
+      </div>
+    </div>
+    <!-- Pesan list -->
+    <div id="chat-messages" class="scroll-content" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;"></div>
+    <!-- Input -->
+    <div style="flex-shrink:0;padding:10px 16px;background:white;border-top:1px solid var(--gray-100);display:flex;gap:8px;align-items:flex-end;">
+      <textarea id="chat-input" placeholder="Tulis pesan..." rows="1" style="flex:1;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:20px;font-size:13px;resize:none;outline:none;font-family:inherit;max-height:100px;overflow-y:auto;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+      <button onclick="kirimPesan()" style="width:40px;height:40px;background:var(--green);border:none;border-radius:50%;color:white;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+
+  <!-- Modal Tulis Pesan Baru (Guru → Ortu) -->
+  <div id="modal-pesan-baru" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:flex-end;">
+    <div style="background:white;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;box-sizing:border-box;max-height:80vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="font-size:15px;font-weight:800;">Pesan ke Orang Tua</div>
+        <button onclick="tutupModalPesanBaru()" style="background:var(--gray-100);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;">&#x2715;</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Pilih Murid</label>
+        <select id="pesan-baru-murid" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;background:white;"></select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px;font-weight:700;color:var(--gray-600);">Pesan</label>
+        <textarea id="pesan-baru-isi" placeholder="Tulis pesan untuk orang tua..." rows="4" style="width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:13px;resize:none;outline:none;font-family:inherit;box-sizing:border-box;"></textarea>
+      </div>
+      <button onclick="kirimPesanBaru()" style="width:100%;background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;">Kirim Pesan</button>
+    </div>
   </div>
 
   <!-- ===== PROFIL USER ===== -->
@@ -5823,7 +5912,7 @@
       <button class="nav-item" onclick="switchTabOrtu(this,'timeline-ortu')"><i class="ti ti-home-2" aria-hidden="true"></i><span class="nav-label">Beranda</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'dokumentasi')"><i class="ti ti-photo" aria-hidden="true"></i><span class="nav-label">Foto</span></button>
       <button class="nav-item" onclick="switchTabOrtu(this,'laporan-bulanan')"><i class="ti ti-chart-bar" aria-hidden="true"></i><span class="nav-label">Laporan</span></button>
-      <button class="nav-item" onclick="switchTabOrtu(this,'pesan')"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span></button>
+      <button class="nav-item" onclick="switchTabOrtu(this,'pesan');muatDaftarPesan()" style="position:relative;"><i class="ti ti-message-2" aria-hidden="true"></i><span class="nav-label">Pesan</span><span id="pesan-badge-ortu" style="display:none;position:absolute;top:4px;right:calc(50% - 18px);background:var(--error);color:white;border-radius:10px;font-size:9px;font-weight:800;padding:1px 5px;"></span></button>
       <button class="nav-item active" onclick="switchTabOrtu(this,'profil-ortu')"><i class="ti ti-user-circle" aria-hidden="true"></i><span class="nav-label">Profil</span></button>
     </nav>
   </div>
@@ -6984,7 +7073,7 @@ function goTo(screenId) {
     const scrollable = to.querySelector('.scroll-content');
     if (scrollable) scrollable.scrollTop = 0;
     if (screenId === 'dokumentasi') updateDokumentasiNav();
-    if (screenId === 'pesan') updatePesanNav();
+    if (screenId === 'pesan') { updatePesanNav(); muatDaftarPesan(); }
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'dashboard-kepala' || screenId === 'kepala-arsip') updateBadgeArsip();
     if (screenId === 'dashboard-kepala') { muatGuruPendingDariSupabase().then(updateBadgeGuruPending); muatStatDashboardKepala(); }
@@ -6994,6 +7083,8 @@ function goTo(screenId) {
 
 function goBack() {
   const curr = document.querySelector('.screen.active');
+  // Stop chat polling jika keluar dari chat
+  if (curr && curr.id === 'chat-detail') stopChatPolling();
   let prev = screenHistory.length > 0 ? screenHistory.pop() : null;
   if (!prev) {
     const id = curr ? curr.id : '';
@@ -7005,11 +7096,11 @@ function goBack() {
       'profil-murid','detail-murid','guru-rapor-siswa','guru-form-rapor','daftar-murid-guru',
       'profil-detail-murid','absensi','info-pribadi','ubah-password','bantuan','tentang-app',
       'pengaturan','info-sekolah','kelola-guru','kelola-kelas','kelola-murid','pengaturan-penilaian',
-      'backup-restore','form-murid'];
+      'backup-restore','form-murid','chat-detail'];
 
     const ortuScreens = ['laporan-bulanan','rapor','detail-rapor','notifikasi','ortu-info-pribadi',
       'ortu-data-anak','ortu-ubah-hp','ortu-notifikasi','ortu-ubah-password','ortu-profil-guru',
-      'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view','bantuan-ortu'];
+      'ortu-detail-guru-1','ortu-detail-guru-2','profil-ortu','info-sekolah-view','bantuan-ortu','chat-detail'];
 
     const kepalaScreens = ['laporan-kepala','kalender-kepala','pendaftaran-masuk',
       'detail-pendaftaran','pengaturan-kepala','absensi-guru-kepala','kelola-banner','kelola-ta'];
@@ -11998,9 +12089,9 @@ async function masukKeDashboardSesuaiProfil(userId) {
       });
     }
     goTo('dashboard-guru');
-    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); muatTeacherToday(); }, 300);
+    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); muatTeacherToday(); cekBadgePesan(); setInterval(cekBadgePesan, 30000); }, 300);
   }
-  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); }, 300); }
+  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); cekBadgePesan(); setInterval(cekBadgePesan, 30000); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); muatTahunAjaranAktif(); }, 300); }
 }
 
@@ -12078,7 +12169,7 @@ function switchTab(screenId, btn, role) {
     const sc = document.getElementById(screenId)?.querySelector('.scroll-content');
     if (sc) sc.scrollTop = 0;
     if (screenId === 'dokumentasi') updateDokumentasiNav();
-    if (screenId === 'pesan') updatePesanNav();
+    if (screenId === 'pesan') { updatePesanNav(); muatDaftarPesan(); }
     if (screenId === 'profil-user') updateProfilUserView();
     if (screenId === 'info-pribadi' && (currentRole === 'guru' || currentRole === 'kepala')) isiFormProfilGuru();
     if (screenId === 'laporan-harian') muatLaporanHarian();
@@ -12302,6 +12393,293 @@ const ASPEK_WARNA = {
   'Sosial':'#F8BBD0,#F48FB1','Agama':'#C8E6C9,#A5D6A7',
   'Seni':'#FFE0B2,#FFCC80','default':'#E8F5E9,#A5D6A7'
 };
+
+// ===== SISTEM PESAN GURU ↔ ORTU =====
+let chatPercakapanAktif = null;
+let chatPolling = null;
+
+async function muatDaftarPesan() {
+  const list = document.getElementById('pesan-list');
+  const tulisBtn = document.getElementById('pesan-tulis-btn');
+  if (!list) return;
+
+  // Tampilkan tombol Tulis hanya untuk guru
+  if (tulisBtn) tulisBtn.style.display = currentRole === 'guru' ? '' : 'none';
+
+  list.innerHTML = '<div style="text-align:center;padding:48px;color:var(--gray-400);"><i class="ti ti-loader" style="font-size:32px;"></i></div>';
+
+  try {
+    const uid = currentUserProfile?.id;
+    if (!uid) return;
+
+    let query;
+    if (currentRole === 'guru') {
+      query = supabaseClient.from('percakapan').select('*').eq('guru_id', uid).order('waktu_terakhir', { ascending: false });
+    } else {
+      query = supabaseClient.from('percakapan').select('*').eq('ortu_id', uid).order('waktu_terakhir', { ascending: false });
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      list.innerHTML = `<div style="text-align:center;padding:56px 16px;color:var(--gray-400);">
+        <i class="ti ti-message-circle" style="font-size:44px;color:var(--gray-300);display:block;margin-bottom:10px;"></i>
+        <div style="font-size:14px;font-weight:700;color:var(--gray-600);">Belum ada pesan</div>
+        <div style="font-size:12px;margin-top:4px;">${currentRole === 'guru' ? 'Tap tombol Tulis untuk mulai percakapan dengan orang tua' : 'Guru akan menghubungi Anda melalui pesan ini'}</div>
+      </div>`;
+      return;
+    }
+
+    // Ambil info profil lawan bicara
+    const lawanIds = data.map(p => currentRole === 'guru' ? p.ortu_id : p.guru_id).filter(Boolean);
+    const { data: profiles } = await supabaseClient.from('profiles').select('id,nama,role').in('id', lawanIds);
+    const profileMap = {};
+    (profiles||[]).forEach(p => profileMap[p.id] = p);
+
+    list.innerHTML = data.map(p => {
+      const lawanId = currentRole === 'guru' ? p.ortu_id : p.guru_id;
+      const lawan = profileMap[lawanId] || {};
+      const namaLawan = lawan.nama || (currentRole === 'guru' ? 'Orang Tua' : 'Guru');
+      const inisial = namaLawan.charAt(0).toUpperCase();
+      const belumBaca = currentRole === 'guru' ? p.belum_baca_guru : p.belum_baca_ortu;
+      const waktu = p.waktu_terakhir ? new Date(p.waktu_terakhir).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' }) : '';
+      const tgl = p.waktu_terakhir ? new Date(p.waktu_terakhir).toLocaleDateString('id-ID', { day:'numeric', month:'short' }) : '';
+      const waktuLabel = isToday(p.waktu_terakhir) ? waktu : tgl;
+
+      return `<div class="chat-item" onclick="bukaChat('${p.id}','${namaLawan.replace(/'/g,"\\'")}','${p.murid_nama||''}')">
+        <div class="chat-avatar">${inisial}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-size:13px;font-weight:${belumBaca>0?'800':'700'};color:var(--gray-900);">${namaLawan}</div>
+            <div style="font-size:11px;color:${belumBaca>0?'var(--green)':'var(--gray-400)'};">${waktuLabel}</div>
+          </div>
+          ${p.murid_nama ? `<div style="font-size:11px;color:var(--green);font-weight:600;">Murid: ${p.murid_nama}</div>` : ''}
+          <div style="font-size:12px;color:var(--gray-500);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px;">
+            <span>${p.pesan_terakhir || '...'}</span>
+            ${belumBaca > 0 ? `<span style="background:var(--green);color:white;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${belumBaca}</span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat: ${e.message}</div>`;
+  }
+}
+
+function isToday(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return d.toDateString() === now.toDateString();
+}
+
+async function bukaChat(percakapanId, namaLawan, muridNama) {
+  chatPercakapanAktif = percakapanId;
+  const namaEl = document.getElementById('chat-nama-lawan');
+  const subEl = document.getElementById('chat-sub-lawan');
+  if (namaEl) namaEl.textContent = namaLawan;
+  if (subEl) subEl.textContent = muridNama ? 'Murid: ' + muridNama : (currentRole === 'guru' ? 'Orang Tua' : 'Guru');
+
+  goToFromDashboard('chat-detail', 'pesan');
+  await muatPesanChat(percakapanId);
+
+  // Tandai sudah dibaca
+  try {
+    const kolom = currentRole === 'guru' ? { belum_baca_guru: 0 } : { belum_baca_ortu: 0 };
+    await supabaseClient.from('percakapan').update(kolom).eq('id', percakapanId);
+  } catch(e) {}
+
+  // Polling setiap 5 detik
+  if (chatPolling) clearInterval(chatPolling);
+  chatPolling = setInterval(() => muatPesanChat(percakapanId), 5000);
+}
+
+async function muatPesanChat(percakapanId) {
+  const container = document.getElementById('chat-messages');
+  if (!container) return;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('pesan')
+      .select('*')
+      .eq('percakapan_id', percakapanId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+
+    const uid = currentUserProfile?.id;
+    const wasAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+
+    container.innerHTML = (data||[]).length === 0
+      ? '<div style="text-align:center;padding:32px;color:var(--gray-400);font-size:12px;">Belum ada pesan. Mulai percakapan!</div>'
+      : (data||[]).map(p => {
+          const saya = p.pengirim_id === uid;
+          const waktu = new Date(p.created_at).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+          return `<div style="display:flex;flex-direction:column;align-items:${saya?'flex-end':'flex-start'};">
+            <div class="${saya?'chat-bubble-saya':'chat-bubble-lawan'}">${p.isi}</div>
+            <div class="${saya?'chat-waktu':'chat-waktu-lawan'}" style="margin:2px ${saya?'6':'6'}px 0;">${waktu}${saya && p.dibaca?'  ✓✓':''}</div>
+          </div>`;
+        }).join('');
+
+    // Scroll ke bawah jika sudah di bawah atau pesan baru
+    if (wasAtBottom || data?.length > 0) {
+      setTimeout(() => container.scrollTop = container.scrollHeight, 50);
+    }
+  } catch(e) {}
+}
+
+async function kirimPesan() {
+  const input = document.getElementById('chat-input');
+  const isi = input?.value?.trim();
+  if (!isi || !chatPercakapanAktif) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  try {
+    const uid = currentUserProfile?.id;
+    // Insert pesan
+    await supabaseClient.from('pesan').insert({
+      percakapan_id: chatPercakapanAktif,
+      pengirim_id: uid,
+      pengirim_role: currentRole,
+      isi
+    });
+
+    // Update percakapan
+    const updateData = {
+      pesan_terakhir: isi,
+      waktu_terakhir: new Date().toISOString()
+    };
+    if (currentRole === 'guru') updateData.belum_baca_ortu = supabaseClient.rpc ? 1 : 1;
+    else updateData.belum_baca_guru = 1;
+
+    await supabaseClient.from('percakapan').update(updateData).eq('id', chatPercakapanAktif);
+
+    // Increment belum baca untuk lawan
+    const { data: current } = await supabaseClient.from('percakapan').select('belum_baca_guru,belum_baca_ortu').eq('id', chatPercakapanAktif).single();
+    if (current) {
+      if (currentRole === 'guru') {
+        await supabaseClient.from('percakapan').update({ belum_baca_ortu: (current.belum_baca_ortu||0) + 1 }).eq('id', chatPercakapanAktif);
+      } else {
+        await supabaseClient.from('percakapan').update({ belum_baca_guru: (current.belum_baca_guru||0) + 1 }).eq('id', chatPercakapanAktif);
+      }
+    }
+
+    muatPesanChat(chatPercakapanAktif);
+  } catch(e) {
+    showToast('Gagal kirim pesan ⚠️');
+  }
+}
+
+async function bukaTulisanPesan() {
+  // Isi dropdown murid
+  const select = document.getElementById('pesan-baru-murid');
+  if (select) {
+    const muridAktif = getMuridAktif();
+    select.innerHTML = muridAktif.map(m => `<option value="${m.nama}">${m.nama}</option>`).join('');
+  }
+  document.getElementById('pesan-baru-isi').value = '';
+  document.getElementById('modal-pesan-baru').style.display = 'flex';
+}
+
+function tutupModalPesanBaru() {
+  document.getElementById('modal-pesan-baru').style.display = 'none';
+}
+
+async function kirimPesanBaru() {
+  const muridNama = document.getElementById('pesan-baru-murid').value;
+  const isi = document.getElementById('pesan-baru-isi').value.trim();
+  if (!muridNama || !isi) { showToast('Pilih murid dan isi pesan ⚠️'); return; }
+
+  showLoading();
+  try {
+    const guruId = currentUserProfile?.id;
+
+    // Cari ortu berdasarkan nama anak
+    const { data: ortuProfile } = await supabaseClient
+      .from('profiles').select('id').eq('role','ortu').eq('anak_nama', muridNama).maybeSingle();
+
+    if (!ortuProfile) {
+      hideLoading();
+      showToast('Orang tua murid ini belum terdaftar di aplikasi ⚠️');
+      return;
+    }
+
+    // Cari atau buat percakapan
+    let { data: percakapan } = await supabaseClient
+      .from('percakapan').select('id').eq('guru_id', guruId).eq('ortu_id', ortuProfile.id).maybeSingle();
+
+    if (!percakapan) {
+      const { data: newPerc } = await supabaseClient.from('percakapan').insert({
+        guru_id: guruId,
+        ortu_id: ortuProfile.id,
+        murid_nama: muridNama,
+        pesan_terakhir: isi,
+        waktu_terakhir: new Date().toISOString(),
+        belum_baca_ortu: 1
+      }).select().single();
+      percakapan = newPerc;
+    } else {
+      await supabaseClient.from('percakapan').update({
+        pesan_terakhir: isi,
+        waktu_terakhir: new Date().toISOString(),
+        belum_baca_ortu: 1
+      }).eq('id', percakapan.id);
+    }
+
+    // Insert pesan
+    await supabaseClient.from('pesan').insert({
+      percakapan_id: percakapan.id,
+      pengirim_id: guruId,
+      pengirim_role: 'guru',
+      isi
+    });
+
+    // Notifikasi ke ortu
+    await buatNotifikasi({
+      user_id: ortuProfile.id,
+      judul: '💬 Pesan dari Guru',
+      isi: isi.substring(0, 80) + (isi.length > 80 ? '...' : ''),
+      tipe: 'pengumuman'
+    });
+
+    hideLoading();
+    tutupModalPesanBaru();
+    showToast('Pesan terkirim ✅');
+    muatDaftarPesan();
+
+    // Langsung buka chat
+    const { data: guruProf } = await supabaseClient.from('profiles').select('nama').eq('id', guruId).single();
+    setTimeout(() => bukaChat(percakapan.id, guruProf?.nama || 'Guru', muridNama), 300);
+  } catch(e) {
+    hideLoading();
+    showToast('Gagal kirim: ' + e.message + ' ⚠️');
+  }
+}
+
+// Stop polling saat keluar dari chat
+function stopChatPolling() {
+  if (chatPolling) { clearInterval(chatPolling); chatPolling = null; }
+}
+
+async function cekBadgePesan() {
+  const uid = currentUserProfile?.id;
+  if (!uid) return;
+  try {
+    const kolom = currentRole === 'guru' ? 'belum_baca_guru' : 'belum_baca_ortu';
+    const idField = currentRole === 'guru' ? 'guru_id' : 'ortu_id';
+    const { data } = await supabaseClient.from('percakapan').select(kolom).eq(idField, uid);
+    const total = (data||[]).reduce((sum, p) => sum + (p[kolom]||0), 0);
+    // Update badge guru
+    const badgeGuru = document.getElementById('pesan-badge-guru');
+    if (badgeGuru) { badgeGuru.textContent = total > 0 ? (total > 9 ? '9+' : total) : ''; badgeGuru.style.display = total > 0 ? '' : 'none'; }
+    // Update badge ortu
+    const badgeOrtu = document.getElementById('pesan-badge-ortu');
+    const badgeOrtu2 = document.getElementById('pesan-badge-ortu2');
+    [badgeOrtu, badgeOrtu2].forEach(b => { if (b) { b.textContent = total > 0 ? (total > 9 ? '9+' : total) : ''; b.style.display = total > 0 ? '' : 'none'; } });
+  } catch(e) {}
+}
 
 // ===== ACADEMIC YEAR ENGINE =====
 let tahunAjaranAktif = null;
