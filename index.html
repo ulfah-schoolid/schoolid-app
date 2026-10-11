@@ -1,4 +1,4 @@
-<!-- SchoolID v2.2.2 (debug fix) -->
+<!-- SchoolID v2.2.3 -->
  <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7942,9 +7942,10 @@ async function generateNarasiAI() {
   btn.innerHTML = '<span>⏳</span> Sedang membuat narasi...';
 
   try {
+    const { data: { session: sesiNarasi } } = await supabaseClient.auth.getSession();
     const res = await fetch('/api/generate-narasi', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (sesiNarasi?.access_token || '') },
       body: JSON.stringify({
         nama: m.nama,
         jk: m.jk === 'L' ? 'laki-laki' : 'perempuan',
