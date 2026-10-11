@@ -1,4 +1,4 @@
-<!-- SchoolID v2.2.1 -->
+<!-- SchoolID v2.2.2 (debug fix) -->
  <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -25,8 +25,11 @@
     --gray-100: #F5F5F5;
     --gray-200: #EEEEEE;
     --gray-300: #E0E0E0;
+    --gray-400: #BDBDBD;
     --gray-500: #9E9E9E;
+    --gray-600: #757575;
     --gray-700: #616161;
+    --gray-800: #424242;
     --gray-900: #212121;
     --radius: 12px;
     --radius-sm: 8px;
@@ -4276,7 +4279,7 @@
     <div class="top-bar">
       <button class="back-btn" onclick="goBack()">&#8249;</button>
       <h2>Aktivitas</h2>
-      <button onclick="goToFromDashboard('tambah-aktivitas','daftar-aktivitas-guru')" style="background:var(--green);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Baru</button>
+      <button onclick="goToFromDashboard('aktivitas','daftar-aktivitas-guru');initAktivitasBaru()" style="background:var(--green);color:white;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">+ Baru</button>
     </div>
     <div style="padding:8px 16px;display:flex;gap:6px;flex-shrink:0;overflow-x:auto;">
       <button onclick="filterAktivitasGuru('hari',this)" class="filter-tab active" style="white-space:nowrap;">Hari Ini</button>
@@ -5458,7 +5461,7 @@
   </div>
 
   <!-- ===== CHAT DETAIL ===== -->
-  <div id="chat-detail" class="screen" style="display:flex;flex-direction:column;">
+  <div id="chat-detail" class="screen">
     <div class="top-bar" style="flex-shrink:0;">
       <button class="back-btn" onclick="goBack()">&#8249;</button>
       <div style="flex:1;min-width:0;">
@@ -6855,6 +6858,27 @@
 </div>
 
 <script>
+// ===== HELPER (perbaikan debug v2.2.2) =====
+// Escape teks agar aman dimasukkan ke innerHTML (cegah XSS)
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// Escape teks untuk argumen string di dalam atribut onclick="fungsi('...')"
+// (nama dengan apostrof seperti Nur'aini tidak lagi merusak tombol)
+function jsq(s) {
+  return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+}
+// Tanggal lokal (WIB/WITA/WIT) format YYYY-MM-DD — pengganti toISOString().split('T')[0]
+function tglLokal(d) {
+  d = d ? new Date(d) : new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+// Offset zona waktu perangkat, mis. "+07:00", untuk filter timestamp
+function tzOffset() {
+  const m = -new Date().getTimezoneOffset(), sgn = m >= 0 ? '+' : '-', a = Math.abs(m);
+  return sgn + String(Math.floor(a / 60)).padStart(2, '0') + ':' + String(a % 60).padStart(2, '0');
+}
+
 // ===== STATE =====
 let currentScreen = 'splash';
 let screenHistory = [];
@@ -6941,17 +6965,17 @@ async function muatDokumentasi(filter) {
     const now = new Date();
     let tglMulai;
     if (filter === 'hari') {
-      tglMulai = now.toISOString().split('T')[0];
+      tglMulai = tglLokal(now);
     } else if (filter === 'minggu') {
       const day = now.getDay();
       const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      tglMulai = new Date(now.setDate(diff)).toISOString().split('T')[0];
+      tglMulai = tglLokal(new Date(now.setDate(diff)));
     } else {
-      tglMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+      tglMulai = tglLokal(new Date(now.getFullYear(), now.getMonth(), 1));
     }
 
     // Filter berdasarkan role - ortu hanya lihat aktivitas anaknya
-    let query = supabaseClient.from('modul_ajar').select('id, data, updated_at').gte('updated_at', tglMulai + 'T00:00:00').order('updated_at', { ascending: false });
+    let query = supabaseClient.from('modul_ajar').select('id, data, updated_at').gte('updated_at', tglMulai + 'T00:00:00' + tzOffset()).order('updated_at', { ascending: false });
     const { data, error } = await query.limit(200);
     if (error) throw error;
 
@@ -7146,7 +7170,7 @@ function backupData() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'schoolid-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.download = 'schoolid-backup-' + tglLokal() + '.json';
   a.click();
   URL.revokeObjectURL(url);
   showToast('Backup berhasil didownload! ✅');
@@ -7221,7 +7245,7 @@ function renderDaftarMuridGuru() {
     const daftarData = daftarList.find(d => d.anak?.nama?.toLowerCase() === m.nama.toLowerCase());
     const adaData = daftarData ? '📋' : '';
     return `
-    <div onclick="bukaProfilDetailMurid('${m.nama}')" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+    <div onclick="bukaProfilDetailMurid('${jsq(m.nama)}')" style="background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;">
       ${avatarDivHtml(m, 48)}
       <div style="flex:1;min-width:0;">
         <div style="font-weight:700;font-size:14px;color:var(--gray-900);">${m.nama} ${adaData}</div>
@@ -7261,7 +7285,7 @@ async function muatPerkembanganMurid() {
 
     // Ambil absensi bulan ini
     const now = new Date();
-    const bulanMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const bulanMulai = tglLokal(new Date(now.getFullYear(), now.getMonth(), 1));
     const { data: absensi } = await supabaseClient.from('absensi').select('status').eq('murid_nama', nama).gte('tanggal', bulanMulai);
     const totalHadir = (absensi||[]).filter(a => a.status === 'H').length;
     const totalAbsen = (absensi||[]).length;
@@ -7375,6 +7399,12 @@ async function muatAktivitasMurid() {
   } catch(e) {
     panel.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray-400);">Gagal memuat aktivitas</div>';
   }
+}
+
+function bukaProfilMuridById(id) {
+  const m = getMuridList().find(x => String(x.id) === String(id));
+  if (!m) { showToast('Data murid belum termuat, coba lagi ⚠️'); return; }
+  bukaProfilDetailMurid(m.nama);
 }
 
 function bukaProfilDetailMurid(nama) {
@@ -7559,6 +7589,7 @@ function initTombolTambahBaris() {
     wrap.style.cssText = 'display:flex;gap:6px;margin-bottom:8px;';
     wrap.innerHTML = `
       <button onclick="tambahBarisTabel('${tbl.id}')" style="flex:1;padding:7px;background:#E8F5E9;color:var(--green);border:1.5px dashed var(--green);border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">➕ Tambah Baris</button>
+      <button class="btn-edit-indikator" onclick="toggleEditIndikator()" style="padding:7px 12px;background:#E3F2FD;color:#1565C0;border:1.5px dashed #1565C0;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">✏️ Edit Kegiatan</button>
       <button onclick="hapusBarisAktif('${tbl.id}')" style="padding:7px 12px;background:#FFEBEE;color:#F44336;border:1.5px dashed #F44336;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">🗑️ Hapus</button>
     `;
     tbl.insertAdjacentElement('afterend', wrap);
@@ -7619,12 +7650,11 @@ let editIndikatorMode = false;
 
 function toggleEditIndikator() {
   editIndikatorMode = !editIndikatorMode;
-  const btn = document.getElementById('btn-edit-indikator');
-  if (btn) {
+  document.querySelectorAll('#btn-edit-indikator, .btn-edit-indikator').forEach(btn => {
     btn.textContent = editIndikatorMode ? '✅ Selesai Edit' : '✏️ Edit Kegiatan';
     btn.style.background = editIndikatorMode ? '#E8F5E9' : '#E3F2FD';
     btn.style.color = editIndikatorMode ? 'var(--green)' : '#1565C0';
-  }
+  });
 
   document.querySelectorAll('#guru-form-rapor .indikator-cell').forEach(cell => {
     const span = cell.querySelector('.indikator-text');
@@ -8362,8 +8392,8 @@ async function muatNotifikasi() {
       return `<div class="notif-item${n.dibaca ? '' : ' unread'}" onclick="tandaiSatuBaca('${n.id}',this)" style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;background:${n.dibaca ? 'white' : '#F9FFF9'};position:relative;">
         <div style="width:42px;height:42px;border-radius:12px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${icon}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:${n.dibaca ? '600' : '800'};color:var(--gray-900);margin-bottom:3px;">${n.judul}</div>
-          <div style="font-size:12px;color:var(--gray-600);line-height:1.4;">${n.isi}</div>
+          <div style="font-size:13px;font-weight:${n.dibaca ? '600' : '800'};color:var(--gray-900);margin-bottom:3px;">${escapeHtml(n.judul)}</div>
+          <div style="font-size:12px;color:var(--gray-600);line-height:1.4;">${escapeHtml(n.isi)}</div>
           <div style="font-size:11px;color:var(--gray-400);margin-top:5px;">${waktu}</div>
         </div>
         ${!n.dibaca ? '<div class="unread-dot" style="width:8px;height:8px;background:var(--green);border-radius:50%;flex-shrink:0;margin-top:4px;"></div>' : ''}
@@ -8826,7 +8856,7 @@ function toggleFaq(el) {
 // Tabel: penilaian (id, murid_nama, kelompok, aspek, nilai, tanggal, modul_ajar_id, created_at)
 let nilaiMurid = {}; // cache in-memory: key = "NamaMurid_Aspek", val = nilai angka
 let aspekAktif = 'Motorik Halus';
-let pnTanggalAktif = new Date().toISOString().split('T')[0]; // tanggal penilaian aktif
+let pnTanggalAktif = tglLokal(); // tanggal penilaian aktif
 
 function nilaiKeLabel(n) {
   if (n >= 85) return {label:'BSB', color:'#1B5E20', bg:'#E8F5E9'};
@@ -8850,7 +8880,7 @@ function pilihAspek(btn, aspek) {
 
 async function initPenilaian() {
   // Set tanggal aktif ke hari ini
-  pnTanggalAktif = new Date().toISOString().split('T')[0];
+  pnTanggalAktif = tglLokal();
 
   // Muat aktivitas dari Supabase
   const select = document.getElementById('pn-aktivitas');
@@ -9652,7 +9682,7 @@ function terapkanNamaAnakOrtu() {
 
 function terapkanDataAnakAsli() { terapkanNamaAnakOrtu(); }
 async function muatLaporanHarian(tanggal) {
-  const today = tanggal || new Date().toISOString().split('T')[0];
+  const today = tanggal || tglLokal();
   const el = id => document.getElementById(id);
   if (el('lh-tanggal')) el('lh-tanggal').value = today;
 
@@ -9729,13 +9759,13 @@ async function muatDaftarAktivitasGuru(filter) {
     const now = new Date();
     let tglMulai;
     if (filter === 'hari') {
-      tglMulai = now.toISOString().split('T')[0];
+      tglMulai = tglLokal(now);
     } else if (filter === 'minggu') {
       const day = now.getDay();
       const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      tglMulai = new Date(new Date().setDate(diff)).toISOString().split('T')[0];
+      tglMulai = tglLokal(new Date(new Date().setDate(diff)));
     } else if (filter === 'bulan') {
-      tglMulai = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+      tglMulai = tglLokal(new Date(now.getFullYear(), now.getMonth(), 1));
     }
 
     let query = supabaseClient.from('modul_ajar').select('id,data,updated_at').order('updated_at', { ascending: false }).limit(100);
@@ -9808,7 +9838,11 @@ async function bukaNilaiAktivitas(aktivitasId) {
     const d = typeof akt.data === 'string' ? JSON.parse(akt.data) : (akt.data||{});
     window._nilaiAktivitasData = d;
   }
-  goToFromDashboard('penilaian-cepat', 'daftar-aktivitas-guru');
+  goToFromDashboard('penilaian', 'daftar-aktivitas-guru');
+  await initPenilaian();
+  // Pilih otomatis aktivitas yang diklik
+  const sel = document.getElementById('pn-aktivitas');
+  if (sel && [...sel.options].some(o => o.value === String(aktivitasId))) { sel.value = String(aktivitasId); renderPenilaian(); }
 }
 
 // ===== TEACHER TODAY =====
@@ -9818,7 +9852,7 @@ async function muatTeacherToday() {
   if (!list) return;
 
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = tglLokal(today);
   if (tglEl) tglEl.textContent = today.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long' });
 
   const muridAktif = getMuridAktif();
@@ -9875,7 +9909,7 @@ async function muatTeacherToday() {
       icon: 'ti-star',
       warna: (aktKelas.length > 0 && belumDinilai === 0) ? '#E8F5E9' : '#FFF8E1',
       warnaIkon: (aktKelas.length > 0 && belumDinilai === 0) ? '#2E7D32' : '#F57F17',
-      aksi: belumDinilai > 0 ? "goToFromDashboard('penilaian-cepat','dashboard-guru')" : null
+      aksi: belumDinilai > 0 ? "goToFromDashboard('penilaian','dashboard-guru');initPenilaian()" : null
     });
 
     // 4. Cek dokumentasi hari ini
@@ -9891,7 +9925,7 @@ async function muatTeacherToday() {
       icon: 'ti-camera',
       warna: fotoHariIni > 0 ? '#E8F5E9' : '#F3E5F5',
       warnaIkon: fotoHariIni > 0 ? '#2E7D32' : '#6A1B9A',
-      aksi: "goToFromDashboard('tambah-aktivitas','dashboard-guru')"
+      aksi: "goToFromDashboard('aktivitas','dashboard-guru');initAktivitasBaru()"
     });
 
     const selesaiCount = tasks.filter(t => t.selesai).length;
@@ -9926,7 +9960,7 @@ async function muatTeacherToday() {
 
 async function muatRingkasanDashboardGuru() {
   if (!currentUserProfile) return;
-  const today = new Date().toISOString().split('T')[0];
+  const today = tglLokal();
 
   // Quote motivasi harian (rotasi berdasarkan tanggal)
   const quotes = [
@@ -10853,7 +10887,7 @@ function renderArsipKepala() {
   }).join('');
 }
 
-function esc(s) { return (s || '-').toString().replace(/\\n/g, '<br>'); }
+function esc(s) { return escapeHtml(s || '-').replace(/\r?\n/g, '<br>'); }
 
 function bukaDetailArsip(type, id) {
   let item;
@@ -11372,7 +11406,7 @@ let fotoAktivitasFiles = [];
 
 function initAktivitasBaru() {
   // Set tanggal hari ini
-  const today = new Date().toISOString().split('T')[0];
+  const today = tglLokal();
   const now = new Date();
   const jam = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
   const elTgl = document.getElementById('ab-tanggal');
@@ -11534,7 +11568,7 @@ let absensiCache = {}; // { tanggal: { namaMusid: status } }
 let absensiTanggalAktif = '';
 
 function initAbsensi() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = tglLokal();
   absensiTanggalAktif = today;
   const elTgl = document.getElementById('abs-tanggal');
   if (elTgl) elTgl.value = today;
@@ -11667,7 +11701,7 @@ function renderDaftarMuridAktivitas() {
   if (!container) return;
   const hadir = dataMurid.filter(m => statusAbsensi[m.nama] === 'H');
   container.innerHTML = hadir.map((m,i) => `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;${i<hadir.length-1?'border-bottom:1px solid var(--gray-100)':''}" onclick="togglePeserta('${m.nama}',this)">
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;${i<hadir.length-1?'border-bottom:1px solid var(--gray-100)':''}" onclick="togglePeserta('${jsq(m.nama)}',this)">
       <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,${m.warna});display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${m.avatar}</div>
       <div style="flex:1;font-size:14px;font-weight:600;color:var(--gray-900);">${m.nama}</div>
       <div id="check-${m.nama.replace(/ /g,'_')}" style="width:24px;height:24px;border-radius:50%;border:2px solid ${pesertaAktivitas[m.nama]?'var(--green)':'var(--gray-300)'};background:${pesertaAktivitas[m.nama]?'var(--green)':'white'};display:flex;align-items:center;justify-content:center;color:white;font-size:13px;flex-shrink:0;">
@@ -11691,18 +11725,13 @@ function togglePeserta(nama, row) {
 }
 
 function toggleSemuaMurid(btn) {
-  const semuaChecked = dataMurid.every(m => pesertaAktivitas[m.nama]);
-  dataMurid.forEach(m => pesertaAktivitas[m.nama] = !semuaChecked);
+  const listAktif = getMuridAktif();
+  const semuaChecked = listAktif.length > 0 && listAktif.every(m => pesertaAktivitas[m.nama]);
+  listAktif.forEach(m => pesertaAktivitas[m.nama] = !semuaChecked);
   renderDaftarMuridAktivitas();
   btn.textContent = semuaChecked ? '☑️ Pilih Semua' : '✅ Pilih Semua';
 }
 
-function updateRingkasanPeserta() {
-  const el = document.getElementById('ringkasan-peserta');
-  if (!el) return;
-  const terpilih = Object.values(pesertaAktivitas).filter(Boolean).length;
-  el.textContent = `👥 ${terpilih} dari ${dataMurid.length} murid dipilih`;
-}
 
 // Init saat screen absensi/aktivitas dibuka
 function initScreenIfNeeded(screenId) {
@@ -12089,9 +12118,9 @@ async function masukKeDashboardSesuaiProfil(userId) {
       });
     }
     goTo('dashboard-guru');
-    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); muatTeacherToday(); cekBadgePesan(); setInterval(cekBadgePesan, 30000); }, 300);
+    setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); muatTeacherToday(); cekBadgePesan(); mulaiPollingBadgePesan(); }, 300);
   }
-  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); cekBadgePesan(); setInterval(cekBadgePesan, 30000); }, 300); }
+  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); cekBadgePesan(); mulaiPollingBadgePesan(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); muatTahunAjaranAktif(); }, 300); }
 }
 
@@ -12182,6 +12211,7 @@ function switchTab(screenId, btn, role) {
 }
 
 function goToFromDashboard(screenId, dashboardId) {
+  if (!document.getElementById(screenId)) { console.warn('Screen tidak ditemukan:', screenId); showToast('Halaman belum tersedia ⚠️'); return; }
   screenHistory.push(dashboardId);
   const curr = document.querySelector('.screen.active');
   if (curr) curr.classList.remove('active');
@@ -12202,7 +12232,7 @@ let statusAbsensiGuru = {};
 
 function bukaAbsensiGuru() {
   goToFromDashboard('absensi-guru-kepala', 'dashboard-kepala');
-  const today = new Date().toISOString().split('T')[0];
+  const today = tglLokal();
   const inp = document.getElementById('ag-tanggal');
   if (inp) inp.value = today;
   muatAbsensiGuru(today);
@@ -12261,7 +12291,7 @@ function renderAbsensiGuru(guruList) {
         <div style="font-size:13px;font-weight:700;color:var(--gray-900);">${g.nama}</div>
       </div>
       <div style="display:flex;gap:6px;">
-        ${statusOpts.map(o => `<button onclick="setStatusAbsensiGuru('${g.nama}','${o.val}',this)" style="width:32px;height:32px;border-radius:8px;border:2px solid ${st===o.val?o.color:'#eee'};background:${st===o.val?o.bg:'white'};color:${st===o.val?o.color:'var(--gray-400)'};font-size:12px;font-weight:800;cursor:pointer;" data-guru="${g.nama}" data-val="${o.val}">${o.label}</button>`).join('')}
+        ${statusOpts.map(o => `<button onclick="setStatusAbsensiGuru('${jsq(g.nama)}','${o.val}',this)" style="width:32px;height:32px;border-radius:8px;border:2px solid ${st===o.val?o.color:'#eee'};background:${st===o.val?o.bg:'white'};color:${st===o.val?o.color:'var(--gray-400)'};font-size:12px;font-weight:800;cursor:pointer;" data-guru="${g.nama}" data-val="${o.val}">${o.label}</button>`).join('')}
       </div>
     </div>`;
   }).join('');
@@ -12516,7 +12546,7 @@ async function muatPesanChat(percakapanId) {
           const saya = p.pengirim_id === uid;
           const waktu = new Date(p.created_at).toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
           return `<div style="display:flex;flex-direction:column;align-items:${saya?'flex-end':'flex-start'};">
-            <div class="${saya?'chat-bubble-saya':'chat-bubble-lawan'}">${p.isi}</div>
+            <div class="${saya?'chat-bubble-saya':'chat-bubble-lawan'}">${escapeHtml(p.isi).replace(/\n/g,'<br>')}</div>
             <div class="${saya?'chat-waktu':'chat-waktu-lawan'}" style="margin:2px ${saya?'6':'6'}px 0;">${waktu}${saya && p.dibaca?'  ✓✓':''}</div>
           </div>`;
         }).join('');
@@ -12675,9 +12705,7 @@ async function cekBadgePesan() {
     const badgeGuru = document.getElementById('pesan-badge-guru');
     if (badgeGuru) { badgeGuru.textContent = total > 0 ? (total > 9 ? '9+' : total) : ''; badgeGuru.style.display = total > 0 ? '' : 'none'; }
     // Update badge ortu
-    const badgeOrtu = document.getElementById('pesan-badge-ortu');
-    const badgeOrtu2 = document.getElementById('pesan-badge-ortu2');
-    [badgeOrtu, badgeOrtu2].forEach(b => { if (b) { b.textContent = total > 0 ? (total > 9 ? '9+' : total) : ''; b.style.display = total > 0 ? '' : 'none'; } });
+    document.querySelectorAll('[id="pesan-badge-ortu"], [id="pesan-badge-ortu2"]').forEach(b => { if (b) { b.textContent = total > 0 ? (total > 9 ? '9+' : total) : ''; b.style.display = total > 0 ? '' : 'none'; } });
   } catch(e) {}
 }
 
@@ -13243,9 +13271,9 @@ async function muatPerkembanganOrtu() {
     const now = new Date();
     const day = now.getDay();
     const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-    const mingguMulai = new Date(new Date().setDate(diff)).toISOString().split('T')[0];
+    const mingguMulai = tglLokal(new Date(new Date().setDate(diff)));
 
-    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('data').gte('updated_at', mingguMulai + 'T00:00:00');
+    const { data: aktivitas } = await supabaseClient.from('modul_ajar').select('data').gte('updated_at', mingguMulai + 'T00:00:00' + tzOffset());
     const aktMurid = (aktivitas||[]).filter(a => {
       const d = typeof a.data === 'string' ? JSON.parse(a.data) : (a.data||{});
       return (d.peserta||[]).includes(nama);
@@ -13296,7 +13324,7 @@ async function muatPerkembanganOrtu() {
 }
 
 async function initTimelineOrtu() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = tglLokal();
   const tlInput = document.getElementById('tl-tanggal');
   if (tlInput) tlInput.value = today;
   updateTlDateDisplay(today);
@@ -14126,9 +14154,17 @@ function closePhotoModal() {
 }
 
 // ===== LOGOUT =====
+let badgePesanTimer = null;
+function mulaiPollingBadgePesan() {
+  if (badgePesanTimer) clearInterval(badgePesanTimer);
+  badgePesanTimer = setInterval(cekBadgePesan, 30000);
+}
 async function confirmLogout() {
   if (confirm('Yakin ingin keluar dari SchoolID?')) {
     showLoading();
+    if (badgePesanTimer) { clearInterval(badgePesanTimer); badgePesanTimer = null; }
+    try { stopChatPolling(); } catch (e) {}
+    kelasGuru = ''; namaAsli = ''; jabatanAsli = '';
     try { await supabaseClient.auth.signOut(); } catch (e) {}
     setTimeout(() => {
       hideLoading();
@@ -14198,44 +14234,8 @@ window.addEventListener('popstate', goBack);
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    const swCode = `// SchoolID Service Worker - PWA Support
-const CACHE_NAME = 'schoolid-v1';
-const urlsToCache = ['/'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        if (res && res.status === 200 && res.type === 'basic') {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-        }
-        return res;
-      })
-      .catch(() => caches.match(e.request))
-  );
-});
-`;
-    const blob = new Blob([swCode], {type: 'application/javascript'});
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl)
+    // Service worker harus file nyata di server (blob: URL ditolak browser). Upload sw.js ke root.
+    navigator.serviceWorker.register('/sw.js')
       .then(() => console.log('SW registered'))
       .catch(e => console.log('SW error:', e));
   });
