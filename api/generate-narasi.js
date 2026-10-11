@@ -3,10 +3,33 @@
 // API key AI disimpan sebagai Environment Variable di dashboard Vercel,
 // TIDAK PERNAH ditaruh di kode/browser, supaya tidak bisa dicuri lewat "View Source".
 
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
+  }
+
+  // Hanya guru / kepala sekolah yang sedang login boleh memakai AI
+  // (mencegah orang luar menghabiskan saldo API AI)
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+  if (!token) {
+    return res.status(401).json({ error: 'Silakan login terlebih dahulu.' });
+  }
+  const supabaseUser = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY,
+    { global: { headers: { Authorization: `Bearer ${token}` } } }
+  );
+  const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
+  if (userError || !user) {
+    return res.status(401).json({ error: 'Sesi tidak valid, silakan login ulang.' });
+  }
+  const { data: profile } = await supabaseUser.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['guru', 'kepala', 'kepala_sekolah'].includes(profile.role)) {
+    return res.status(403).json({ error: 'Hanya guru yang boleh membuat narasi rapor.' });
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
