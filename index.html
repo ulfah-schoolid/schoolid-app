@@ -1,4 +1,4 @@
-<!-- SchoolID v2.2.3 -->
+<!-- SchoolID v2.3.0 -->
  <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -2035,7 +2035,7 @@
         <label>Nama Lengkap Anak</label>
         <div class="input-wrap">
           <span class="input-icon"><i class="ti ti-user" aria-hidden="true"></i></span>
-          <input type="text" id="reg-anak" placeholder="cth: Ahmad Fauzan">
+          <input type="text" id="reg-anak" placeholder="Nama lengkap sesuai data sekolah">
         </div>
       </div>
 
@@ -8393,8 +8393,8 @@ async function muatNotifikasi() {
       return `<div class="notif-item${n.dibaca ? '' : ' unread'}" onclick="tandaiSatuBaca('${n.id}',this)" style="display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--gray-100);cursor:pointer;background:${n.dibaca ? 'white' : '#F9FFF9'};position:relative;">
         <div style="width:42px;height:42px;border-radius:12px;background:${bg};display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${icon}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-size:13px;font-weight:${n.dibaca ? '600' : '800'};color:var(--gray-900);margin-bottom:3px;">${escapeHtml(n.judul)}</div>
-          <div style="font-size:12px;color:var(--gray-600);line-height:1.4;">${escapeHtml(n.isi)}</div>
+          <div style="font-size:13px;font-weight:${n.dibaca ? '600' : '800'};color:var(--gray-900);margin-bottom:3px;">${escapeHtml(n.judul).replace(/&amp;#(\d+);/g, '&#$1;')}</div>
+          <div style="font-size:12px;color:var(--gray-600);line-height:1.4;">${escapeHtml(n.isi).replace(/&amp;#(\d+);/g, '&#$1;')}</div>
           <div style="font-size:11px;color:var(--gray-400);margin-top:5px;">${waktu}</div>
         </div>
         ${!n.dibaca ? '<div class="unread-dot" style="width:8px;height:8px;background:var(--green);border-radius:50%;flex-shrink:0;margin-top:4px;"></div>' : ''}
@@ -10450,8 +10450,8 @@ async function bagikanRaporKeOrtu() {
   await saveRaporGuruAll(all);
   // Notifikasi ke ortu murid ini
   try {
-    const { data: ortuProfile } = await supabaseClient.from('profiles').select('id').eq('role', 'ortu').eq('anak_nama', m.nama).maybeSingle();
-    if (ortuProfile) await buatNotifikasi({ user_id: ortuProfile.id, judul: 'Rapor Sudah Tersedia &#128196;', isi: 'Rapor perkembangan ' + m.nama + ' sudah dapat dilihat. Buka menu Rapor untuk melihat selengkapnya.', tipe: 'rapor' });
+    const { data: daftarOrtuRapor } = await supabaseClient.from('profiles').select('id').eq('role', 'ortu').eq('anak_nama', m.nama);
+    for (const ortuProfile of (daftarOrtuRapor || [])) await buatNotifikasi({ user_id: ortuProfile.id, judul: 'Rapor Sudah Tersedia 📄', isi: 'Rapor perkembangan ' + m.nama + ' sudah dapat dilihat. Buka menu Rapor untuk melihat selengkapnya.', tipe: 'rapor' });
   } catch(e) {}
   showToast('Rapor berhasil dibagikan ke Wali Murid 📨');
   renderStatusRaporGuru();
@@ -11975,12 +11975,12 @@ async function daftarAkunGuru() {
 
 async function daftarAkunOrtu() {
   const nama = document.getElementById('reg-nama').value.trim();
-  const anak = document.getElementById('reg-anak').value.trim();
+  const anakDiketik = document.getElementById('reg-anak').value.trim().replace(/\s+/g, ' ');
   const email = document.getElementById('reg-email').value.trim();
   const pass = document.getElementById('reg-password').value;
   const pass2 = document.getElementById('reg-password2').value;
 
-  if (!nama || !anak || !email || !pass || !pass2) {
+  if (!nama || !anakDiketik || !email || !pass || !pass2) {
     showToast('Semua kolom wajib diisi ⚠️'); return;
   }
   if (pass.length < 6) {
@@ -11992,12 +11992,26 @@ async function daftarAkunOrtu() {
 
   showLoading();
 
+  // 0. Cocokkan nama anak dengan data murid sekolah (tidak peka huruf besar/kecil & spasi)
+  let anak = anakDiketik;
+  try {
+    const { data: namaResmi, error: cekErr } = await supabaseClient.rpc('cek_nama_murid', { p_nama: anakDiketik });
+    if (!cekErr) {
+      if (!namaResmi) {
+        hideLoading();
+        showToast('Nama anak tidak ditemukan di data sekolah. Tulis nama lengkap sesuai data sekolah, atau hubungi guru ⚠️');
+        return;
+      }
+      anak = namaResmi;
+    }
+  } catch (e) { /* kalau pengecekan gagal, tetap lanjut dengan nama yang diketik */ }
+
   // 1. Daftar akun di Supabase Auth
   const { data, error } = await supabaseClient.auth.signUp({
     email,
     password: pass,
     options: {
-      data: { role: 'ortu', nama }
+      data: { role: 'ortu', nama, anak_nama: anak }
     }
   });
 
@@ -12072,6 +12086,17 @@ async function masukKeDashboardSesuaiProfil(userId) {
     return;
   }
 
+  if (profile.role === 'ortu' && !profile.anak_nama) {
+    try {
+      const { data: { user: authUser } } = await supabaseClient.auth.getUser();
+      const anakMeta = authUser?.user_metadata?.anak_nama;
+      if (anakMeta) {
+        await supabaseClient.from('profiles').update({ anak_nama: anakMeta }).eq('id', userId);
+        profile.anak_nama = anakMeta;
+      }
+    } catch (e) {}
+  }
+
   currentRole = profile.role;
   currentUserProfile = profile;
   screenHistory = [];
@@ -12121,7 +12146,7 @@ async function masukKeDashboardSesuaiProfil(userId) {
     goTo('dashboard-guru');
     setTimeout(() => { cekNotifBadge(); muatBannerCarouselGuru(); muatTahunAjaranAktif(); muatTeacherToday(); cekBadgePesan(); mulaiPollingBadgePesan(); }, 300);
   }
-  else if (profile.role === 'ortu') { goTo('timeline-ortu'); setTimeout(() => { initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); cekBadgePesan(); mulaiPollingBadgePesan(); }, 300); }
+  else if (profile.role === 'ortu') { terapkanNamaAnakOrtu(); goTo('timeline-ortu'); setTimeout(() => { terapkanNamaAnakOrtu(); initTimelineOrtu(); muatProfilOrtu(); cekNotifBadge(); cekBadgePesan(); mulaiPollingBadgePesan(); }, 300); }
   else if (profile.role === 'kepala') { goTo('dashboard-kepala'); setTimeout(() => { muatStatDashboardKepala(); cekNotifBadge(); muatTahunAjaranAktif(); }, 300); }
 }
 
@@ -12478,7 +12503,7 @@ async function muatDaftarPesan() {
       const tgl = p.waktu_terakhir ? new Date(p.waktu_terakhir).toLocaleDateString('id-ID', { day:'numeric', month:'short' }) : '';
       const waktuLabel = isToday(p.waktu_terakhir) ? waktu : tgl;
 
-      return `<div class="chat-item" onclick="bukaChat('${p.id}','${namaLawan.replace(/'/g,"\\'")}','${p.murid_nama||''}')">
+      return `<div class="chat-item" onclick="bukaChat('${p.id}','${jsq(namaLawan)}','${jsq(p.murid_nama||'')}')">
         <div class="chat-avatar">${inisial}</div>
         <div style="flex:1;min-width:0;">
           <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -12627,16 +12652,18 @@ async function kirimPesanBaru() {
   try {
     const guruId = currentUserProfile?.id;
 
-    // Cari ortu berdasarkan nama anak
-    const { data: ortuProfile } = await supabaseClient
-      .from('profiles').select('id').eq('role','ortu').eq('anak_nama', muridNama).maybeSingle();
+    // Cari SEMUA ortu berdasarkan nama anak (ayah & ibu bisa sama-sama terdaftar)
+    const { data: daftarOrtu } = await supabaseClient
+      .from('profiles').select('id, nama').eq('role','ortu').eq('anak_nama', muridNama);
 
-    if (!ortuProfile) {
+    if (!daftarOrtu || daftarOrtu.length === 0) {
       hideLoading();
       showToast('Orang tua murid ini belum terdaftar di aplikasi ⚠️');
       return;
     }
 
+    let percakapanPertama = null;
+    for (const ortuProfile of daftarOrtu) {
     // Cari atau buat percakapan
     let { data: percakapan } = await supabaseClient
       .from('percakapan').select('id').eq('guru_id', guruId).eq('ortu_id', ortuProfile.id).maybeSingle();
@@ -12674,15 +12701,17 @@ async function kirimPesanBaru() {
       isi: isi.substring(0, 80) + (isi.length > 80 ? '...' : ''),
       tipe: 'pengumuman'
     });
+    if (!percakapanPertama) percakapanPertama = percakapan;
+    }
+    const percakapan = percakapanPertama;
 
     hideLoading();
     tutupModalPesanBaru();
-    showToast('Pesan terkirim ✅');
+    showToast(daftarOrtu.length > 1 ? `Pesan terkirim ke ${daftarOrtu.length} orang tua ✅` : 'Pesan terkirim ✅');
     muatDaftarPesan();
 
     // Langsung buka chat
-    const { data: guruProf } = await supabaseClient.from('profiles').select('nama').eq('id', guruId).single();
-    setTimeout(() => bukaChat(percakapan.id, guruProf?.nama || 'Guru', muridNama), 300);
+    setTimeout(() => bukaChat(percakapan.id, daftarOrtu[0]?.nama || 'Orang Tua', muridNama), 300);
   } catch(e) {
     hideLoading();
     showToast('Gagal kirim: ' + e.message + ' ⚠️');
